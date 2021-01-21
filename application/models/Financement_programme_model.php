@@ -1,0 +1,89 @@
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+class Financement_programme_model extends CI_Model {
+    protected $table = 'financement_programme';
+
+    public function add($finprg)  {
+		// Ajout d'un enregitrement
+        $this->db->set($this->_set($finprg))
+                            ->insert($this->table);
+        if($this->db->affected_rows() === 1)  {
+            return $this->db->insert_id();
+        }else{
+            return null;
+        }                    
+    }
+    public function update($id, $finprg)  {
+		// Mise à jour d'un enregitrement
+        $this->db->set($this->_set($finprg))
+                            ->where('id', (int) $id)
+                            ->update($this->table);
+        if($this->db->affected_rows() === 1)  {
+            return true;
+        }else{
+            return null;
+        }                      
+    }
+    public function _set($finprg) {
+		// Affectation des valeurs
+        return array(
+            'id_programme' => $finprg['id_programme'],
+            'id_source_financement' => $finprg['id_source_financement'],
+            'id_type_financement' => $finprg['id_type_financement'],
+            'id_axe_strategique' => $finprg['id_axe_strategique'],
+            'id_devise' => $finprg['id_devise'],
+            'budget_initial' => $finprg['budget_initial'],
+            'budget_modifie' => $finprg['budget_modifie'],
+        );
+    }
+    public function delete($id) {
+		// Suppression d'un enregitrement
+        $this->db->where('id', (int) $id)->delete($this->table);
+        if($this->db->affected_rows() === 1)  {
+            return true;
+        }else{
+            return null;
+        }  
+    }
+    public function findAll() {
+		// Selection de tous les enregitrements
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->order_by('id')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+    public function findById($id) {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where("id", $id)
+                        ->order_by('id', 'asc')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+    public function findByIdProgramme($id) {
+		// Selection par id
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where("id_programme", $id)
+                        ->order_by('id', 'asc')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return array();
+        }                 
+    }
+}
+?>
