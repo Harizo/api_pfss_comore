@@ -10,48 +10,68 @@ class Region extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('region_model', 'RegionManager');
+        $this->load->model('ile_model', 'ileManager');
+        $this->load->model('programme_model', 'ProgrammeManager');
     }
-    //recuperation region
-    public function index_get() 
-    {
+
+    public function index_get() {
         $id = $this->get('id');
-        $all_filter = $this->get('all_filter');
-            if ($id) {
-                $data = array();
-				// Selection par id
-                $region = $this->RegionManager->findById($id);
-                $data['id'] = $region->id;
-                $data['code'] = $region->code;
-                $data['nom'] = $region->nom;
-                $data['chef_lieu'] = $region->chef_lieu;
-                
-            } 
-            else 
-            {
-				if ($all_filter == 1) 
+        $cle_etrangere = $this->get('cle_etrangere');
+        $ile_id = $this->get('ile_id');
+        
+        if ($ile_id) {
+            $tmp = $this->RegionManager->findPrefectureByIle($ile_id);
+                if ($tmp)
                 {
-                    $data = $this->RegionManager->findAll_filter();
-                }
+                    foreach ($tmp as $key => $value)
+                    {
+                        $data[$key]['id'] = $value->id;
+                        $data[$key]['Code'] = $value->Code;
+                        $data[$key]['Region'] = $value->Region;
+                    };
+                } else
+                    $data = array();
+        } 
+        else
+        {
+
+            if ($cle_etrangere) 
+            {
+            $data = $this->RegionManager->findAllByIle($cle_etrangere);
+            
+            } else {
+                if ($id)
+                {
+                    $data = array();
+                    $region = $this->RegionManager->findById($id);
+                    $data['id'] = $region->id;
+                    $data['Code'] = $region->Code;
+                    $data['Region'] = $region->Region;
+                    
+                } 
                 else
                 {
-                    // Selection de tous les enregistrements
                     $region = $this->RegionManager->findAll();
-                    if ($region) 
+                    if ($region)
                     {
-                        foreach ($region as $key => $value) 
+                        foreach ($region as $key => $value)
                         {
-                            
+                            $ile = $this->ileManager->findById($value->ile_id);
+                            $prog = $this->ProgrammeManager->findById($value->programme_id);
+
                             $data[$key]['id'] = $value->id;
-                            $data[$key]['code'] = $value->code;
-                            $data[$key]['nom'] = $value->nom;
-                            $data[$key]['chef_lieu'] = $value->chef_lieu;
-                            
+                            $data[$key]['Code'] = $value->Code;
+                            $data[$key]['Region'] = $value->Region;
+                            $data[$key]['ile'] = $ile;
+                            $data[$key]['programme'] = $prog[0];
                         };
-                    } 
-                    else
+                    } else
                         $data = array();
                 }
             }
+        }
+        
+        
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
@@ -66,16 +86,16 @@ class Region extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
-    //insertion,modification,suppression region
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
         if ($supprimer == 0) {
             if ($id == 0) {
                 $data = array(
-                    'code' => $this->post('code'),
-                    'nom' => $this->post('nom'),
-                    'chef_lieu' => $this->post('chef_lieu'),
+                    'Code' => $this->post('Code'),
+                    'Region' => $this->post('Region'),
+                    'ile_id' => $this->post('ile_id'),
+                    'programme_id' => $this->post('programme_id')
                 );               
                 if (!$data) {
                     $this->response([
@@ -84,7 +104,6 @@ class Region extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-				// Ajout d'un enregistrement
                 $dataId = $this->RegionManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
@@ -101,8 +120,10 @@ class Region extends REST_Controller {
                 }
             } else {
                 $data = array(
-                    'code' => $this->post('code'),
-                    'nom' => $this->post('nom')
+                    'Code' => $this->post('Code'),
+                    'Region' => $this->post('Region'),
+                    'ile_id' => $this->post('ile_id'),
+                    'programme_id' => $this->post('programme_id')
                 );              
                 if (!$data || !$id) {
                     $this->response([
@@ -111,7 +132,6 @@ class Region extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-				// Mise à jour d'un enregistrement
                 $update = $this->RegionManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
@@ -134,7 +154,6 @@ class Region extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
-			// Suppression d'un enregistrement
             $delete = $this->RegionManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

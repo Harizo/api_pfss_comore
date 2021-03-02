@@ -47,7 +47,7 @@ class District_model extends CI_Model {
 		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('nom')
+                        ->order_by('district')
                         ->get()
                         ->result();
         if($result)
@@ -61,7 +61,7 @@ class District_model extends CI_Model {
 		// Selection district par région
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('nom')
+                        ->order_by('district')
                         ->where("region_id", $region_id)
                         ->get()
                         ->result();
