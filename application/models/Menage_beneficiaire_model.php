@@ -30,7 +30,7 @@ class Menage_beneficiaire_model extends CI_Model {
 		// Affectation des valeurs
         return array(
             'id_menage'        => $menage_benef['id_menage'],
-            'id_intervention'  => $menage_benef['id_intervention'],                      
+            'id_sous_projet'  => $menage_benef['id_sous_projet'],                      
             'date_sortie'      => $menage_benef['date_sortie'],                      
             'date_inscription' => $menage_benef['date_inscription'],                      
         );
@@ -58,7 +58,7 @@ class Menage_beneficiaire_model extends CI_Model {
             return null;
         }                 
     }
-    public function findAllByProgramme($id_interventions)   {
+    public function findAllByProgramme($id_sous_projet)   {
 		// Selection par intervention
         $result =  $this->db->select('menage.id as id_menage,
                                         menage_benef.id as id,
@@ -70,7 +70,7 @@ class Menage_beneficiaire_model extends CI_Model {
                                         ')
                         ->from($this->table)
                         ->join('menage', 'menage.id = menage_benef.id_menage')
-                        ->like('id_intervention', $id_interventions)
+                        ->like('id_sous_projet', $id_sous_projet)
                         ->get()
                         ->result();
         if($result) {
@@ -97,14 +97,14 @@ class Menage_beneficiaire_model extends CI_Model {
         }
         return null;
     }
-    public function findAllByProgrammeAndVillage($id_interventions,$id_fokontany)  {
+    public function findAllByProgrammeAndVillage($id_sous_projet,$village_id)  {
 		// Selection par intervention et par fokontany
-		$requete="select mp.id,mp.id_menage,m.nom,m.prenom,m.date_naissance,m.cin,m.profession,m.date_inscription,mp.id_intervention"
+		$requete="select mp.id,mp.id_menage,m.nom,m.prenom,m.date_naissance,m.cin,m.profession,m.date_inscription,mp.id_sous_projet"
 				." from menage_beneficiaire as mp"
 				." left outer join menage as m on m.id=mp.id_menage"
-				." left outer join fokontany as v on v.id=m.id_fokontany"
-                ." where mp.id_intervention like ".$id_interventions
-				." and v.id=".$id_fokontany;	
+				." left outer join see_village as v on v.id=m.village_id"
+                ." where mp.id_sous_projet like ".$id_sous_projet
+				." and v.id=".$village_id;	
 				$result = $this->db->query($requete)->result();
         if($result)
         {

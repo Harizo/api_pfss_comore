@@ -10,8 +10,8 @@ class Menage_beneficiaire extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
-        $id_intervention = $this->get('id_intervention');
-        $id_fokontany = $this->get('id_fokontany');
+        $id_sous_projet = $this->get('id_sous_projet');
+        $village_id = $this->get('village_id');
         $data = array() ;
         if ($cle_etrangere) {
 			// Selection des enregistrements par ménage
@@ -19,15 +19,15 @@ class Menage_beneficiaire extends REST_Controller {
             if ($menage_programme) {
                 $data['id'] = ($menage_programme->id);
                 $data['id_menage'] = ($menage_programme->id_menage);
-                $data['id_intervention'] = ($menage_programme->id_intervention);                
+                $data['id_sous_projet'] = ($menage_programme->id_sous_projet);                
                 $data['date_sortie'] = ($menage_programme->date_sortie);                
                 $data['date_inscription'] = ($menage_programme->date_inscription);                
             }
         } else {
-            if ($id_intervention && $id_fokontany) {  
-                $id_prog = "'%".'"'.$id_intervention.'"'."%'" ;
+            if ($id_sous_projet && $village_id) {  
+                $id_prog = "'%".'"'.$id_sous_projet.'"'."%'" ;
 				// Selection des ménage par programme et par fokontany
-                $list_menage = $this->MenagebeficiaireManager->findAllByProgrammeAndVillage($id_prog,$id_fokontany);
+                $list_menage = $this->MenagebeficiaireManager->findAllByProgrammeAndVillage($id_prog,$village_id);
                 if ($list_menage)  {
                     foreach ($list_menage as $key => $value)  {
                         $data[$key]['id'] = $value->id;
@@ -38,15 +38,15 @@ class Menage_beneficiaire extends REST_Controller {
                         $data[$key]['cin'] = ($value->cin);
                         $data[$key]['profession'] = ($value->profession);
                         $data[$key]['date_inscription'] = ($value->date_inscription);
-                        $data[$key]['id_intervention'] = ($value->id_intervention);
+                        $data[$key]['id_sous_projet'] = ($value->id_sous_projet);
                         $data[$key]['date_sortie'] = ($value->date_sortie);
                         $data[$key]['date_inscription'] = ($value->date_inscription);
                         $data[$key]['detail_suivi_menage'] = array();
                         $data[$key]['detail_charge'] = 0;
                     }
                 }				
-			} else	if ($id_intervention) {
-                $id_prog = '"'.$id_intervention.'"' ;
+			} else	if ($id_sous_projet) {
+                $id_prog = '"'.$id_sous_projet.'"' ;
 				// Selection ménage par programme
                 $list_menage_programme = $this->MenagebeficiaireManager->findAllByProgramme($id_prog);
                 if ($list_menage_programme) {
@@ -57,7 +57,7 @@ class Menage_beneficiaire extends REST_Controller {
                         $data[$key]['AgeInscrire'] = ($value->AgeInscrire);
                         $data[$key]['Addresse'] = ($value->Addresse);
                         $data[$key]['NumeroEnregistrement'] = ($value->NumeroEnregistrement);
-                        $data[$key]['id_intervention'] = ($id_intervention);
+                        $data[$key]['id_sous_projet'] = ($id_sous_projet);
                         $data[$key]['date_sortie'] = ($value->date_sortie);
                         $data[$key]['date_inscription'] = ($value->date_inscription);
                     }
@@ -91,7 +91,7 @@ class Menage_beneficiaire extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
 		$data = array(
 			'id_menage' => $this->post('id_menage'),
-			'id_intervention' => ($this->post('id_intervention')),
+			'id_sous_projet' => ($this->post('id_sous_projet')),
 			'date_sortie' => ($this->post('date_sortie')),
 			'date_inscription' => ($this->post('date_inscription')),
 		);               
