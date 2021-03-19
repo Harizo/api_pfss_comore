@@ -92,6 +92,21 @@ class Communaute_model extends CI_Model
         }                 
     }
 
+    public function getcommunautebeneficiaire()
+    {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where('statut',"BENEFICIAIRE")
+                        ->order_by('code')
+                        ->get()
+                        ->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
     public function getcommunauteinscrit()
     {
         $result =  $this->db->select('*')
@@ -113,6 +128,22 @@ class Communaute_model extends CI_Model
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where('statut',"PRESELECTIONNE")
+                        ->order_by('code')
+                        ->get()
+                        ->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+
+    public function getcommunautebycommune($id_commune)
+    {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where('id_commune',$id_commune)
                         ->order_by('code')
                         ->get()
                         ->result();

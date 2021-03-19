@@ -1,13 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Aspects_env_model extends CI_Model
+class Plan_gestion_env_model extends CI_Model
 {
-    protected $table = 'aspects_env';
+    protected $table = 'plan_gestion_env';
 
 
-    public function add($aspect_env)
+    public function add($plan_gestion_env)
     {
-        $this->db->set($this->_set($aspect_env))
+        $this->db->set($this->_set($plan_gestion_env))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
         {
@@ -18,9 +18,9 @@ class Aspects_env_model extends CI_Model
     }
 
 
-    public function update($id, $aspect_env)
+    public function update($id, $plan_gestion_env)
     {
-        $this->db->set($this->_set($aspect_env))
+        $this->db->set($this->_set($plan_gestion_env))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)
@@ -31,19 +31,20 @@ class Aspects_env_model extends CI_Model
         }                      
     }
 
-    public function _set($aspect_env)
+    public function _set($plan_gestion_env)
     {
-        return array(
-           // 'type_sous_projet' => $aspect_env['type_sous_projet'],
-            'emplace_site' => $aspect_env['emplace_site'],
-            'etat_initial_recepteur' => $aspect_env['etat_initial_recepteur'],
-            'classification_sous_projet' => $aspect_env['classification_sous_projet'],
-            'id_sous_projet' =>      $aspect_env['id_sous_projet']                      
+        return array(            
+            'impacts'=> $plan_gestion_env['impacts'],      
+            'mesures'=> $plan_gestion_env['mesures'],      
+            'responsable'=> $plan_gestion_env['responsable'],
+            'calendrier_execution'=> $plan_gestion_env['calendrier_execution'],      
+            'cout_estimatif'=> $plan_gestion_env['cout_estimatif'],      
+            'id_fiche_env'=> $plan_gestion_env['id_fiche_env']
         );
     }
 
-    public function add_down($aspect_env, $id)  {
-        $this->db->set($this->_set_down($aspect_env, $id))
+    public function add_down($plan_gestion_env, $id)  {
+        $this->db->set($this->_set_down($plan_gestion_env, $id))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -51,14 +52,15 @@ class Aspects_env_model extends CI_Model
             return null;
         }                    
     }
-    public function _set_down($aspect_env, $id)
+    public function _set_down($plan_gestion_env, $id)
     {
         return array(
-            //'type_sous_projet' => $aspect_env['type_sous_projet'],
-            'emplace_site' => $aspect_env['emplace_site'],
-            'etat_initial_recepteur' => $aspect_env['etat_initial_recepteur'],
-            'classification_sous_projet' => $aspect_env['classification_sous_projet'],
-            'id_sous_projet' =>      $aspect_env['id_sous_projet'] 
+            'impacts'=> $plan_gestion_env['impacts'],      
+            'mesures'=> $plan_gestion_env['mesures'],      
+            'responsable'=> $plan_gestion_env['responsable'],
+            'calendrier_execution'=> $plan_gestion_env['calendrier_execution'],      
+            'cout_estimatif'=> $plan_gestion_env['cout_estimatif'],      
+            'id_fiche_env'=> $plan_gestion_env['id_fiche_env']
         );
     }
 
@@ -78,7 +80,7 @@ class Aspects_env_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('id_sous_projet')
+                        ->order_by('id_fiche_env')
                         ->get()
                         ->result();
         if($result)
@@ -90,12 +92,12 @@ class Aspects_env_model extends CI_Model
     }
     
 
-    public function getaspects_envbysousprojet($id_sous_projet)
+    public function getplan_gestion_envbyfiche($id_fiche_env)
     {
         $result =  $this->db->select("*")
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
-                        ->order_by('id_sous_projet')
+                        ->where('id_fiche_env',$id_fiche_env)
+                        ->order_by('id_fiche_env')
                         ->get()
                         ->result();
         if($result)

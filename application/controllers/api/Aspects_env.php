@@ -69,7 +69,7 @@ class Aspects_env extends REST_Controller {
         if ($supprimer == 0) {
             if ($id == 0) {
                 $data = array(
-                    'type_sous_projet' => $this->post('type_sous_projet'),
+                    //'type_sous_projet' => $this->post('type_sous_projet'),
                     'emplace_site' => $this->post('emplace_site'),
                     'etat_initial_recepteur' => $this->post('etat_initial_recepteur'),
                     'classification_sous_projet' => $this->post('classification_sous_projet'),
@@ -102,7 +102,7 @@ class Aspects_env extends REST_Controller {
                 if ($etat_download)
                 {   
                     $data = array(
-                        'type_sous_projet' => $this->post('type_sous_projet'),
+                        //'type_sous_projet' => $this->post('type_sous_projet'),
                         'emplace_site' => $this->post('emplace_site'),
                         'etat_initial_recepteur' => $this->post('etat_initial_recepteur'),
                         'classification_sous_projet' => $this->post('classification_sous_projet'),
@@ -133,7 +133,7 @@ class Aspects_env extends REST_Controller {
                 else
                 {
                     $data = array(
-                        'type_sous_projet' => $this->post('type_sous_projet'),
+                        //'type_sous_projet' => $this->post('type_sous_projet'),
                         'emplace_site' => $this->post('emplace_site'),
                         'etat_initial_recepteur' => $this->post('etat_initial_recepteur'),
                         'classification_sous_projet' => $this->post('classification_sous_projet'),

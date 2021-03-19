@@ -1,13 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Aspects_env_model extends CI_Model
+class Etude_env_model extends CI_Model
 {
-    protected $table = 'aspects_env';
+    protected $table = 'etude_env';
 
 
-    public function add($aspect_env)
+    public function add($etude_env)
     {
-        $this->db->set($this->_set($aspect_env))
+        $this->db->set($this->_set($etude_env))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
         {
@@ -18,9 +18,9 @@ class Aspects_env_model extends CI_Model
     }
 
 
-    public function update($id, $aspect_env)
+    public function update($id, $etude_env)
     {
-        $this->db->set($this->_set($aspect_env))
+        $this->db->set($this->_set($etude_env))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)
@@ -31,19 +31,20 @@ class Aspects_env_model extends CI_Model
         }                      
     }
 
-    public function _set($aspect_env)
+    public function _set($etude_env)
     {
         return array(
-           // 'type_sous_projet' => $aspect_env['type_sous_projet'],
-            'emplace_site' => $aspect_env['emplace_site'],
-            'etat_initial_recepteur' => $aspect_env['etat_initial_recepteur'],
-            'classification_sous_projet' => $aspect_env['classification_sous_projet'],
-            'id_sous_projet' =>      $aspect_env['id_sous_projet']                      
+            'introduction' => $etude_env['introduction'],
+            'description_sour_recep' => $etude_env['description_sour_recep'],
+            'description_impacts' => $etude_env['description_impacts'],
+            'mesure' => $etude_env['mesure'],
+            'plan_gestion' => $etude_env['plan_gestion'],
+            'id_sous_projet' =>      $etude_env['id_sous_projet']                      
         );
     }
 
-    public function add_down($aspect_env, $id)  {
-        $this->db->set($this->_set_down($aspect_env, $id))
+    public function add_down($etude_env, $id)  {
+        $this->db->set($this->_set_down($etude_env, $id))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -51,14 +52,15 @@ class Aspects_env_model extends CI_Model
             return null;
         }                    
     }
-    public function _set_down($aspect_env, $id)
+    public function _set_down($etude_env, $id)
     {
         return array(
-            //'type_sous_projet' => $aspect_env['type_sous_projet'],
-            'emplace_site' => $aspect_env['emplace_site'],
-            'etat_initial_recepteur' => $aspect_env['etat_initial_recepteur'],
-            'classification_sous_projet' => $aspect_env['classification_sous_projet'],
-            'id_sous_projet' =>      $aspect_env['id_sous_projet'] 
+            'introduction' => $etude_env['introduction'],
+            'description_sour_recep' => $etude_env['description_sour_recep'],
+            'description_impacts' => $etude_env['description_impacts'],
+            'mesure' => $etude_env['mesure'],
+            'plan_gestion' => $etude_env['plan_gestion'],
+            'id_sous_projet' =>      $etude_env['id_sous_projet'] 
         );
     }
 
@@ -90,7 +92,7 @@ class Aspects_env_model extends CI_Model
     }
     
 
-    public function getaspects_envbysousprojet($id_sous_projet)
+    public function getetude_envbysousprojet($id_sous_projet)
     {
         $result =  $this->db->select("*")
                         ->from($this->table)

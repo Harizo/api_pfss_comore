@@ -50,7 +50,13 @@ class Activite_par extends REST_Controller {
         $etat_download = $this->post('etat_download') ; 	
 		$data = array(
 			'id_par' => $this->post('id_par'),
-			'description' => $this->post('description'),
+			'activite' => $this->post('activite'),
+			'nbr_menage' => $this->post('nbr_menage'),
+			'bien_ressource' => $this->post('bien_ressource'),
+			'mesure_compensatoire' => $this->post('mesure_compensatoire'),
+			'responsable' => $this->post('responsable'),
+			'calendrier_execution' => $this->post('calendrier_execution'),
+			'cout_estimatif' => $this->post('cout_estimatif')
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {

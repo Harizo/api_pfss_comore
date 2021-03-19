@@ -38,7 +38,21 @@ class Sous_projet_model extends CI_Model
     public function _set($sous_projet)  {
         return array(
             'code'         => $sous_projet['code'],
-            'description'  => $sous_projet['description'],
+            'intitule' => $sous_projet['intitule'],
+            'nature' => $sous_projet['nature'],
+            'type' => $sous_projet['type'],
+            'description_sousprojet' => $sous_projet['description_sousprojet'],
+            'description_activite' => $sous_projet['description_activite'],
+            'presentantion_communaute' => $sous_projet['presentantion_communaute'],
+            'ref_dgsc' => $sous_projet['ref_dgsc'],
+            'nbr_menage_participant' => $sous_projet['nbr_menage_participant'],
+            'nbr_menage_nonparticipant' => $sous_projet['nbr_menage_nonparticipant'],
+            'population_total' => $sous_projet['population_total'],
+            'objectif' => $sous_projet['objectif'],
+            'duree' => $sous_projet['duree'],
+            'id_commune' => $sous_projet['id_commune'],
+            'id_village' => $sous_projet['id_village'],
+            'id_communaute' => $sous_projet['id_communaute'],
             'id_par'  => $sous_projet['id_par'],
         );
     }
@@ -46,7 +60,21 @@ class Sous_projet_model extends CI_Model
         return array(
             'id' => $id,
             'code' => $sous_projet['code'],
-            'description' => $sous_projet['description'],
+            'intitule' => $sous_projet['intitule'],
+            'nature' => $sous_projet['nature'],
+            'type' => $sous_projet['type'],
+            'description_sousprojet' => $sous_projet['description_sousprojet'],
+            'description_activite' => $sous_projet['description_activite'],
+            'presentantion_communaute' => $sous_projet['presentantion_communaute'],
+            'ref_dgsc' => $sous_projet['ref_dgsc'],
+            'nbr_menage_participant' => $sous_projet['nbr_menage_participant'],
+            'nbr_menage_nonparticipant' => $sous_projet['nbr_menage_nonparticipant'],
+            'population_total' => $sous_projet['population_total'],
+            'objectif' => $sous_projet['objectif'],
+            'duree' => $sous_projet['duree'],
+            'id_commune' => $sous_projet['id_commune'],
+            'id_village' => $sous_projet['id_village'],
+            'id_communaute' => $sous_projet['id_communaute'],
             'id_par' => $sous_projet['id_par'],
         );
     }
@@ -60,9 +88,11 @@ class Sous_projet_model extends CI_Model
             return null;
         }  
     }
+    
 	// Récupération de tous les enregistrements de la table
-    public function findAll()  {
-		$requete='select sp.id,sp.code,sp.description,sp.id_par,par.intitule as plan_action_reinstallation'
+    public function findAll()
+    {
+		$requete='select sp.id,sp.code,sp.description_sousprojet as description,sp.id_par,par.intitule as plan_action_reinstallation'
 				.' from sous_projet as sp'
 				.' left outer join plan_action_reinstallation as par on par.id=sp.id_par'
 				.' order by sp.id	';				
@@ -101,6 +131,19 @@ class Sous_projet_model extends CI_Model
                         ->from($this->table)
                         ->where("code", $code)
                         ->order_by('id', 'asc')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return array();
+        }                 
+    }
+    public function getsousprojetbypar($id_par) 
+    {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where("id_par", $id_par)
                         ->get()
                         ->result();
         if($result) {

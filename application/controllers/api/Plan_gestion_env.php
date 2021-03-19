@@ -5,27 +5,33 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 // afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Filtration_env extends REST_Controller {
+class Plan_gestion_env extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('filtration_env_model', 'FiltrationManager');
+        $this->load->model('plan_gestion_env_model', 'Plan_gestion_envManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getfiltration_envbysousprojet") {
+        $id_fiche_env = $this->get('id_fiche_env');
+        if ($menu=="getplan_gestion_envbyfiche") {
                
-            $filtration_env = $this->FiltrationManager->getfiltration_envbysousprojet($id_sous_projet);
-                if ($filtration_env) {
-                    $data = $filtration_env;
-                    /*foreach ($filtration_env as $key => $value) {
+            $plan_gestion_env = $this->Plan_gestion_envManager->getplan_gestion_envbyfiche($id_fiche_env);
+                if ($plan_gestion_env) {
+                    $data = $plan_gestion_env;
+                    /*foreach ($plan_gestion_env as $key => $value)
+                    {
+                        $ile = $this->IleManager->findById($value->calendrier_execution);
+                        $region = $this->RegionManager->findById($value->cout_estimatif);
+                        $commune = $this->CommuneManager->findById($value->id_commune);
+
                         $data[$key]['id'] = $value->id;
-                        $data[$key]['code'] = $value->code;
-                        $data[$key]['description'] = $value->description;
-                        
+                        $data[$key]['impacts'] = $value-> impacts;      
+                        $data[$key]['mesures'] = $value-> mesures;      
+                        $data[$key]['responsable'] = $value-> responsable;
+                        $data[$key]['id_fiche_env'] = $value->id_fiche_env;                        
                     };*/
 
                 } else
@@ -33,16 +39,16 @@ class Filtration_env extends REST_Controller {
             
         } elseif ($id) {
                
-                $data = $this->FiltrationManager->findById($id);
-                /*$data['id'] = $filtration_env->id;
-                $data['code'] = $filtration_env->code;
-                $data['description'] = $filtration_env->description;*/
+                $data = $this->Plan_gestion_envManager->findById($id);
+                /*$data['id'] = $plan_gestion_env->id;
+                $data['code'] = $plan_gestion_env->code;
+                $data['description'] = $plan_gestion_env->description;*/
                 
             } else 
             {
-               /* $filtration_env = $this->FiltrationManager->findAll();
-                if ($filtration_env) {
-                    $data = $filtration_env;
+               /* $plan_gestion_env = $this->Plan_gestion_envManager->findAll();
+                if ($plan_gestion_env) {
+                    $data = $plan_gestion_env;
 
                 } else*/
                     $data = array();
@@ -69,21 +75,12 @@ class Filtration_env extends REST_Controller {
         if ($supprimer == 0) {
             if ($id == 0) {
                 $data = array(
-                    //'nature_sous_projet' => $this->post('nature_sous_projet'),
-                    'secretariat' => $this->post('secretariat'),
-                    //'intitule_sous_projet' => $this->post('intitule_sous_projet'),
-                    //'type_sous_projet' => $this->post('type_sous_projet'),
-                    //'localisation' => $this->post('localisation'),
-                    //'objectif_sous_projet' => $this->post('objectif_sous_projet'),
-                    //'activite_sous_projet' => $this->post('activite_sous_projet'),
-                    'cout_estime_sous_projet' => $this->post('cout_estime_sous_projet'),
-                    'envergure_sous_projet' => $this->post('envergure_sous_projet'),
-                    'ouvrage_prevu' => $this->post('ouvrage_prevu'),
-                    //'description_sous_projet' => $this->post('description_sous_projet'),
-                    'environnement_naturel' => $this->post('environnement_naturel'),
-                    'date_visa_rt_ibd' => $this->post('date_visa_rt_ibd'),
-                    'date_visa_res' => $this->post('date_visa_res'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'impacts'=> $this->post( 'impacts'),      
+                    'mesures'=> $this->post( 'mesures'),      
+                    'responsable'=> $this->post( 'responsable'),
+                    'calendrier_execution'=> $this->post( 'calendrier_execution'),      
+                    'cout_estimatif'=> $this->post( 'cout_estimatif'), 
+                    'id_fiche_env' => $this->post('id_fiche_env')
                 );               
                 if (!$data) {
                     $this->response([
@@ -92,7 +89,7 @@ class Filtration_env extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->FiltrationManager->add($data);              
+                $dataId = $this->Plan_gestion_envManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -112,21 +109,12 @@ class Filtration_env extends REST_Controller {
                 if ($etat_download)
                 {   
                     $data = array(
-                        //'nature_sous_projet' => $this->post('nature_sous_projet'),
-                        'secretariat' => $this->post('secretariat'),
-                        //'intitule_sous_projet' => $this->post('intitule_sous_projet'),
-                        //'type_sous_projet' => $this->post('type_sous_projet'),
-                        //'localisation' => $this->post('localisation'),
-                        //'objectif_sous_projet' => $this->post('objectif_sous_projet'),
-                        //'activite_sous_projet' => $this->post('activite_sous_projet'),
-                        'cout_estime_sous_projet' => $this->post('cout_estime_sous_projet'),
-                        'envergure_sous_projet' => $this->post('envergure_sous_projet'),
-                        'ouvrage_prevu' => $this->post('ouvrage_prevu'),
-                        //'description_sous_projet' => $this->post('description_sous_projet'),
-                        'environnement_naturel' => $this->post('environnement_naturel'),
-                        'date_visa_rt_ibd' => $this->post('date_visa_rt_ibd'),
-                        'date_visa_res' => $this->post('date_visa_res'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'impacts'=> $this->post( 'impacts'),      
+                        'mesures'=> $this->post( 'mesures'),      
+                        'responsable'=> $this->post( 'responsable'),
+                        'calendrier_execution'=> $this->post( 'calendrier_execution'),      
+                        'cout_estimatif'=> $this->post( 'cout_estimatif'), 
+                        'id_fiche_env' => $this->post('id_fiche_env')
                     );
                     if (!$data) {
                         $this->response([
@@ -135,7 +123,7 @@ class Filtration_env extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_BAD_REQUEST);
                     }
-                    $dataId = $this->FiltrationManager->add_down($data, $id);              
+                    $dataId = $this->Plan_gestion_envManager->add_down($data, $id);              
                     if (!is_null($dataId)) {
                         $this->response([
                             'status' => TRUE,
@@ -153,21 +141,12 @@ class Filtration_env extends REST_Controller {
                 else
                 {
                     $data = array(
-                        //'nature_sous_projet' => $this->post('nature_sous_projet'),
-                        'secretariat' => $this->post('secretariat'),
-                        //'intitule_sous_projet' => $this->post('intitule_sous_projet'),
-                        //'type_sous_projet' => $this->post('type_sous_projet'),
-                        //'localisation' => $this->post('localisation'),
-                        //'objectif_sous_projet' => $this->post('objectif_sous_projet'),
-                        //'activite_sous_projet' => $this->post('activite_sous_projet'),
-                        'cout_estime_sous_projet' => $this->post('cout_estime_sous_projet'),
-                        'envergure_sous_projet' => $this->post('envergure_sous_projet'),
-                        'ouvrage_prevu' => $this->post('ouvrage_prevu'),
-                        //'description_sous_projet' => $this->post('description_sous_projet'),
-                        'environnement_naturel' => $this->post('environnement_naturel'),
-                        'date_visa_rt_ibd' => $this->post('date_visa_rt_ibd'),
-                        'date_visa_res' => $this->post('date_visa_res'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'impacts'=> $this->post( 'impacts'),      
+                        'mesures'=> $this->post( 'mesures'),      
+                        'responsable'=> $this->post( 'responsable'),
+                        'calendrier_execution'=> $this->post( 'calendrier_execution'),      
+                        'cout_estimatif'=> $this->post( 'cout_estimatif'),
+                        'id_fiche_env' => $this->post('id_fiche_env')
                     );              
                     if (!$data || !$id) {
                         $this->response([
@@ -176,7 +155,7 @@ class Filtration_env extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_BAD_REQUEST);
                     }
-                    $update = $this->FiltrationManager->update($id, $data);              
+                    $update = $this->Plan_gestion_envManager->update($id, $data);              
                     if(!is_null($update)){
                         $this->response([
                             'status' => TRUE, 
@@ -201,7 +180,7 @@ class Filtration_env extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
-            $delete = $this->FiltrationManager->delete($id);          
+            $delete = $this->Plan_gestion_envManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,

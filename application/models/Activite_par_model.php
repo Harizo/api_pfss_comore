@@ -38,14 +38,26 @@ class Activite_par_model extends CI_Model
     public function _set($plan_action)  {
         return array(
             'id_par'         => $plan_action['id_par'],
-            'description'  => $plan_action['description'],
+            'activite'  => $plan_action['activite'],
+            'nbr_menage'  => $plan_action['nbr_menage'],
+            'bien_ressource'  => $plan_action['bien_ressource'],
+            'mesure_compensatoire'  => $plan_action['mesure_compensatoire'],
+            'responsable'  => $plan_action['responsable'],
+            'calendrier_execution'  => $plan_action['calendrier_execution'],
+            'cout_estimatif'  => $plan_action['cout_estimatif']
         );
     }
     public function _set_down($plan_action, $id) {
         return array(
             'id' => $id,
             'id_par' => $plan_action['id_par'],
-            'description' => $plan_action['description'],
+            'activite'  => $plan_action['activite'],
+            'nbr_menage'  => $plan_action['nbr_menage'],
+            'bien_ressource'  => $plan_action['bien_ressource'],
+            'mesure_compensatoire'  => $plan_action['mesure_compensatoire'],
+            'responsable'  => $plan_action['responsable'],
+            'calendrier_execution'  => $plan_action['calendrier_execution'],
+            'cout_estimatif'  => $plan_action['cout_estimatif']
         );
     }
 	// Suppression d'un enregistrement
@@ -62,7 +74,7 @@ class Activite_par_model extends CI_Model
     public function findAll()  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('code')
+                        ->order_by('id')
                         ->get()
                         ->result();
         if($result)  {

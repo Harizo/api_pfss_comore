@@ -1,13 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Aspects_env_model extends CI_Model
+class Convention_mod_model extends CI_Model
 {
-    protected $table = 'aspects_env';
+    protected $table = 'convention_mod';
 
 
-    public function add($aspect_env)
+    public function add($convention_mod)
     {
-        $this->db->set($this->_set($aspect_env))
+        $this->db->set($this->_set($convention_mod))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
         {
@@ -18,9 +18,9 @@ class Aspects_env_model extends CI_Model
     }
 
 
-    public function update($id, $aspect_env)
+    public function update($id, $convention_mod)
     {
-        $this->db->set($this->_set($aspect_env))
+        $this->db->set($this->_set($convention_mod))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)
@@ -31,19 +31,21 @@ class Aspects_env_model extends CI_Model
         }                      
     }
 
-    public function _set($aspect_env)
+    public function _set($convention_mod)
     {
         return array(
-           // 'type_sous_projet' => $aspect_env['type_sous_projet'],
-            'emplace_site' => $aspect_env['emplace_site'],
-            'etat_initial_recepteur' => $aspect_env['etat_initial_recepteur'],
-            'classification_sous_projet' => $aspect_env['classification_sous_projet'],
-            'id_sous_projet' =>      $aspect_env['id_sous_projet']                      
+            'deux_parti_concernee' => $convention_mod['deux_parti_concernee'],
+            'objet' => $convention_mod['objet'],
+            'montant_travaux' => $convention_mod['montant_travaux'],
+            'nom_signataire' => $convention_mod['nom_signataire'],
+            'date_signature' => $convention_mod['date_signature'],
+            'date_prevu_recep' => $convention_mod['date_prevu_recep'],
+            'id_sous_projet' =>      $convention_mod['id_sous_projet']                      
         );
     }
 
-    public function add_down($aspect_env, $id)  {
-        $this->db->set($this->_set_down($aspect_env, $id))
+    public function add_down($convention_mod, $id)  {
+        $this->db->set($this->_set_down($convention_mod, $id))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -51,14 +53,16 @@ class Aspects_env_model extends CI_Model
             return null;
         }                    
     }
-    public function _set_down($aspect_env, $id)
+    public function _set_down($convention_mod, $id)
     {
         return array(
-            //'type_sous_projet' => $aspect_env['type_sous_projet'],
-            'emplace_site' => $aspect_env['emplace_site'],
-            'etat_initial_recepteur' => $aspect_env['etat_initial_recepteur'],
-            'classification_sous_projet' => $aspect_env['classification_sous_projet'],
-            'id_sous_projet' =>      $aspect_env['id_sous_projet'] 
+            'deux_parti_concernee' => $convention_mod['deux_parti_concernee'],
+            'objet' => $convention_mod['objet'],
+            'montant_travaux' => $convention_mod['montant_travaux'],
+            'nom_signataire' => $convention_mod['nom_signataire'],
+            'date_signature' => $convention_mod['date_signature'],
+            'date_prevu_recep' => $convention_mod['date_prevu_recep'],
+            'id_sous_projet' =>      $convention_mod['id_sous_projet'] 
         );
     }
 
@@ -90,7 +94,7 @@ class Aspects_env_model extends CI_Model
     }
     
 
-    public function getaspects_envbysousprojet($id_sous_projet)
+    public function getconvention_modbysousprojet($id_sous_projet)
     {
         $result =  $this->db->select("*")
                         ->from($this->table)

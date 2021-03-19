@@ -65,7 +65,7 @@ class Village extends REST_Controller {
                         $data[$key]['id'] = $value->id;
                         $data[$key]['Code'] = $value->Code;
                         $data[$key]['Village'] = $value->Village;
-                        $data[$key]['commune'] = $com[0];
+                        $data[$key]['commune'] = $com;
                         $data[$key]['programme'] = $prog[0];
                         
                     };

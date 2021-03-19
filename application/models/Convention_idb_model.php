@@ -1,13 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Aspects_env_model extends CI_Model
+class Convention_idb_model extends CI_Model
 {
-    protected $table = 'aspects_env';
+    protected $table = 'convention_idb';
 
 
-    public function add($aspect_env)
+    public function add($convention_idb)
     {
-        $this->db->set($this->_set($aspect_env))
+        $this->db->set($this->_set($convention_idb))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
         {
@@ -18,9 +18,9 @@ class Aspects_env_model extends CI_Model
     }
 
 
-    public function update($id, $aspect_env)
+    public function update($id, $convention_idb)
     {
-        $this->db->set($this->_set($aspect_env))
+        $this->db->set($this->_set($convention_idb))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)
@@ -31,19 +31,21 @@ class Aspects_env_model extends CI_Model
         }                      
     }
 
-    public function _set($aspect_env)
+    public function _set($convention_idb)
     {
         return array(
-           // 'type_sous_projet' => $aspect_env['type_sous_projet'],
-            'emplace_site' => $aspect_env['emplace_site'],
-            'etat_initial_recepteur' => $aspect_env['etat_initial_recepteur'],
-            'classification_sous_projet' => $aspect_env['classification_sous_projet'],
-            'id_sous_projet' =>      $aspect_env['id_sous_projet']                      
+            'deux_parti_concernee' => $convention_idb['deux_parti_concernee'],
+            'objet' => $convention_idb['objet'],
+            'montant_financement' => $convention_idb['montant_financement'],
+            'nom_signataire' => $convention_idb['nom_signataire'],
+            'date_signature' => $convention_idb['date_signature'],
+            'litige_conclusion' => $convention_idb['litige_conclusion'],
+            'id_sous_projet' =>      $convention_idb['id_sous_projet']                      
         );
     }
 
-    public function add_down($aspect_env, $id)  {
-        $this->db->set($this->_set_down($aspect_env, $id))
+    public function add_down($convention_idb, $id)  {
+        $this->db->set($this->_set_down($convention_idb, $id))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -51,14 +53,16 @@ class Aspects_env_model extends CI_Model
             return null;
         }                    
     }
-    public function _set_down($aspect_env, $id)
+    public function _set_down($convention_idb, $id)
     {
         return array(
-            //'type_sous_projet' => $aspect_env['type_sous_projet'],
-            'emplace_site' => $aspect_env['emplace_site'],
-            'etat_initial_recepteur' => $aspect_env['etat_initial_recepteur'],
-            'classification_sous_projet' => $aspect_env['classification_sous_projet'],
-            'id_sous_projet' =>      $aspect_env['id_sous_projet'] 
+            'deux_parti_concernee' => $convention_idb['deux_parti_concernee'],
+            'objet' => $convention_idb['objet'],
+            'montant_financement' => $convention_idb['montant_financement'],
+            'nom_signataire' => $convention_idb['nom_signataire'],
+            'date_signature' => $convention_idb['date_signature'],
+            'litige_conclusion' => $convention_idb['litige_conclusion'],
+            'id_sous_projet' =>      $convention_idb['id_sous_projet'] 
         );
     }
 
@@ -90,7 +94,7 @@ class Aspects_env_model extends CI_Model
     }
     
 
-    public function getaspects_envbysousprojet($id_sous_projet)
+    public function getconvention_idbbysousprojet($id_sous_projet)
     {
         $result =  $this->db->select("*")
                         ->from($this->table)

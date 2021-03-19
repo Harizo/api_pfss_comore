@@ -44,8 +44,8 @@ class Plan_action_reinstallation extends REST_Controller {
         $etat_download = $this->post('etat_download') ; 	
 		$data = array(
 			'intitule' => $this->post('intitule'),
-			'description' => $this->post('description'),
-			'id_commune' => $this->post('id_commune'),
+			'ser' => $this->post('ser'),
+			'date_elaboration' => $this->post('date_elaboration'),
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {

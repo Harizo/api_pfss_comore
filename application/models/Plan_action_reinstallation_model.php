@@ -38,16 +38,16 @@ class Plan_action_reinstallation_model extends CI_Model
     public function _set($plan_action)  {
         return array(
             'intitule'         => $plan_action['intitule'],
-            'description'  => $plan_action['description'],
-            'id_commune' => $plan_action['id_commune'],
+            'ser'  => $plan_action['ser'],
+            'date_elaboration' => $plan_action['date_elaboration'],
         );
     }
     public function _set_down($plan_action, $id) {
         return array(
             'id' => $id,
             'intitule' => $plan_action['intitule'],
-            'description' => $plan_action['description'],
-            'id_commune' => $plan_action['id_commune'],
+            'ser' => $plan_action['ser'],
+            'date_elaboration' => $plan_action['date_elaboration'],
         );
     }
 	// Suppression d'un enregistrement
@@ -64,7 +64,7 @@ class Plan_action_reinstallation_model extends CI_Model
     public function findAll()  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('description')
+                        ->order_by('ser')
                         ->get()
                         ->result();
         if($result)  {

@@ -17,14 +17,64 @@ class Communaute extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        if ($menu=="getcommunautepreselection") {
+        $id_commune = $this->get('id_commune');
+        if ($menu=="getcommunautebycommune") {
+               
+            $communaute = $this->CommunauteManager->getcommunautebycommune($id_commune);
+                if ($communaute) {
+                    //$data = $communaute;
+                    foreach ($communaute as $key => $value)
+                    {
+                        $commune = $this->CommuneManager->findById($value->id_commune);
+                        $zip = $this->ZipManager->findById($value->id_zip);
+                        $data[$key]['id'] = $value->id;
+                        $data[$key]['code'] = $value->code;
+                        $data[$key]['libelle'] = $value->libelle;
+                        $data[$key]['nbr_personne'] = $value->nbr_personne;
+                        $data[$key]['representant'] = $value->representant;
+                        $data[$key]['telephone'] = $value->telephone;
+                        $data[$key]['statut'] = $value->statut;
+                        $data[$key]['zip'] = $zip;
+                        $data[$key]['commune'] = $commune;
+                        
+                    };
+
+                } else
+                    $data = array();
+            
+        } elseif ($menu=="getcommunautebeneficiaire") {
+               
+            $communaute = $this->CommunauteManager->getcommunautebeneficiaire();
+                if ($communaute) {
+                    //$data = $communaute;
+                    foreach ($communaute as $key => $value)
+                    {
+                        $commune = $this->CommuneManager->findById($value->id_commune);
+                        $zip = $this->ZipManager->findById($value->id_zip);
+                        $data[$key]['id'] = $value->id;
+                        $data[$key]['code'] = $value->code;
+                        $data[$key]['libelle'] = $value->libelle;
+                        $data[$key]['nbr_personne'] = $value->nbr_personne;
+                        $data[$key]['representant'] = $value->representant;
+                        $data[$key]['telephone'] = $value->telephone;
+                        $data[$key]['statut'] = $value->statut;
+                        $data[$key]['zip'] = $zip;
+                        $data[$key]['commune'] = $commune;
+                        
+                    };
+
+                } else
+                    $data = array();
+            
+        }
+        elseif ($menu=="getcommunautepreselection") {
                
             $communaute = $this->CommunauteManager->getcommunautepreselection();
                 if ($communaute) {
                     //$data = $communaute;
                     foreach ($communaute as $key => $value)
                     {
-                        $commune = $this->CommuneManager->findById_row($value->id_commune);
+                        $commune = $this->CommuneManager->findById($value->id_commune);
                         $zip = $this->ZipManager->findById($value->id_zip);
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
@@ -48,7 +98,7 @@ class Communaute extends REST_Controller {
                     //$data = $communaute;
                     foreach ($communaute as $key => $value)
                     {
-                        $commune = $this->CommuneManager->findById_row($value->id_commune);
+                        $commune = $this->CommuneManager->findById($value->id_commune);
                         $zip = $this->ZipManager->findById($value->id_zip);
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;

@@ -1,13 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Aspects_env_model extends CI_Model
+class Tableau_mesure_pges_model extends CI_Model
 {
-    protected $table = 'aspects_env';
+    protected $table = 'tableau_mesure_pges';
 
 
-    public function add($aspect_env)
+    public function add($tableau_mesure_pges)
     {
-        $this->db->set($this->_set($aspect_env))
+        $this->db->set($this->_set($tableau_mesure_pges))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
         {
@@ -18,9 +18,9 @@ class Aspects_env_model extends CI_Model
     }
 
 
-    public function update($id, $aspect_env)
+    public function update($id, $tableau_mesure_pges)
     {
-        $this->db->set($this->_set($aspect_env))
+        $this->db->set($this->_set($tableau_mesure_pges))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)
@@ -31,19 +31,21 @@ class Aspects_env_model extends CI_Model
         }                      
     }
 
-    public function _set($aspect_env)
+    public function _set($tableau_mesure_pges)
     {
         return array(
-           // 'type_sous_projet' => $aspect_env['type_sous_projet'],
-            'emplace_site' => $aspect_env['emplace_site'],
-            'etat_initial_recepteur' => $aspect_env['etat_initial_recepteur'],
-            'classification_sous_projet' => $aspect_env['classification_sous_projet'],
-            'id_sous_projet' =>      $aspect_env['id_sous_projet']                      
+            'activites_sousprojets' => $tableau_mesure_pges['activites_sousprojets'],
+            'mesure' => $tableau_mesure_pges['mesure'],
+            'responsables' => $tableau_mesure_pges['responsables'],
+            'estimation_cout' => $tableau_mesure_pges['estimation_cout'],
+            'impacts' => $tableau_mesure_pges['impacts'],
+            'timing' => $tableau_mesure_pges['timing'],
+            'id_etude_env' =>      $tableau_mesure_pges['id_etude_env']                      
         );
     }
 
-    public function add_down($aspect_env, $id)  {
-        $this->db->set($this->_set_down($aspect_env, $id))
+    public function add_down($tableau_mesure_pges, $id)  {
+        $this->db->set($this->_set_down($tableau_mesure_pges, $id))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -51,14 +53,16 @@ class Aspects_env_model extends CI_Model
             return null;
         }                    
     }
-    public function _set_down($aspect_env, $id)
+    public function _set_down($tableau_mesure_pges, $id)
     {
         return array(
-            //'type_sous_projet' => $aspect_env['type_sous_projet'],
-            'emplace_site' => $aspect_env['emplace_site'],
-            'etat_initial_recepteur' => $aspect_env['etat_initial_recepteur'],
-            'classification_sous_projet' => $aspect_env['classification_sous_projet'],
-            'id_sous_projet' =>      $aspect_env['id_sous_projet'] 
+            'activites_sousprojets' => $tableau_mesure_pges['activites_sousprojets'],
+            'mesure' => $tableau_mesure_pges['mesure'],
+            'responsables' => $tableau_mesure_pges['responsables'],
+            'estimation_cout' => $tableau_mesure_pges['estimation_cout'],
+            'impacts' => $tableau_mesure_pges['impacts'],
+            'timing' => $tableau_mesure_pges['timing'],
+            'id_etude_env' =>      $tableau_mesure_pges['id_etude_env']  
         );
     }
 
@@ -78,7 +82,7 @@ class Aspects_env_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('id_sous_projet')
+                        ->order_by('id_etude_env')
                         ->get()
                         ->result();
         if($result)
@@ -90,12 +94,12 @@ class Aspects_env_model extends CI_Model
     }
     
 
-    public function getaspects_envbysousprojet($id_sous_projet)
+    public function gettableau_mesure_pgesbyetude($id_etude_env)
     {
         $result =  $this->db->select("*")
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
-                        ->order_by('id_sous_projet')
+                        ->where('id_etude_env',$id_etude_env)
+                        ->order_by('id_etude_env')
                         ->get()
                         ->result();
         if($result)

@@ -5,23 +5,23 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 // afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Filtration_env extends REST_Controller {
+class Convention_entretien extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('filtration_env_model', 'FiltrationManager');
+        $this->load->model('convention_entretien_model', 'Convention_entretienManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
         $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getfiltration_envbysousprojet") {
+        if ($menu=="getconvention_entretienbysousprojet") {
                
-            $filtration_env = $this->FiltrationManager->getfiltration_envbysousprojet($id_sous_projet);
-                if ($filtration_env) {
-                    $data = $filtration_env;
-                    /*foreach ($filtration_env as $key => $value) {
+            $convention_entretien = $this->Convention_entretienManager->getconvention_entretienbysousprojet($id_sous_projet);
+                if ($convention_entretien) {
+                    $data = $convention_entretien;
+                    /*foreach ($convention_entretien as $key => $value) {
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
                         $data[$key]['description'] = $value->description;
@@ -33,16 +33,16 @@ class Filtration_env extends REST_Controller {
             
         } elseif ($id) {
                
-                $data = $this->FiltrationManager->findById($id);
-                /*$data['id'] = $filtration_env->id;
-                $data['code'] = $filtration_env->code;
-                $data['description'] = $filtration_env->description;*/
+                $data = $this->Convention_entretienManager->findById($id);
+                /*$data['id'] = $convention_entretien->id;
+                $data['code'] = $convention_entretien->code;
+                $data['description'] = $convention_entretien->description;*/
                 
             } else 
             {
-               /* $filtration_env = $this->FiltrationManager->findAll();
-                if ($filtration_env) {
-                    $data = $filtration_env;
+               /* $convention_entretien = $this->Convention_entretienManager->findAll();
+                if ($convention_entretien) {
+                    $data = $convention_entretien;
 
                 } else*/
                     $data = array();
@@ -69,20 +69,11 @@ class Filtration_env extends REST_Controller {
         if ($supprimer == 0) {
             if ($id == 0) {
                 $data = array(
-                    //'nature_sous_projet' => $this->post('nature_sous_projet'),
-                    'secretariat' => $this->post('secretariat'),
-                    //'intitule_sous_projet' => $this->post('intitule_sous_projet'),
-                    //'type_sous_projet' => $this->post('type_sous_projet'),
-                    //'localisation' => $this->post('localisation'),
-                    //'objectif_sous_projet' => $this->post('objectif_sous_projet'),
-                    //'activite_sous_projet' => $this->post('activite_sous_projet'),
-                    'cout_estime_sous_projet' => $this->post('cout_estime_sous_projet'),
-                    'envergure_sous_projet' => $this->post('envergure_sous_projet'),
-                    'ouvrage_prevu' => $this->post('ouvrage_prevu'),
-                    //'description_sous_projet' => $this->post('description_sous_projet'),
-                    'environnement_naturel' => $this->post('environnement_naturel'),
-                    'date_visa_rt_ibd' => $this->post('date_visa_rt_ibd'),
-                    'date_visa_res' => $this->post('date_visa_res'),
+                    'deux_parti_concernee' => $this->post('deux_parti_concernee'),
+                    'objet' => $this->post('objet'),
+                    'montant_travaux' => $this->post('montant_travaux'),
+                    'nom_signataire' => $this->post('nom_signataire'),
+                    'date_signature' => $this->post('date_signature'),
                     'id_sous_projet' => $this->post('id_sous_projet')
                 );               
                 if (!$data) {
@@ -92,7 +83,7 @@ class Filtration_env extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->FiltrationManager->add($data);              
+                $dataId = $this->Convention_entretienManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -112,20 +103,11 @@ class Filtration_env extends REST_Controller {
                 if ($etat_download)
                 {   
                     $data = array(
-                        //'nature_sous_projet' => $this->post('nature_sous_projet'),
-                        'secretariat' => $this->post('secretariat'),
-                        //'intitule_sous_projet' => $this->post('intitule_sous_projet'),
-                        //'type_sous_projet' => $this->post('type_sous_projet'),
-                        //'localisation' => $this->post('localisation'),
-                        //'objectif_sous_projet' => $this->post('objectif_sous_projet'),
-                        //'activite_sous_projet' => $this->post('activite_sous_projet'),
-                        'cout_estime_sous_projet' => $this->post('cout_estime_sous_projet'),
-                        'envergure_sous_projet' => $this->post('envergure_sous_projet'),
-                        'ouvrage_prevu' => $this->post('ouvrage_prevu'),
-                        //'description_sous_projet' => $this->post('description_sous_projet'),
-                        'environnement_naturel' => $this->post('environnement_naturel'),
-                        'date_visa_rt_ibd' => $this->post('date_visa_rt_ibd'),
-                        'date_visa_res' => $this->post('date_visa_res'),
+                        'deux_parti_concernee' => $this->post('deux_parti_concernee'),
+                        'objet' => $this->post('objet'),
+                        'montant_travaux' => $this->post('montant_travaux'),
+                        'nom_signataire' => $this->post('nom_signataire'),
+                        'date_signature' => $this->post('date_signature'),
                         'id_sous_projet' => $this->post('id_sous_projet')
                     );
                     if (!$data) {
@@ -135,7 +117,7 @@ class Filtration_env extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_BAD_REQUEST);
                     }
-                    $dataId = $this->FiltrationManager->add_down($data, $id);              
+                    $dataId = $this->Convention_entretienManager->add_down($data, $id);              
                     if (!is_null($dataId)) {
                         $this->response([
                             'status' => TRUE,
@@ -153,20 +135,11 @@ class Filtration_env extends REST_Controller {
                 else
                 {
                     $data = array(
-                        //'nature_sous_projet' => $this->post('nature_sous_projet'),
-                        'secretariat' => $this->post('secretariat'),
-                        //'intitule_sous_projet' => $this->post('intitule_sous_projet'),
-                        //'type_sous_projet' => $this->post('type_sous_projet'),
-                        //'localisation' => $this->post('localisation'),
-                        //'objectif_sous_projet' => $this->post('objectif_sous_projet'),
-                        //'activite_sous_projet' => $this->post('activite_sous_projet'),
-                        'cout_estime_sous_projet' => $this->post('cout_estime_sous_projet'),
-                        'envergure_sous_projet' => $this->post('envergure_sous_projet'),
-                        'ouvrage_prevu' => $this->post('ouvrage_prevu'),
-                        //'description_sous_projet' => $this->post('description_sous_projet'),
-                        'environnement_naturel' => $this->post('environnement_naturel'),
-                        'date_visa_rt_ibd' => $this->post('date_visa_rt_ibd'),
-                        'date_visa_res' => $this->post('date_visa_res'),
+                        'deux_parti_concernee' => $this->post('deux_parti_concernee'),
+                        'objet' => $this->post('objet'),
+                        'montant_travaux' => $this->post('montant_travaux'),
+                        'nom_signataire' => $this->post('nom_signataire'),
+                        'date_signature' => $this->post('date_signature'),
                         'id_sous_projet' => $this->post('id_sous_projet')
                     );              
                     if (!$data || !$id) {
@@ -176,7 +149,7 @@ class Filtration_env extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_BAD_REQUEST);
                     }
-                    $update = $this->FiltrationManager->update($id, $data);              
+                    $update = $this->Convention_entretienManager->update($id, $data);              
                     if(!is_null($update)){
                         $this->response([
                             'status' => TRUE, 
@@ -201,7 +174,7 @@ class Filtration_env extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
-            $delete = $this->FiltrationManager->delete($id);          
+            $delete = $this->Convention_entretienManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,
