@@ -41,7 +41,7 @@ class Sous_projet_model extends CI_Model
             'intitule' => $sous_projet['intitule'],
             'nature' => $sous_projet['nature'],
             'type' => $sous_projet['type'],
-            'description_sousprojet' => $sous_projet['description_sousprojet'],
+            'description' => $sous_projet['description'],
             'description_activite' => $sous_projet['description_activite'],
             'presentantion_communaute' => $sous_projet['presentantion_communaute'],
             'ref_dgsc' => $sous_projet['ref_dgsc'],
@@ -63,7 +63,7 @@ class Sous_projet_model extends CI_Model
             'intitule' => $sous_projet['intitule'],
             'nature' => $sous_projet['nature'],
             'type' => $sous_projet['type'],
-            'description_sousprojet' => $sous_projet['description_sousprojet'],
+            'description' => $sous_projet['description'],
             'description_activite' => $sous_projet['description_activite'],
             'presentantion_communaute' => $sous_projet['presentantion_communaute'],
             'ref_dgsc' => $sous_projet['ref_dgsc'],
@@ -92,7 +92,7 @@ class Sous_projet_model extends CI_Model
 	// Récupération de tous les enregistrements de la table
     public function findAll()
     {
-		$requete='select sp.id,sp.code,sp.description_sousprojet as description,sp.id_par,par.intitule as plan_action_reinstallation'
+		$requete='select sp.id,sp.code,sp.description as description,sp.id_par,par.intitule as plan_action_reinstallation'
 				.' from sous_projet as sp'
 				.' left outer join plan_action_reinstallation as par on par.id=sp.id_par'
 				.' order by sp.id	';				

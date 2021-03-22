@@ -33,7 +33,7 @@ class Sous_projet extends REST_Controller {
                     $data[$key]['nature'] = $value->nature;
                     $data[$key]['code']= $value->code;
                     $data[$key]['type']= $value->type;
-                    $data[$key]['description_sousprojet']= $value->description_sousprojet;
+                    $data[$key]['description']= $value->description;
                     $data[$key]['description_activite']= $value->description_activite;
                     $data[$key]['presentantion_communaute']= $value->presentantion_communaute;
                     $data[$key]['ref_dgsc']= $value->ref_dgsc;
@@ -97,7 +97,7 @@ class Sous_projet extends REST_Controller {
                 'intitule' => $this->post('intitule') ,
                 'nature' => $this->post('nature') ,
                 'type' => $this->post('type') ,
-                'description_sousprojet' => $this->post('description_sousprojet') ,
+                'description' => $this->post('description') ,
                 'description_activite' => $this->post('description_activite') ,
                 'presentantion_communaute' => $this->post('presentantion_communaute') ,
                 'ref_dgsc' => $this->post('ref_dgsc') ,
@@ -119,7 +119,7 @@ class Sous_projet extends REST_Controller {
                 'intitule' => $this->post('intitule') ,
                 'nature' => $this->post('nature') ,
                 'type' => $this->post('type') ,
-                'description_sousprojet' => $this->post('description_sousprojet') ,
+                'description' => $this->post('description') ,
                 'description_activite' => $this->post('description_activite') ,
                 'presentantion_communaute' => $this->post('presentantion_communaute') ,
                 'ref_dgsc' => $this->post('ref_dgsc') ,
