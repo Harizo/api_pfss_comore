@@ -27,6 +27,7 @@ class Contrat_consultant_ong_model extends CI_Model {
     public function _set($contrat) {
 		// Affectation des valeurs
         return array(
+            'id_consultant' =>  $contrat['id_consultant'],
             'id_sous_projet' =>  $contrat['id_sous_projet'],
             'reference'  =>  $contrat['reference'],                       
             'date_contrat'    =>  $contrat['date_contrat'],                       
@@ -44,9 +45,11 @@ class Contrat_consultant_ong_model extends CI_Model {
     }
     public function findAll() {
 		// Selection de tous les enregitrements
- 		$requete="select ct.id,ct.id_sous_projet, ct.reference,m.date_contrat,m.nomchefmenage,m.nom_conjoint,m.Addresse,"
+ 		$requete="select ct.id,ct.id_consultant,ct.id_sous_projet, ct.reference,sp.description as sous_projet,ct.date_contrat,ct.objet,"
+		."co.raison_social as consultant"
 		." from contrat_consultant_ong as ct"
 		." left outer join sous_projet as sp on sp.id=ct.id_sous_projet"
+		." left outer join consultant_ong as co on co.id=ct.id_consultant"
 		." order by ct.id";
 		$query= $this->db->query($requete);		
 		if($query->result()) {

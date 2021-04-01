@@ -1,6 +1,6 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Point_controle_mode extends CI_Model {
+class Point_controle_model extends CI_Model {
     protected $table = 'point_controle';
 
     public function add($pointc)  {
@@ -45,6 +45,20 @@ class Point_controle_mode extends CI_Model {
 		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
+                        ->order_by('id')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+    public function findByIdlivrable($id_livrable) {
+		// Selection de tous les enregitrements
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where('id_livrable' , $id_livrable)
                         ->order_by('id')
                         ->get()
                         ->result();

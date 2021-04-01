@@ -45,6 +45,7 @@ class Liste_mlpl extends REST_Controller {
 		// Affectation des valeurs des colonnes de la table
 		$data = array(
 			'id_groupe_ml_pl' => $this->post('id_groupe_ml_pl'),
+			'menage_id' => $this->post('menage_id'),
 			'nom_prenom'      => $this->post('nom_prenom'),
 			'adresse'         => $this->post('adresse'),
 			'contact'         => $this->post('contact'),

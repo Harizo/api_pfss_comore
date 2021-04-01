@@ -42,6 +42,7 @@ class Fiche_paiementmenage extends REST_Controller {
 			'menage_id' => ($this->post('menage_id')),
 			'village_id' => ($this->post('village_id')),
 			'fiche_presence_id' => ($this->post('fiche_presence_id')),
+			'microprojet_id' => ($this->post('microprojet_id')),
 			'travailleurpresent' => ($this->post('travailleurpresent')),
 			'suppliantpresent' => ($this->post('suppliantpresent')),
 			'montanttotalapayer' => ($this->post('montanttotalapayer')),

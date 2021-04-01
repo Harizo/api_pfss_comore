@@ -35,6 +35,7 @@ class Plainte_model extends CI_Model {
     public function _set($plainte) {
         return array(
             'menage_id'                 => $plainte['menage_id'],
+            'id_sous_projet'            => $plainte['id_sous_projet'],
             'activite_id'               => $plainte['activite_id'],
             'cellulederecours_id'       => $plainte['cellulederecours_id'],
             'typeplainte_id'            => $plainte['typeplainte_id'],
@@ -61,6 +62,7 @@ class Plainte_model extends CI_Model {
         return array(
             'id'                        => $id,
             'menage_id'                 => $plainte['menage_id'],
+            'id_sous_projet'            => $plainte['id_sous_projet'],
             'activite_id'               => $plainte['activite_id'],
             'cellulederecours_id'       => $plainte['cellulederecours_id'],
             'typeplainte_id'            => $plainte['typeplainte_id'],
@@ -131,12 +133,18 @@ class Plainte_model extends CI_Model {
     public function findByVillage($village_id) {
 		$requete = "select v.Village as village,cp.Code as code,tp.TypePlainte as type_plainte,rp.libelle as resultat_plainte,"
 					."p.id,p.village_id,p.cellulederecours_id,p.typeplainte_id,p.solution_id,p.Objet,p.datedepot,p.reference,"
-					."p.nomplaignant,p.adresseplaignant,p.dateresolution"
+					."p.nomplaignant,p.adresseplaignant,p.dateresolution,"
+					."ssp.code as code_sous_projet,ssp.description as sous_projet,"
+					."p.menage_id,m.NumeroEnregistrement,m.nomchefmenage,"
+					."p.responsableenregistrement,p.mesureprise,p.id_sous_projet,p.statut,p.a_ete_modifie,"
+					."p.userid,p.datemodification"
 					." from see_plainte as p"
 					." left outer join see_village as v on v.id=p.village_id"
+					." left outer join see_menage as m on m.id=p.menage_id"
 					." left outer join see_celluleprotectionsociale as cp on cp.id=p.cellulederecours_id"
 					." left outer join see_typeplainte as tp on tp.id=p.typeplainte_id"
-					." left outer join resultat_plainte as rp on tp.id=p.solution_id"
+					." left outer join resultat_plainte as rp on rp.id=p.solution_id"
+					." left outer join sous_projet as ssp on ssp.id=p.id_sous_projet"
 					." where p.village_id=".$village_id;
 		$query = $this->db->query($requete);
         return $query->result();                 

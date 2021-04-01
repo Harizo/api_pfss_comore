@@ -45,6 +45,18 @@ class Menage_beneficiaire_model extends CI_Model {
             return null;
         }  
     }
+    public function deleteByMenageSousprojet($id_menage,$id_sous_projet)  {
+		// Suppression d'un enregitrement
+        $this->db->where('id_menage', (int) $id_menage)
+		->where('id_sous_projet', (int) $id_sous_projet)
+		->delete($this->table);
+        if($this->db->affected_rows() === 1)
+        {
+            return true;
+        }else{
+            return null;
+        }  
+    }
     public function findAll()  {
 		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
@@ -88,6 +100,15 @@ class Menage_beneficiaire_model extends CI_Model {
         }
         return null;  
     }
+    public function findAllByMenageSousprojet($id_menage,$id_sous_projet) {
+        // Selection par id_sous_projet
+        $this->db->where("id_menage", $id_menage)->where("id_sous_projet", $id_sous_projet);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;  
+    }
     public function findById($id)  {
 		// Selection par id
         $this->db->where("id", $id);
@@ -105,6 +126,24 @@ class Menage_beneficiaire_model extends CI_Model {
 				." left outer join see_village as v on v.id=m.village_id"
                 ." where mp.id_sous_projet like ".$id_sous_projet
 				." and v.id=".$village_id;	
+				$result = $this->db->query($requete)->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                  
+    }
+    public function findAllBySousprojetAndVillage($id_sous_projet,$village_id)  {
+		// Selection par intervention et par fokontany
+		$requete="select m.inapte,m.NumeroEnregistrement as numeroenregistrement,m.nomchefmenage,mp.id,mp.id_menage,mp.id_sous_projet,"
+				."m.NomTravailleur as nomtravailleur,m.SexeTravailleur as sexetravailleur,m.NomTravailleurSuppliant as nomtravailleursuppleant,"
+				."m.SexeTravailleurSuppliant as sexetravailleursuppliant"
+				." from menage_beneficiaire as mp"
+				." left outer join menage as m on m.id=mp.id_menage"
+				." left outer join see_village as v on v.id=m.village_id"
+                ." where mp.id_sous_projet=".$id_sous_projet
+				." and v.id=".$village_id." and m.statut='BENEFICIAIRE'";	
 				$result = $this->db->query($requete)->result();
         if($result)
         {

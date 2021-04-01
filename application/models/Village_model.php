@@ -111,5 +111,18 @@ public function findAllByIle($ile_id)
         }
         return null;
     }
+    public function findByIdAr($id)
+    {
+ 		$requete="select v.Village as village,v.zone_id"
+				." from see_village as v"
+                ." where v.id=".$id;
+				$result = $this->db->query($requete)->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }   
+    }
 
 }

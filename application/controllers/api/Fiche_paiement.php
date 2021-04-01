@@ -41,7 +41,7 @@ class Fiche_paiement extends REST_Controller {
 			'activite_id' => $this->post('activite_id'),
 			'village_id' => ($this->post('village_id')),
 			'id_annee' => ($this->post('id_annee')),
-			'id_sous_projet' => ($this->post('id_sous_projet')),
+			'microprojet_id' => ($this->post('id_sous_projet')),
 			'etape_id' => ($this->post('date_sortie')),
 			'fichepresence_id' => ($this->post('fichepresence_id')),
 			'agep_id' => ($this->post('agep_id')),

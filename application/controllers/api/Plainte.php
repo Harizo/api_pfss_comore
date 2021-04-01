@@ -47,10 +47,16 @@ class Plainte extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+        $tempo = $this->post('menage_id') ;
         $etat_download = $this->post('etat_download') ; 
+		$menage_id=null;
+		if($tempo && intval($tempo) >0) {
+			$menage_id=$tempo;
+		}
 		$data = array(
-            'menage_id'                 => $this->post('menage_id'),
+            'menage_id'                 => $menage_id,
             'activite_id'               => $this->post('activite_id'),
+            'id_sous_projet'            => $this->post('id_sous_projet'),
             'cellulederecours_id'       => $this->post('cellulederecours_id'),
             'typeplainte_id'            => $this->post('typeplainte_id'),
             'solution_id'               => $this->post('solution_id'),

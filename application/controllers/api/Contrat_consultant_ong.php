@@ -7,6 +7,8 @@ class Contrat_consultant_ong extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('contrat_consultant_ong_model', 'ContratconsultantManager');
+        $this->load->model('livrable_consultant_model', 'LivrableconsultantManager');
+        $this->load->model('point_controle_model', 'PoincontroleManager');
     }
     public function index_get() {
         $id = $this->get('id');
@@ -40,6 +42,7 @@ class Contrat_consultant_ong extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
 		// Affectation des valeurs des colonnes de la table
 		$data = array(
+			'id_consultant' => $this->post('id_consultant'),
 			'id_sous_projet' => $this->post('id_sous_projet'),
 			'reference'  => $this->post('reference'),
 			'date_contrat'    => $this->post('date_contrat'),
@@ -101,6 +104,14 @@ class Contrat_consultant_ong extends REST_Controller {
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregistrement
+			$detail_livrable =$this->LivrableconsultantManager->findByContrat($id);
+			foreach($detail_livrable as $k=>$v) {
+				$detail_point_controle=$this->PoincontroleManager->findByIdlivrable($v->id);
+				foreach($detail_point_controle as $kk=>$vv) {
+					$delete = $this->PoincontroleManager->delete($vv->id);
+				}
+				$delete1 = $this->LivrableconsultantManager->delete($v->id);
+			}
             $delete = $this->ContratconsultantManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([

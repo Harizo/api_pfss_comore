@@ -32,7 +32,7 @@ class Fiche_paiement_model extends CI_Model {
             'activite_id'        => $fiche_pres['activite_id'],
             'village_id'  => $fiche_pres['village_id'],                      
             'id_annee'  => $fiche_pres['id_annee'],                      
-            'id_sous_projet'  => $fiche_pres['id_sous_projet'],                      
+            'microprojet_id'  => $fiche_pres['microprojet_id'],                      
             'etape_id'      => $fiche_pres['etape_id'],                      
             'agep_id' => $fiche_pres['agep_id'],                      
             'fichepresence_id' => $fiche_pres['fichepresence_id'],                      

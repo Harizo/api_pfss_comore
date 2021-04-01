@@ -75,17 +75,12 @@ class Agent_ex_model extends CI_Model {
         }                 
     }
     public function findById($id) {
-        $result =  $this->db->select('*')
-                        ->from($this->table)
-                        ->where("id", $id)
-                        ->order_by('id', 'asc')
-                        ->get()
-                        ->result();
-        if($result) {
-            return $result;
-        }else{
-            return null;
-        }                 
+        $this->db->where("id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
     }
     public function findByIdArray($id)  {
         $result =  $this->db->select('*')

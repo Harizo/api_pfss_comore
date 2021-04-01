@@ -16,7 +16,11 @@ class Livrable_consultant extends REST_Controller {
 			$data = $this->LivrableconsultantManager->findById($id);
             if (!$data)
                 $data = array();
-		}  else  {
+		}  else  if($cle_etrangere) {
+			$data = $this->LivrableconsultantManager->findByContrat($cle_etrangere);
+            if (!$data)
+                $data = array();
+		} else {	
 			$data = $this->LivrableconsultantManager->findAll();
             if (!$data)
                 $data = array();
