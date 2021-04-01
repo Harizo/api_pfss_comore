@@ -12,8 +12,16 @@ class Menage_beneficiaire extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
         $id_sous_projet = $this->get('id_sous_projet');
         $village_id = $this->get('village_id');
+        $menu = $this->get('menu');
+        $id_sous_projet_2 = $this->get('id_sous_projet_2');
         $data = array() ;
-        if ($cle_etrangere) {
+        if ($menu=="getmenageBysous_projet")
+        {
+            $menage = $this->MenagebeficiaireManager->getmenageBysous_projet($id_sous_projet_2);          
+            if ($menage) {
+                $data = $menage;               
+            }
+        } elseif ($cle_etrangere) {
 			// Selection des enregistrements par ménage
             $menage_programme = $this->MenagebeficiaireManager->findAllByMenage($cle_etrangere);          
             if ($menage_programme) {

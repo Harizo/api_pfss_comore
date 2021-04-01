@@ -10,13 +10,33 @@ class Activite_agr extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('activite_agr_model', 'Activite_agrManager');
+        $this->load->model('type_agr_model', 'Type_agrManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
         $id_type_agr = $this->get('id_type_agr');
-        if ($menu=="getactivite_agrbytype") {
+        $id_tableau_recap_pac = $this->get('id_tableau_recap_pac');
+        if ($menu=="getactivite_agrbytableau_recap") {
+               
+            $activite_agr = $this->Activite_agrManager->getactivite_agrbytableau_recap($id_tableau_recap_pac);
+                if ($activite_agr) {
+                   // $data = $activite_agr;
+                    foreach ($activite_agr as $key => $value)
+                    {   
+                        $type_agr = $this->Type_agrManager->findById($value->id_type_agr);
+                        $data[$key]['id'] = $value->id;
+                        $data[$key]['code'] = $value->code;
+                        $data[$key]['libelle'] = $value->libelle;
+                        $data[$key]['type_agr'] = $type_agr;
+                        
+                    };
+
+                } else
+                    $data = array();
+            
+        } elseif ($menu=="getactivite_agrbytype") {
                
             $activite_agr = $this->Activite_agrManager->getactivite_agrbytype($id_type_agr);
                 if ($activite_agr) {
@@ -76,7 +96,8 @@ class Activite_agr extends REST_Controller {
                 $data = array(
                     'code' => $this->post('code'),
                     'libelle' => $this->post('libelle'),
-                    'id_type_agr' => $this->post('id_type_agr')
+                    'id_type_agr' => $this->post('id_type_agr'),
+                    'id_tableau_recap_pac' => $this->post('id_tableau_recap_pac')
                 );               
                 if (!$data) {
                     $this->response([
@@ -107,7 +128,8 @@ class Activite_agr extends REST_Controller {
                     $data = array(
                         'code' => $this->post('code'),
                         'libelle' => $this->post('libelle'),
-                        'id_type_agr' => $this->post('id_type_agr')
+                        'id_type_agr' => $this->post('id_type_agr'),
+                        'id_tableau_recap_pac' => $this->post('id_tableau_recap_pac')
                     );
                     if (!$data) {
                         $this->response([
@@ -136,7 +158,8 @@ class Activite_agr extends REST_Controller {
                     $data = array(
                         'code' => $this->post('code'),
                         'libelle' => $this->post('libelle'),
-                        'id_type_agr' => $this->post('id_type_agr')
+                        'id_type_agr' => $this->post('id_type_agr'),
+                        'id_tableau_recap_pac' => $this->post('id_tableau_recap_pac')
                     );              
                     if (!$data || !$id) {
                         $this->response([

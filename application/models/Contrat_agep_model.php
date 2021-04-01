@@ -1,10 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Agence_p_model extends CI_Model {
-    protected $table = 'see_agent';
+class Contrat_agep_model extends CI_Model {
+    protected $table = 'contrat_agep';
 
-    public function add($agence_p)  {
-        $this->db->set($this->_set($agence_p))
+    public function add($contrat_agep)  {
+        $this->db->set($this->_set($contrat_agep))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -13,17 +13,8 @@ class Agence_p_model extends CI_Model {
         }                    
     }
 
-    public function add_down($agence_p, $id)  {
-        $this->db->set($this->_set_down($agence_p, $id))
-                            ->insert($this->table);
-        if($this->db->affected_rows() === 1)  {
-            return $this->db->insert_id();
-        }else{
-            return null;
-        }                    
-    }
-    public function update($id, $agence_p)  {
-        $this->db->set($this->_set($agence_p))
+    public function update($id, $contrat_agep)  {
+        $this->db->set($this->_set($contrat_agep))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -32,28 +23,24 @@ class Agence_p_model extends CI_Model {
             return null;
         }                      
     }
-    public function _set($agence_p) {
-        return array(
-            'identifiant' => $agence_p['identifiant'],
-            'raison_social' => $agence_p['raison_social'],
-            'nom_contact' => $agence_p['nom_contact'],
-            'titre_contact' => $agence_p['titre_contact'],
-            'numero_phone_contact' => $agence_p['numero_phone_contact'],
-            'adresse' => $agence_p['adresse']
+    public function _set($contrat_agep) 
+    {
+        return array
+        (
+            'numero_contrat'    => $contrat_agep['numero_contrat'],
+            'id_agep'           => $contrat_agep['id_agep'],
+            'id_sous_projet'    => $contrat_agep['id_sous_projet'],
+            'objet_contrat'     => $contrat_agep['objet_contrat'],
+            'montant_contrat'    => $contrat_agep['montant_contrat'],
+            'modalite_contrat'  => $contrat_agep['modalite_contrat'],
+            'date_signature'    => $contrat_agep['date_signature'],
+            'date_prevu_fin'    => $contrat_agep['date_prevu_fin'],
+            'noms_signataires'  => $contrat_agep['noms_signataires'],
+            'statu'             => $contrat_agep['statu']
         );
     }
 
-    public function _set_down($agence_p, $id) {
-        return array(
-            'id' => $id,
-            'identifiant' => $agence_p['identifiant'],
-            'raison_social' => $agence_p['raison_social'],
-            'nom_contact' => $agence_p['nom_contact'],
-            'titre_contact' => $agence_p['titre_contact'],
-            'numero_phone_contact' => $agence_p['numero_phone_contact'],
-            'adresse' => $agence_p['adresse']
-        );
-    }
+
     public function delete($id) {
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)  {

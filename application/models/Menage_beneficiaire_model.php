@@ -79,6 +79,25 @@ class Menage_beneficiaire_model extends CI_Model {
             return null;
         }                  
     }
+    public function getmenageBysous_projet($id_sous_projet)   {
+		// Selection par intervention
+        $result =  $this->db->select('menage.id as id,
+                                        menage.NumeroEnregistrement as NumeroEnregistrement,
+                                        menage.NomTravailleurSuppliant as NomTravailleurSuppliant,
+                                        menage.AgeInscrire as AgeInscrire,
+                                        menage.SexeTravailleurSuppliant as SexeTravailleurSuppliant
+                                        ')
+                        ->from($this->table)
+                        ->join('menage', 'menage.id = menage_beneficiaire.id_menage')
+                        ->like('menage_beneficiaire.id_sous_projet', $id_sous_projet)
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                  
+    }
     public function findAllByMenage($id_menage) {
         // Selection par id_menage
         $this->db->where("id_menage", $id_menage);

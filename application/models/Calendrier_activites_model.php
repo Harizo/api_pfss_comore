@@ -1,13 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Activite_agr_model extends CI_Model
+class Calendrier_activites_model extends CI_Model
 {
-    protected $table = 'activite_agr';
+    protected $table = 'calendrier_activites';
 
 
-    public function add($activite_agr)
+    public function add($calendrier_activites)
     {
-        $this->db->set($this->_set($activite_agr))
+        $this->db->set($this->_set($calendrier_activites))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
         {
@@ -18,9 +18,9 @@ class Activite_agr_model extends CI_Model
     }
 
 
-    public function update($id, $activite_agr)
+    public function update($id, $calendrier_activites)
     {
-        $this->db->set($this->_set($activite_agr))
+        $this->db->set($this->_set($calendrier_activites))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)
@@ -31,18 +31,18 @@ class Activite_agr_model extends CI_Model
         }                      
     }
 
-    public function _set($activite_agr)
+    public function _set($calendrier_activites)
     {
-        return array(
-            'code'    =>      $activite_agr['code'],
-            'libelle' =>      $activite_agr['libelle'],
-            'id_type_agr' =>      $activite_agr['id_type_agr'] ,
-            'id_tableau_recap_pac' =>      $activite_agr['id_tableau_recap_pac']                     
+        return array(            
+            'mois'       => $calendrier_activites['mois'],
+            'activite'  => $calendrier_activites['activite'],
+            'duree'  => $calendrier_activites['duree'],      
+            'id_pac'    => $calendrier_activites['id_pac']
         );
     }
 
-    public function add_down($activite_agr, $id)  {
-        $this->db->set($this->_set_down($activite_agr, $id))
+    public function add_down($calendrier_activites, $id)  {
+        $this->db->set($this->_set_down($calendrier_activites, $id))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -50,14 +50,13 @@ class Activite_agr_model extends CI_Model
             return null;
         }                    
     }
-    public function _set_down($activite_agr, $id)
+    public function _set_down($calendrier_activites, $id)
     {
         return array(
-            'id' => $id,
-            'code' => $activite_agr['code'],
-            'libelle' => $activite_agr['libelle'],
-            'id_type_agr' =>      $activite_agr['id_type_agr'] ,
-            'id_tableau_recap_pac' =>      $activite_agr['id_tableau_recap_pac'] 
+            'mois'       => $calendrier_activites['mois'],
+            'activite'  => $calendrier_activites['activite'],
+            'duree'  => $calendrier_activites['duree'],      
+            'id_pac'    => $calendrier_activites['id_pac']
         );
     }
 
@@ -77,7 +76,7 @@ class Activite_agr_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('code')
+                        ->order_by('id')
                         ->get()
                         ->result();
         if($result)
@@ -86,14 +85,12 @@ class Activite_agr_model extends CI_Model
         }else{
             return null;
         }                 
-    }
-
-    public function getactivite_agrbytableau_recap($id_tableau_recap_pac)
+    } 
+    public function getcalendrier_activitesbypac($id_pac)
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where('id_tableau_recap_pac',$id_tableau_recap_pac)
-                        ->order_by('code')
+                        ->where('id_pac',$id_pac)
                         ->get()
                         ->result();
         if($result)
@@ -102,24 +99,7 @@ class Activite_agr_model extends CI_Model
         }else{
             return null;
         }                 
-    }
-
-    public function getactivite_agrbytype($id_type_agr)
-    {
-        $result =  $this->db->select('*')
-                        ->from($this->table)
-                        ->where('id_type_agr',$id_type_agr)
-                        ->order_by('code')
-                        ->get()
-                        ->result();
-        if($result)
-        {
-            return $result;
-        }else{
-            return null;
-        }                 
-    }
-
+    } 
     public function findById($id)
     {
         $this->db->where("id", $id);
