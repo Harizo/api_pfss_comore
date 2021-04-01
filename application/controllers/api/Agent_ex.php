@@ -9,39 +9,30 @@ class Agent_ex extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('agent_ex_model', 'AgentexManager');
-        $this->load->model('ile_model', 'ileManager');
-        $this->load->model('programme_model', 'ProgrammeManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
 		$data = array();
-        $taiza='';
-		if ($id) {
+        
+
+		if ($id) 
+        {
 			$tmp = $this->AgentexManager->findById($id);
-			if($tmp) {
+			if($tmp) 
+            {
 				$data=$tmp;
                 $taiza='taoid';
 			}
-		} else {			
+		} 
+        else 
+        {			
 			$tmp = $this->AgentexManager->findAll();
-			if ($tmp) {
-				//$data=$tmp;
-                foreach ($tmp as $key => $value)
-                {
-                    $ile = $this->ileManager->findById($value->ile_id);
-                    $prog = $this->ProgrammeManager->findById($value->programme_id);
-                    
-                    $data[$key]['id'] = $value->id;
-                    $data[$key]['Code'] = $value->Code;
-                    $data[$key]['Nom'] = $value->Nom;
-                    $data[$key]['Contact'] = $value->Contact;
-                    $data[$key]['Representant'] = $value->Representant;
-                    $data[$key]['ile'] = $ile;
-                    $data[$key]['programme'] = $prog[0];
-                     $taiza='findall';
-                }
-                
+			if ($tmp) 
+            {
+				$data=$tmp;
+          
+
 			}
 		}
         if (count($data)>0) {
@@ -58,17 +49,23 @@ class Agent_ex extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
-    public function index_post() {
+
+    public function index_post() 
+    {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
-        $etat_download = $this->post('etat_download') ; 
+        $etat_download = $this->post('etat_download') ;
+
 		$data = array(
-			'Code' => $this->post('Code'),
+			
+
+            'identifiant_agex' => $this->post('identifiant_agex'),
             'Nom' => $this->post('Nom'),
-            'Contact' => $this->post('Contact'),
-            'Representant' => $this->post('Representant'),
-            'ile_id' => $this->post('ile_id'),
-            'programme_id' => $this->post('programme_id')
+            'intervenant_agex' => $this->post('intervenant_agex'),
+            'nom_contact_agex' => $this->post('nom_contact_agex'),
+            'titre_contact' => $this->post('titre_contact'),
+            'numero_phone_contact' => $this->post('numero_phone_contact'),
+            'adresse_agex' => $this->post('adresse_agex')
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {

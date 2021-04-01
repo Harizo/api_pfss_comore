@@ -34,24 +34,26 @@ class Agent_ex_model extends CI_Model {
     }
     public function _set($agent_ex) {
         return array(
-            'Code' => $agent_ex['Code'],
+            'identifiant_agex' => $agent_ex['identifiant_agex'],
             'Nom' => $agent_ex['Nom'],
-            'Contact' => $agent_ex['Contact'],
-            'Representant' => $agent_ex['Representant'],
-            'programme_id' => $agent_ex['programme_id'],
-            'ile_id' => $agent_ex['ile_id']
+            'intervenant_agex' => $agent_ex['intervenant_agex'],
+            'nom_contact_agex' => $agent_ex['nom_contact_agex'],
+            'titre_contact' => $agent_ex['titre_contact'],
+            'numero_phone_contact' => $agent_ex['numero_phone_contact'],
+            'adresse_agex' => $agent_ex['adresse_agex']
         );
     }
 
     public function _set_down($agent_ex, $id) {
         return array(
             'id' => $id,
-            'Code' => $agent_ex['Code'],
+            'identifiant_agex' => $agent_ex['identifiant_agex'],
             'Nom' => $agent_ex['Nom'],
-            'Contact' => $agent_ex['Contact'],
-            'Representant' => $agent_ex['Representant'],
-            'programme_id' => $agent_ex['programme_id'],
-            'ile_id' => $agent_ex['ile_id']
+            'intervenant_agex' => $agent_ex['intervenant_agex'],
+            'nom_contact_agex' => $agent_ex['nom_contact_agex'],
+            'titre_contact' => $agent_ex['titre_contact'],
+            'numero_phone_contact' => $agent_ex['numero_phone_contact'],
+            'adresse_agex' => $agent_ex['adresse_agex']
         );
     }
     public function delete($id) {
@@ -65,7 +67,7 @@ class Agent_ex_model extends CI_Model {
     public function findAll() {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('Code')
+                        ->order_by('identifiant_agex')
                         ->get()
                         ->result();
         if($result) {
