@@ -60,13 +60,34 @@ class Fiche_presencemenage_model extends CI_Model {
         }                 
     }
     public function findById($id)  {
-		// Selection par id
-        $this->db->where("id", $id);
-        $q = $this->db->get($this->table);
-        if ($q->num_rows() > 0) {
-            return $q->row();
-        }
-        return null;
+		// Selection de tous les enregitrements
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where('id', $id)
+                        ->order_by('id')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+    public function findByFiche_presence_id($fiche_presence_id)  {
+		// Selection de tous les enregitrements
+		 $requete="select fpm.fiche_presence_id,fpm.menage_id,fpm.village_id,m.inapte,m.nomchefmenage,"
+				."m.NumeroEnregistrement,m.NomTravailleur,m.SexeTravailleur,m.NomTravailleurSuppliant,m.SexeTravailleurSuppliant,"
+				."fpm.travailleurpresent,fpm.suppliantpresent"
+				." from see_fichepresencemenage as fpm"
+				." left outer join menage as m on m.id=fpm.menage_id"
+				." where fpm.fiche_presence_id=".$fiche_presence_id;
+				$result = $this->db->query($requete)->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                  
     }
  
 }

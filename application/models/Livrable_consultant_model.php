@@ -55,6 +55,20 @@ class Livrable_consultant_model extends CI_Model {
             return null;
         }                 
     }
+    public function findByContrat($id_contrat) {
+		// Selection de tous les enregitrements
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where("id_contrat", $id_contrat)
+                        ->order_by('id')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
     public function findById($id) {
 		// Selection par id
         $this->db->where("id", $id);

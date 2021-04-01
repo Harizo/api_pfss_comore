@@ -10,6 +10,7 @@ class Menage extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('menage_model', 'menageManager');
+        $this->load->model('menage_beneficiaire_model', 'MenageBeneficiaireManager');
     }
 
     public function index_get() {
@@ -17,12 +18,15 @@ class Menage extends REST_Controller {
 
         $cle_etrangere = $this->get('cle_etrangere');
         $statut = $this->get('statut');
+        $id_sous_projet = $this->get('id_sous_projet');
 
         $max_id = $this->get('max_id');
 		$data=array();
         if ($max_id == 1) {
             $data = $this->menageManager->find_max_id();
-        } else if ($cle_etrangere && $statut) {
+        } else if ($cle_etrangere && $statut && $id_sous_projet) {
+			$data = $this->menageManager->findAllByVillageAndStatutAndSousProjet($cle_etrangere,$statut,$id_sous_projet);
+        }else if ($cle_etrangere && $statut) {
 			$data = $this->menageManager->findAllByVillageAndStatut($cle_etrangere,$statut);
         } else if($cle_etrangere) {
 			$data = $this->menageManager->findAllByVillage($cle_etrangere);			
@@ -49,6 +53,7 @@ class Menage extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
         $mise_a_jour_statut = $this->post('mise_a_jour_statut') ;
+        $mise_a_jour_photo = $this->post('mise_a_jour_photo') ;
 		$data = array(
 			'id_serveur_centrale' => null,
 			'DateInscription' => $this->post('DateInscription'),
@@ -102,9 +107,11 @@ class Menage extends REST_Controller {
 			'rang_obtenu' => $this->post('rang_obtenu'),
 			'NomTravailleur' => $this->post('NomTravailleur'),
 			'SexeTravailleur' => $this->post('SexeTravailleur'),
+			'datedenaissancetravailleur' => $this->post('datedenaissancetravailleur'),
 			'agetravailleur' => $this->post('agetravailleur'),
 			'NomTravailleurSuppliant' => $this->post('NomTravailleurSuppliant'),
 			'SexeTravailleurSuppliant' => $this->post('SexeTravailleurSuppliant'),
+			'datedenaissancesuppliant' => $this->post('datedenaissancesuppliant'),
 			'agesuppliant' => $this->post('agesuppliant'),
 			'statut' => $this->post('statut'),
 			'inapte' => $this->post('inapte'),
@@ -112,6 +119,9 @@ class Menage extends REST_Controller {
 			'quartier' => $this->post('quartier'),
 			'milieu' => $this->post('milieu'),
 			'zip' => $this->post('zip'),
+			'photo' => $this->post('photo'),
+			'phototravailleur' => $this->post('phototravailleur'),
+			'phototravailleursuppliant' => $this->post('phototravailleursuppliant'),
 		);   
         if ($supprimer == 0) {
             if ($id == 0) {
@@ -151,7 +161,30 @@ class Menage extends REST_Controller {
 						'identifiant_menage' => $this->post('identifiant_menage'),
 						);
 					$update = $this->menageManager->update_statut($id, $data);	
-				} else {	
+					if($this->post('statut')=='BENEFICIAIRE') {
+						// ajout menage bénéficiaire si $nombre==null;
+						$nombre = $this->MenageBeneficiaireManager->findAllByMenageSousprojet($this->post('menage_id'),$this->post('id_sous_projet'));	
+						if(!$nombre) {
+							$data = array(
+								'date_inscription' => $this->post('DateInscription'),
+								'date_sortie' => null,
+								'id_menage' => $this->post('menage_id'),
+								'id_sous_projet' => $this->post('id_sous_projet'),
+							);
+							$ajout = $this->MenageBeneficiaireManager->add($data);	
+						} 
+					}else {
+						// Enlever dans ménage bénéficiaire  retour PRESELECTIONNE
+						$del = $this->MenageBeneficiaireManager->deleteByMenageSousprojet($this->post('menage_id'),$this->post('id_sous_projet'));	
+					}						
+				} else if($mise_a_jour_photo) {
+					$data = array(
+						'photo' => $this->post('photo'),
+						'phototravailleur' => $this->post('phototravailleur'),
+						'phototravailleursuppliant' => $this->post('phototravailleursuppliant'),
+					);
+					$update = $this->menageManager->update_photo($id, $data);	
+				} else {		
 					$update = $this->menageManager->update($id, $data); 
 				}		
                 if(!is_null($update)){

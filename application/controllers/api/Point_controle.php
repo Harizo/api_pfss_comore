@@ -16,7 +16,11 @@ class Point_controle extends REST_Controller {
 			$data = $this->PointcontroleManager->findById($id);
             if (!$data)
                 $data = array();
-		}  else  {
+		}  else if($cle_etrangere) {
+			$data = $this->PointcontroleManager->findByIdlivrable($cle_etrangere);
+            if (!$data)
+                $data = array();
+		} else {	
 			$data = $this->PointcontroleManager->findAll();
             if (!$data)
                 $data = array();

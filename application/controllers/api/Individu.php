@@ -65,6 +65,7 @@ class Individu extends REST_Controller {
                     'sexe' => $this->post('sexe'),
                     'lienparental' => $this->post('lienparental'),
                     'a_ete_modifie' => $this->post('a_ete_modifie'),
+                    'scolarise' => $this->post('scolarise'),
                 );               
                 if (!$data) {
                     $this->response([
@@ -99,6 +100,7 @@ class Individu extends REST_Controller {
                     'sexe' => $this->post('sexe'),
                     'lienparental' => $this->post('lienparental'),
                     'a_ete_modifie' => $this->post('a_ete_modifie'),
+                    'scolarise' => $this->post('scolarise'),
                 );              
                 if (!$data || !$id) {
                     $this->response([

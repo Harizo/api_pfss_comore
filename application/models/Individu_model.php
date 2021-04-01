@@ -44,6 +44,7 @@ class Individu_model extends CI_Model
             'sexe'                 =>      $individu['sexe'],
             'lienparental'         =>      $individu['lienparental'],                   
             'a_ete_modifie'        =>      $individu['a_ete_modifie'],                   
+            'scolarise'            =>      $individu['scolarise'],                   
         );
     }
 
@@ -76,7 +77,7 @@ class Individu_model extends CI_Model
 
     public function findAllByMenage($menage_id)
     {
-        $result =  $this->db->select('*')
+       $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')
                         ->where("menage_id", $menage_id)

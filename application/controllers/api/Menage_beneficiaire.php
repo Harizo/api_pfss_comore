@@ -35,7 +35,7 @@ class Menage_beneficiaire extends REST_Controller {
             if ($id_sous_projet && $village_id) {  
                 $id_prog = "'%".'"'.$id_sous_projet.'"'."%'" ;
 				// Selection des ménage par programme et par fokontany
-                $list_menage = $this->MenagebeficiaireManager->findAllByProgrammeAndVillage($id_prog,$village_id);
+                $list_menage = $this->MenagebeficiaireManager->findAllBySousprojetAndVillage($id_sous_projet,$village_id);
                 if ($list_menage)  {
                     foreach ($list_menage as $key => $value)  {
                         $data[$key]['id'] = $value->id;

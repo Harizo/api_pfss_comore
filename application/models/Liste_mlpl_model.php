@@ -28,6 +28,7 @@ class Liste_mlpl_model extends CI_Model {
 		// Affectation des valeurs
         return array(
             'id_groupe_ml_pl' =>  $liste_mlpl['id_groupe_ml_pl'],
+            'menage_id'       =>  $liste_mlpl['menage_id'],
             'nom_prenom'      =>  $liste_mlpl['nom_prenom'],                       
             'adresse'         =>  $liste_mlpl['adresse'],                       
             'contact'         =>  $liste_mlpl['contact'],                       
@@ -57,18 +58,19 @@ class Liste_mlpl_model extends CI_Model {
         }                 
     }
     public function findAllByGroupemlpl($id_groupe_ml_pl)  {     
-		// Selection par id_groupe_ml_pl
-        $result =  $this->db->select('*')
-                        ->from($this->table)
-						->where("id_groupe_ml_pl", $id_groupe_ml_pl)
-                        ->order_by('id')
-                        ->get()
-                        ->result();
-        if($result) {
-            return $result;
+		$requete="select grpm.id_groupe_ml_pl,grpm.menage_id, grpm.id,m.NumeroEnregistrement,m.nomchefmenage,m.nom_conjoint,m.Addresse,"
+		."m.nombre_enfant_non_scolarise,m.nombre_enfant_moins_six_ans,m.nombre_enfant_scolarise,"
+		."grpm.nom_prenom,grpm.adresse,grpm.contact,grpm.fonction"
+		." from liste_ml_pl as grpm"
+		." left outer join menage as m on m.id=grpm.menage_id"
+		." where grpm.id_groupe_ml_pl =".$id_groupe_ml_pl
+		." order by m.NumeroEnregistrement";
+		$query= $this->db->query($requete);		
+		if($query->result()) {
+			return $query->result();
         }else{
             return null;
-        }                 
+        }  
     }
     public function findById($id) {
 		// Selection par id
