@@ -170,7 +170,7 @@ class Requete_export extends REST_Controller {
 			} else if($liste_etat_paiement) {
 				$requeteplus="";
 				if($id_sous_projet && intval($id_sous_projet) >0) {
-					$requeteplus=$requeteplus." and fp.id_sous_projet=".$id_sous_projet;
+					$requeteplus=$requeteplus." and fp.microprojet_id=".$id_sous_projet;
 				}
 				$agep_id= $this->get('agep_id');
 				if($agep_id && intval($agep_id) >0) {

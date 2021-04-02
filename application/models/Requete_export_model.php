@@ -67,7 +67,7 @@ class Requete_export_model extends CI_Model
 	public function Liste_etat_presence($village_id,$requetefiltre) {
 		$requete="SELECT fp.id,i.id as ile_id,i.ile,r.id as region_id,r.region,c.id as commune_id,c.commune,"
 				."fp.village_id as village_id,v.village,"
-				."fp.activite_id,act.detail as activite,fp.agex_id,ag.code,"
+				."fp.activite_id,act.detail as activite,fp.agex_id,ag.identifiant_agex,"
 				."v.zone_id,z.zone,ifnull(date_format(fp.datedu,'%Y-%m-%d'),'') as datedu,ifnull(date_format(fp.datefin,'%Y-%m-%d'),'') as datefin,fp.nombrejourdetravail,"
 				."fp.fichepaiement_id,ifnull(date_format(fpaie.datepaiement,'%Y-%m-%d'),'') as datepaiement,"
 				."fp.microprojet_id,mic.description as microprojet,mic.code as code_sous_projet,"
@@ -98,11 +98,11 @@ class Requete_export_model extends CI_Model
 	public function Liste_etat_paiement($village_id,$requetefiltre) {
 		$requete="SELECT fp.id,i.id as ile_id,i.ile,r.id as region_id,r.region,c.id as commune_id,c.commune,"
 				."fp.village_id as village_id,v.village,"
-				."fp.activite_id,act.detail as activite,fpp.agex_id,ag.code,"
+				."fp.activite_id,act.detail as activite,fpp.agex_id,ag.identifiant_agex,"
 				."v.zone_id,z.zone,ifnull(date_format(fpp.datedu,'%Y-%m-%d'),'') as datedu,ifnull(date_format(fpp.datefin,'%Y-%m-%d'),'') as datefin,fp.nombrejourdetravail,"
 				."fpp.fichepaiement_id,ifnull(date_format(fp.datepaiement,'%Y-%m-%d'),'') as datepaiement,"
-				."fp.id_sous_projet,mic.description as microprojet,mic.code as code_sous_projet,"
-				."fp.etape_id,ph.phase,fp.id_annee as id_annee,a.annee,agp.Code as code_agep,agp.Nom as nom_agep,"
+				."fp.microprojet_id,mic.description as microprojet,mic.code as code_sous_projet,"
+				."fp.etape_id,ph.phase,fp.id_annee as id_annee,a.annee,agp.identifiant as code_agep,agp.raison_social as nom_agep,"
 				."fp.montanttotalapayer,fp.montanttotalpaye,fp.montantapayertravailleur,fp.montantpayetravailleur,"
 				."fp.montantapayersuppliant,fp.montantpayesuppliant"
 				." from see_fichepaiement as fp"
@@ -115,7 +115,7 @@ class Requete_export_model extends CI_Model
 				." left outer join see_agex as ag on ag.id=fpp.agex_id"
 				." left outer join see_agent as agp on agp.id=fp.agep_id"
 				." left outer join see_zone as z on z.id=v.zone_id"
-				." left outer join sous_projet as mic on mic.id=fp.id_sous_projet"
+				." left outer join sous_projet as mic on mic.id=fp.microprojet_id"
 				." left outer join see_phaseexecution as ph on ph.id=fp.etape_id"
 				." left outer join see_annee as a on a.id=fp.id_annee"	
 				." where fp.village_id=".$village_id.$requetefiltre
