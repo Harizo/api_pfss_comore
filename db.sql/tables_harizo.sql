@@ -12,6 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Listage de la structure de la table ogadc. contrat_ugp_agex
+USE ogadc;
 DROP TABLE IF EXISTS `contrat_ugp_agex`;
 CREATE TABLE IF NOT EXISTS `contrat_ugp_agex` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
