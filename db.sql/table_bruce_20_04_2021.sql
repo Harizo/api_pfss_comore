@@ -116,6 +116,30 @@ INSERT INTO `fiche_supervision_mlpl` (`id`, `id_groupemlpl`, `id_consultant_ong`
 	(1, 2, 3, 'type', 'personne', 'organisation', 'planning activite', 'nom mission', '2021-04-07', '2021-04-08', '2021-04-09', 'nom');
 /*!40000 ALTER TABLE `fiche_supervision_mlpl` ENABLE KEYS */;
 
+-- Listage de la structure de la table pfss_db. infrastructure
+DROP TABLE IF EXISTS `infrastructure`;
+CREATE TABLE IF NOT EXISTS `infrastructure` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_type_infrastructure` int(11) DEFAULT NULL,
+  `code` varchar(10) DEFAULT NULL,
+  `libelle` varchar(10) DEFAULT NULL,
+  `id_communaute` int(11) DEFAULT NULL,
+  `statu` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_infrastructure_type_infrastructure` (`id_type_infrastructure`),
+  KEY `FK_infrastructure_communaute` (`id_communaute`),
+  CONSTRAINT `FK_infrastructure_communaute` FOREIGN KEY (`id_communaute`) REFERENCES `communaute` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `FK_infrastructure_type_infrastructure` FOREIGN KEY (`id_type_infrastructure`) REFERENCES `type_infrastructure` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+-- Listage des données de la table pfss_db.infrastructure : ~3 rows (environ)
+/*!40000 ALTER TABLE `infrastructure` DISABLE KEYS */;
+INSERT INTO `infrastructure` (`id`, `id_type_infrastructure`, `code`, `libelle`, `id_communaute`, `statu`) VALUES
+	(1, 1, 'code', ' libelle', NULL, NULL),
+	(2, 1, 'code', 'libelle', NULL, NULL),
+	(3, 1, 'code', 'libelle', 3, 'CHOISI');
+/*!40000 ALTER TABLE `infrastructure` ENABLE KEYS */;
+
 -- Listage de la structure de la table pfss_db. livrable_mlpl
 DROP TABLE IF EXISTS `livrable_mlpl`;
 CREATE TABLE IF NOT EXISTS `livrable_mlpl` (
