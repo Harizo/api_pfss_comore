@@ -30,7 +30,8 @@ class Fichepresence_bienetre_model extends CI_Model {
             'id_groupe_ml_pl'      => $fiche_presence['id_groupe_ml_pl'],
             'date_presence'        => $fiche_presence['date_presence'],                       
             'menage_id'            => $fiche_presence['menage_id'],                       
-            'enfant_moins_six_ans' => $fiche_presence['enfant_moins_six_ans'],                       
+            'enfant_moins_six_ans' => $fiche_presence['enfant_moins_six_ans'],                      
+            'numero_ligne'         => $fiche_presence['numero_ligne']                       
         );
     }
     public function delete($id) {
@@ -46,6 +47,20 @@ class Fichepresence_bienetre_model extends CI_Model {
 		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
+                        ->order_by('id')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+    public function getfichepresencebygroupe($id_groupe_ml_pl) {
+		// Selection de tous les enregitrements
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where("id_groupe_ml_pl", $id_groupe_ml_pl)
                         ->order_by('id')
                         ->get()
                         ->result();

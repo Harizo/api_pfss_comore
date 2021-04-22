@@ -19,6 +19,7 @@ class Requete_export extends REST_Controller {
         $this->load->model('fiche_presence_model', 'FichEpresenceManager');
         $this->load->model('agence_p_model', 'AgencepaiementManager');
         $this->load->model('menage_model', 'MenageManager');
+        $this->load->model('individu_model', 'IndividuManager');
         $this->load->model('requete_export_model', 'RequeteexportManager');
     }
 
@@ -147,7 +148,12 @@ class Requete_export extends REST_Controller {
 				$micro = $this->SousprojetManager->findById($id_sous_projet);
 				$microprojet = $micro->description;
 				$menages=$this->MenageManager->findAllByVillageAndStatutAndSousProjet($village_id,"BENEFICIAIRE",$id_sous_projet);
-				$this->exportcartebeneficiaireARSE($apiUrlbase,$menages,$nom_ile,$region,$commune,$village,$zone_id,$zip,$code_zip,$microprojet,$ile_id,$region_id,$commune_id,$village_id);
+				// Solution Provisoire : id_sous_projet ARSE =2 les autres carte bénéficiaire par défaut
+				if(intval($id_sous_projet)==2) {
+					$this->exportcartebeneficiaireARSE($apiUrlbase,$menages,$nom_ile,$region,$commune,$village,$zone_id,$zip,$code_zip,$microprojet,$ile_id,$region_id,$commune_id,$village_id);
+				} else {
+					$this->exportcartebeneficiaire($apiUrlbase,$menages,$nom_ile,$region,$commune,$village,$zone_id,$zip,$code_zip,$microprojet,$ile_id,$region_id,$commune_id,$village_id);
+				}	
 			}
 		} else {
 			if($fiche_presence) {
@@ -3653,6 +3659,10 @@ class Requete_export extends REST_Controller {
         ini_set ('memory_limit', '2048M');
 		$search= array('é','ô','Ô','î','Î','è','ê','à','ö','ç','&','°',"'");
 		$replace=array('e','o','o','i','i','e','e','a','o','c','_','_','');
+		$ile_original = $ile;
+		$region_original = $region;
+		$commune_original = $commune;
+		$village_original = $village;
 		$ile_tmp = $ile;
 		$region_tmp = $region;
 		$commune_tmp=$commune;		
@@ -3669,6 +3679,19 @@ class Requete_export extends REST_Controller {
 		$filtrecommune = $commune;
 		$filtrevillage = $village;
 		$filtrezone = $code_zip;
+		if($filtreile >"") {
+			$ile_encours=strtolower($filtreile);
+		}
+		if($filtreregion >"") {
+			$region_encours=strtolower($filtreregion);
+		}
+		if($filtrecommune >"") {
+			$commune_encours=strtolower($filtrecommune);
+		}
+		if($filtrevillage >"") {
+			$village_encours=strtolower($filtrevillage);
+		}
+		$village_encours=str_replace ($search,$replace,$village_encours);
 			$ile_tmp = strtolower($ile_tmp);
 			$region_tmp = strtolower($region_tmp);
 			$commune_tmp = strtolower($commune_tmp);
@@ -3678,7 +3701,6 @@ class Requete_export extends REST_Controller {
 			if(!is_dir($directoryName)) {
 				mkdir($directoryName, 0777,true);
 			}
-		
 			$objPHPExcel = new PHPExcel();
 			$objPHPExcel->getProperties()->setCreator("PFSS")
 								 ->setLastModifiedBy("PFSS")
@@ -3694,10 +3716,11 @@ class Requete_export extends REST_Controller {
 			$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(30);
 			$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(5);
 			$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(10);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(5);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(5);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(8);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(7);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(4);
 			$objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth(15);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth(4);
 			$objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);		
 			$objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE)	;		
 			$objPHPExcel->getActiveSheet()->getPageSetup()->setHorizontalCentered(true);
@@ -3706,13 +3729,16 @@ class Requete_export extends REST_Controller {
 			$objPHPExcel->getActiveSheet()->getPageMargins()->setTop(.40);
 			$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(.40);
 			$objPHPExcel->getActiveSheet()->getPageMargins()->setHeader(.17);
-			$objPHPExcel->getActiveSheet()->getPageMargins()->setFooter(.17);			
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setFooter(.17);	
+		$sans_menage=0; // au cas où il n'y a pas de bénéficiaire	
 		if(isset($menages)) {	
 			$i=1;
-			$premier=0;
+			$premier=0;			
 			foreach ($menages as $ii => $d) {
-				if(intval($d->inapte)==0) {
+				if(intval($d->inapte)==0) {					
+					$id_menage=$d->id_menage;
 					$menage=$d->NumeroEnregistrement;
+					$NumeroEnregistrement=$d->NumeroEnregistrement;
 					$nomchefmenage=$d->nomchefmenage;
 					$Addresse=$d->Addresse;
 					$SexeChefMenage=$d->SexeChefMenage;
@@ -3734,6 +3760,7 @@ class Requete_export extends REST_Controller {
 					$numerocarteelectoraletravailleur=$d->numerocarteelectoraletravailleur;
 					$numerocinsuppliant=$d->numerocinsuppliant;
 					$numerocarteelectoralesuppliant=$d->numerocarteelectoralesuppliant;
+					$zip=$d->libelle;
 					$phototravailleur=$d->phototravailleur;
 					$pos_jpg_trav =0;		
 					$pos_jpg_trav =strpos($phototravailleur,".jpg");		
@@ -3744,27 +3771,12 @@ class Requete_export extends REST_Controller {
 						$ile_encours = $ile;
 						$region_encours = $region;
 						$commune_encours = $commune;
-						$village_encours = $village;
 						$ile_encours=strtolower ($ile_encours);
 						$ile_encours=str_replace ($search,$replace,$ile_encours);
 						$region_encours=strtolower ($region_encours );		
 						$region_encours=str_replace ($search,$replace,$region_encours);
 						$commune_encours=strtolower ($commune_encours );
 						$commune_encours=str_replace ($search,$replace,$commune_encours);
-						$village_encours=strtolower ($village_encours);
-						$village_encours=str_replace ($search,$replace,$village_encours);
-						if($filtreile >"") {
-							$ile_encours=strtolower($filtreile);
-						}
-						if($filtreregion >"") {
-							$region_encours=strtolower($filtreregion);
-						}
-						if($filtrecommune >"") {
-							$commune_encours=strtolower($filtrecommune);
-						}
-						if($filtrevillage >"") {
-							$village_encours=strtolower($filtrevillage);
-						}
 						$premier=1;
 					}
 					if($phototravailleur>"") {	
@@ -3773,14 +3785,62 @@ class Requete_export extends REST_Controller {
 					if($phototravailleursuppliant>"") {
 						$phototravailleursuppliant=dirname(__FILE__) . "/../../../../".$phototravailleursuppliant;
 					}
-					for($j=1;$j<=2;$j++) {
 						$i=$i+1;
 						$objPHPExcel->getActiveSheet()->mergeCells('A'.$i.':F'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':K'.($i + 2));
 						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':AB'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$i, 'CARTE DES BENEFICIAIRES ARSE');
 						$objPHPExcel->getActiveSheet()->getStyle('A'.$i)->getFont()->setName('calibri')->setSize(14);
 						$objPHPExcel->getActiveSheet()->getStyle('A'.$i)->getFont()->setBold(true);
-						$i=$i+5;
+						$logo_arse = dirname(__FILE__) . "/../../../../app/src/".'logo_arse.png';
+						if(file_exists($logo_arse)) {
+							$gdImage = imagecreatefrompng($logo_arse);
+							// Add a drawing to the worksheetecho date('H:i:s') . " Add a drawing to the worksheet\n";
+							$objDrawing = new PHPExcel_Worksheet_MemoryDrawing();
+							$objDrawing->setName('Logo carte bénéficiaire');
+							$objDrawing->setDescription('Logo carte bénéficiaire');
+							$objDrawing->setImageResource($gdImage);
+							$objDrawing->setRenderingFunction(PHPExcel_Worksheet_MemoryDrawing::RENDERING_JPEG);
+							$objDrawing->setMimeType(PHPExcel_Worksheet_MemoryDrawing::MIMETYPE_DEFAULT);
+							// $objDrawing->setWidth(125)->setHeight(125);
+							$objDrawing->setCoordinates('J'.$i);
+							$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+						}	
+						$i=$i + 4 ;	
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':K'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, 'PROJET MAYENDELEYO');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						// Light Blue
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':K'.$i)->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => '0033FF'),
+									 'endcolor'   => array('argb' => '0033FF')
+								 )
+						 );							
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setBold(true);						
+						$i=$i + 1 ;	
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':K'.$i);
+						$objPHPExcel->getActiveSheet()->getRowDimension($i)->setRowHeight(23);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, 'PROJET DE FILETS SOCIAUX DE SECURITE');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setName('calibri')->setSize(10);
+						// Light Blue
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':K'.$i)->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => '0033FF'),
+									 'endcolor'   => array('argb' => '0033FF')
+								 )
+						 );							
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setBold(true);						
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':K'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, 'CARTE DES BENEFICIAIRES');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setBold(true);	
 						$objPHPExcel->getActiveSheet()->mergeCells('B'.($i+5).':F'.($i + 16));
 						$logo_carte_beneficiaire_arse = dirname(__FILE__) . "/../../../../app/src/".'logo_carte_beneficiaire_arse.jpg';
 						if(file_exists($logo_carte_beneficiaire_arse)) {
@@ -3796,8 +3856,8 @@ class Requete_export extends REST_Controller {
 							$objDrawing->setCoordinates('B'.$i);
 							$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 						}						
-						$objPHPExcel->getActiveSheet()->mergeCells('G'.($i - 5).':H'.($i + 1));
-						$objPHPExcel->getActiveSheet()->mergeCells('L'.($i - 5).':M'.($i + 1));
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.($i - 5).':I'.($i + 1));
+						$objPHPExcel->getActiveSheet()->mergeCells('L'.($i - 5).':N'.($i + 1));
 						if ( $phototravailleur>"" && $pos_jpg_trav >0) {
 							if(file_exists($phototravailleur)) {
 								$gdImage = imagecreatefromjpeg($phototravailleur);
@@ -3859,332 +3919,439 @@ class Requete_export extends REST_Controller {
 								$objPHPExcel->setActiveSheetIndex(0)->setCellValue('W'.$i, "VERIFIER LA PRESENCE DU PHOTO DANS LE REPERTOIRE");
 							}	
 						}	
-						
-						
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "N° D'INSCRIPTION DU MENAGE");
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('Q'.$i, "(doit être le même que celui du cahier d'enregistrement)");
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setName('calibri')->setSize(11);
-						$objPHPExcel->getActiveSheet()->getStyle('Q'.$i)->getFont()->setName('calibri')->setSize(8);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setBold(true);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, $menage);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("K" . $i,isset($menage) ? $menage : "", PHPExcel_Cell_DataType::TYPE_STRING);			
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Adresse");
-						$styleArray = array(
-						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
-						);
-						$objPHPExcel->getActiveSheet()->mergeCells('E'.$i.':K'.$i);
-						$objPHPExcel->getActiveSheet()->mergeCells('Q'.$i.':X'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('E'.$i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('Q'.$i)->applyFromArray($styleArray);
-						unset($styleArray);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E'.$i, $Addresse);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('L'.$i, "Quartier");
-						$styleArray = array(
-						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->applyFromArray($styleArray);
-						unset($styleArray);
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Village");
-						$styleArray = array(
-						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
-						);
-						$objPHPExcel->getActiveSheet()->mergeCells('E'.$i.':K'.$i);
-						$objPHPExcel->getActiveSheet()->mergeCells('Q'.$i.':X'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('E'.$i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('Q'.$i)->applyFromArray($styleArray);
-						unset($styleArray);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E'.$i, $village);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('Q'.$i, $zip);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('L'.$i, "ZIP");
-						$styleArray = array(
-						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->applyFromArray($styleArray);
-						unset($styleArray);
-						$i=$i + 2;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "INFORMATIONS SUR LE CHEF DE MENAGE");
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setName('calibri')->setSize(11);				
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setBold(true);
-						$objPHPExcel->getActiveSheet()->mergeCells('S'.$i.':T'.$i);
-						$objPHPExcel->getActiveSheet()->mergeCells('U'.$i.':V'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('S'.$i)->getFont()->setName('calibri')->setSize(9);
-						$objPHPExcel->getActiveSheet()->getStyle('U'.$i)->getFont()->setName('calibri')->setSize(9);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('S'.$i, "Homme");
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('U'.$i, "Femme");
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Nom et prénoms");
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setName('calibri')->setSize(10);				
-						$objPHPExcel->getActiveSheet()->mergeCells('H'.$i.':Q'.$i);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H'.$i, $nomchefmenage);
-						$styleArray = array(
-						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('H'.$i)->applyFromArray($styleArray);
-						unset($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('S'.$i.':U'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('S'. $i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('U'. $i)->applyFromArray($styleArray);
-						unset($styleArray);		
-						if($SexeChefMenage=="M") {
-							$objPHPExcel->getActiveSheet()->getStyle('S'.$i)->getFont()->setBold(true);
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('S'.$i, "X");
-						} else if($SexeChefMenage=="F") {
-							$objPHPExcel->getActiveSheet()->getStyle('U'.$i)->getFont()->setBold(true);
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('U'.$i, "X");
-						}
-						$objPHPExcel->getActiveSheet()->mergeCells('W'.$i.':AC'.($i + 6));
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('W'.$i.':AC'.($i + 6))->applyFromArray($styleArray);
-						unset($styleArray);							
-						$objPHPExcel->getActiveSheet()->getStyle('W'.$i .':AC'.($i + 6))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-						$objPHPExcel->getActiveSheet()->getStyle('W'.$i .':AC'.($i + 6))->getFill()->getStartColor()->setRGB('CCCCCC');
-						$objPHPExcel->getActiveSheet()->getStyle('W'.$i)->getAlignment()->setWrapText(true);			
-						$objPHPExcel->getActiveSheet()->getStyle('W'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$objPHPExcel->getActiveSheet()->getStyle('W'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('W'.$i, "PHOTO DE LA PERSONNE QUI VA PERCEVOIR LES FONDS");
-						
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, "REPRESENTANT POUR MENAGE INAPTE");
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setName('calibri')->setSize(11);				
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setBold(true);
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('N'. $i)->applyFromArray($styleArray);
-						unset($styleArray);		
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, "TRAVAILLEUR PRINCIPAL");
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setName('calibri')->setSize(12);				
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setBold(true);
-						$objPHPExcel->getActiveSheet()->getStyle('N'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setBold(true);
-						if($j==1) {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('N'.$i, "X");
-						}	
-						$objPHPExcel->getActiveSheet()->getStyle('N'.$i)->getFont()->setBold(true);
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('N'. $i)->applyFromArray($styleArray);
-						unset($styleArray);		
-
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, "TRAVAILLEUR SUPPLEANT");
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setName('calibri')->setSize(12);				
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setBold(true);
-						$objPHPExcel->getActiveSheet()->getStyle('N'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						if($j==2) {
-							$objPHPExcel->getActiveSheet()->getStyle('N'.$i)->getFont()->setBold(true);
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('N'.$i, "X");
-						}	
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('N'. $i)->applyFromArray($styleArray);
-						unset($styleArray);		
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Nom et prénoms");
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setName('calibri')->setSize(10);
-						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':S'.$i);
-						if($j==1) {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, $NomTravailleur);
-						} else {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, $NomTravailleurSuppliant);
-						}	
-						$styleArray = array(
-						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->applyFromArray($styleArray);				
-						$i=$i + 1;
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setName('calibri')->setSize(9);
-						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(9);
-						$objPHPExcel->getActiveSheet()->getStyle('S'.$i)->getFont()->setName('calibri')->setSize(9);
-						$objPHPExcel->getActiveSheet()->getStyle('U'.$i)->getFont()->setName('calibri')->setSize(9);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, "Age");
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "Date de naissance (mm aaaa)");
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('S'.$i, "Homme");
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('U'.$i, "Femme");
-						$i=$i + 1;
-						if($j==1) {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, $agetravailleur);
-						} else {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, $agesuppliant);
-						}	
+						$i=$i+3;
 						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':H'.$i);
-						$objPHPExcel->getActiveSheet()->mergeCells('I'.$i.':L'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "CODE MENAGE");
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':N'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,$NumeroEnregistrement, PHPExcel_Cell_DataType::TYPE_STRING);	
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':H'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "CHEF DE MENAGE");
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':N'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,isset($nomchefmenage) ? $nomchefmenage : "", PHPExcel_Cell_DataType::TYPE_STRING);	
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "RECEPTEUR PRINCIPAL ");
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':N'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,isset($NomTravailleur) ? $NomTravailleur : "", PHPExcel_Cell_DataType::TYPE_STRING);	
+						$i=$i+1;
+						// $objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "STATUT");
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setBold(true);	
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("H" . $i,"Apte", PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':H'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'.$i, "NIN");
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,$NumeroCIN, PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':J'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, "DATE DE NAISSANCE");
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("M" . $i,$moistravailleur."/".$anneetravailleur, PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('M'.$i.':M'.$i)->getFont()->setItalic(true);
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "Ou CARTE ELECTORALE");
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,$numerocarteelectoraletravailleur, PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':J'.$i)->getFont()->setItalic(true);
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "REMPLACANT");
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':N'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,isset($NomTravailleurSuppliant) ? $NomTravailleurSuppliant : "", PHPExcel_Cell_DataType::TYPE_STRING);	
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "STATUT");
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("H" . $i,"Apte", PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':H'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'.$i, "NIN");
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, "DATE DE NAISSANCE");
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "Ou CARTE ELECTORALE");
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "ADRESSE RESPECTIF");
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,$Addresse, PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':N'.$i)->getFont()->setItalic(true);
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "ILE DE");
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->mergeCells('H'.$i.':J'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':J'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("H" . $i,$ile_original, PHPExcel_Cell_DataType::TYPE_STRING);
+						
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, "PREFECTURE");
+						$objPHPExcel->getActiveSheet()->mergeCells('L'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('L'.$i.':N'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("L" . $i,$region_original, PHPExcel_Cell_DataType::TYPE_STRING);
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "COMMUNE");
+						$objPHPExcel->getActiveSheet()->mergeCells('I'.$i.':K'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i.':K'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("I" . $i,$commune_original, PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('L'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('L'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('L'.$i, "ZIP");
+						$objPHPExcel->getActiveSheet()->getStyle('M'.$i.':M'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("M" . $i,$zip, PHPExcel_Cell_DataType::TYPE_STRING);
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "LOT");
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'.$i, "VILLAGE");
+						$objPHPExcel->getActiveSheet()->mergeCells('K'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i.':N'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("K" . $i,$village_original, PHPExcel_Cell_DataType::TYPE_STRING);
+						$i=$i+1;
+						$styleArray = array(
+						  'borders' => array(
+							'allborders' => array(
+							  'style' => PHPExcel_Style_Border::BORDER_THIN
+							)
+						  )
+						);
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':J'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "DATE DE SIGNATURE DU CONTRAT :");
+						$i=$i + 1 ;	
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':N'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, 'SIGNATURES');
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':N'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(13);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);	
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
 						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						if($j==1) {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, $moistravailleur);				
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'.$i, $anneetravailleur);				
-						} else {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, $moissuppliant);				
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'.$i, $anneesuppliant);				
-						}	
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
+						$objPHPExcel->getActiveSheet()->getStyle('G'.($i + 1).':G'.($i + 3))->getBorders()->getLeft()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);						
+						$objPHPExcel->getActiveSheet()->getStyle('J'.($i + 1).':J'.($i + 3))->getBorders()->getRight()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);						
+						$objPHPExcel->getActiveSheet()->getStyle('N'.($i + 1).':N'.($i + 3))->getBorders()->getRight()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);																								
+						$i=$i + 4 ;	
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':J'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('K'.$i.':N'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, 'Récepteur');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, 'Remplaçant');
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':J'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i.':N'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.($i + 1).':G'.($i + 3))->getBorders()->getLeft()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);						
+						$objPHPExcel->getActiveSheet()->getStyle('J'.($i + 1).':J'.($i + 3))->getBorders()->getRight()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);						
+						$objPHPExcel->getActiveSheet()->getStyle('N'.($i + 1).':N'.($i + 3))->getBorders()->getRight()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);																								
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getFont()->setItalic(true);						
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$i=$i + 4 ;	
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':J'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('K'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getRowDimension($i)->setRowHeight(30);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, 'Représentant du Comité de Protection Sociale');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, 'Directeur Régional');
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':J'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i.':N'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getFont()->setItalic(true);						
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$i=$i + 2 ;	
+						// $objPHPExcel->getActiveSheet()->setBreak('A'.($i), PHPExcel_Worksheet::BREAK_ROW); enlevé car crée page vide
+						// DEUXIEME PAGE  
+						$i=$i + 2 ;	
+						$objPHPExcel->getActiveSheet()->mergeCells('A'.$i.':F'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':N'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$i, 'LISTE DES ENFANTS A CHARGE');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, 'ETATS DE PAIEMENT DES FONDS DE RELEVEMENT');
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getFont()->setName('calibri')->setSize(14);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getAlignment()->setWrapText(true);
+						$i=$i + 2 ;	
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$i, 'N°');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, 'NOMS DES ENFANTS');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, 'SEXE (M/F)');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('D'.$i, 'DATE DE NAISSANCE');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E'.$i, 'AGE');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('F'.$i, 'SCOLARISES (O/N)');
+						// Blue
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':F'.$i)->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => '0000FF'),
+									 'endcolor'   => array('argb' => '0000FF')
+								 )
+						 );													
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':F'.$i)->applyFromArray($styleArray);
+						
+						$objPHPExcel->getActiveSheet()->mergeCells('H'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':L'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('M'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':I'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':L'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('M'.$i.':N'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':N'.$i)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':N'.$i)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':N'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':N'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':N'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H'.$i, 'TRANCHE DE PAIEMENT');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, 'EMARGEMENTS BENEFICIAIRES');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('M'.$i, 'EMARGEMENTS ET CACHET AGENCE DE PAIEMENT');
+						$styleUnderline = array(
+						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
 						);
-						$objPHPExcel->getActiveSheet()->getStyle('C'. $i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('G'. $i.':H'.$i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('I'. $i.':L'.$i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('S'. $i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('U'. $i)->applyFromArray($styleArray);
-						unset($styleArray);		
-						$objPHPExcel->getActiveSheet()->getStyle('S'.$i.':U'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						if($j==1) {
-							if($SexeTravailleur=="M") {
-								$objPHPExcel->getActiveSheet()->getStyle('S'.$i)->getFont()->setBold(true);
-								$objPHPExcel->setActiveSheetIndex(0)->setCellValue('S'.$i, "X");
-							} else if($SexeTravailleur=="F") {
-								$objPHPExcel->getActiveSheet()->getStyle('U'.$i)->getFont()->setBold(true);
-								$objPHPExcel->setActiveSheetIndex(0)->setCellValue('U'.$i, "X");
+						// TABLEAU A DROITE DEUXIEME PAGE
+						$i = $i + 1;
+						$k = $i;
+						$l = $i; // $l : Pour lister les enfants à charge
+						$objPHPExcel->getActiveSheet()->mergeCells('H'.$k.':I'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.($k + 8))->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->mergeCells('M'.$k.':N'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('M'.$k.':N'.($k + 8))->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.($k + 8).':L'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('J'.($k + 8).':L'.($k + 8))->getBorders()->getBottom()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);						
+						// Bleu clair
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.($k + 8))->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => '33B8FF'),
+									 'endcolor'   => array('argb' => '33B8FF')
+								 )
+						 );													
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H'.$k, 'PREMIERE TRANCHE  10%');
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Date :');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 1;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Montant reçu (KMF) : ');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 2;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Emargement du récepteur :');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 6;
+						$objPHPExcel->getActiveSheet()->mergeCells('H'.$k.':I'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.($k + 8))->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->mergeCells('M'.$k.':N'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('M'.$k.':N'.($k + 8))->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.($k + 8).':L'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('J'.($k + 8).':L'.($k + 8))->getBorders()->getBottom()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);						
+						// Bleu foncé
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.($k + 8))->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => '164F99'),
+									 'endcolor'   => array('argb' => '164F99')
+								 )
+						 );							
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H'.$k, 'DEUXIEME TRANCHE  70%');
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Date :');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 1;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Montant reçu (KMF) : ');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 2;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Emargement du récepteur :');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 6;
+						$objPHPExcel->getActiveSheet()->mergeCells('H'.$k.':I'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.($k + 8))->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->mergeCells('M'.$k.':N'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('M'.$k.':N'.($k + 8))->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.($k + 8).':L'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('J'.($k + 8).':L'.($k + 8))->getBorders()->getBottom()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN,
+								 )
+						);						
+						// Bleu
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.($k + 4))->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => '0000FF'),
+									 'endcolor'   => array('argb' => '0000FF')
+								 )
+						 );							
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H'.$k, 'TROISIEME TRANCHE  20%');
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Date :');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 1;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Montant reçu (KMF) : ');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 2;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Emargement du récepteur :');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 6;
+						$i=$k;
+						// Début Lister les enfants à charge
+						$les_individus=$this->IndividuManager->findByMenage($id_menage);
+						if($les_individus) {
+							foreach($les_individus as $key=>$value) {
+								$sexe="";
+								if($value->sexe) {
+									if(intval($value->sexe)==0) {
+										$sexe="F";
+									} else if(intval($value->sexe)==1){
+										$sexe="M";
+									}
+								}
+								$objPHPExcel->getActiveSheet()->getStyle('A'.$l.':F'.$l)->applyFromArray($styleArray);
+								$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("A" . $l,($key + 1), PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("B" . $l,$value->nom, PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("C" . $l,$sexe, PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("D" . $l,$value->date_naissance, PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("E" . $l,($value->age >0 ? $value->age : ''), PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("F" . $l,$value->scolarise, PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->getStyle('A'.$l.':A'.$l)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+								$objPHPExcel->getActiveSheet()->getStyle('A'.$l.':A'.$l)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+								$objPHPExcel->getActiveSheet()->getStyle('C'.$l.':F'.$l)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+								$objPHPExcel->getActiveSheet()->getStyle('C'.$l.':F'.$l)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+								$l=$l + 1;
 							}
-						}	else {
-							if($SexeTravailleurSuppliant=="M") {
-								$objPHPExcel->getActiveSheet()->getStyle('S'.$i)->getFont()->setBold(true);
-								$objPHPExcel->setActiveSheetIndex(0)->setCellValue('S'.$i, "X");
-							} else if($SexeTravailleurSuppliant=="F") {
-								$objPHPExcel->getActiveSheet()->getStyle('U'.$i)->getFont()->setBold(true);
-								$objPHPExcel->setActiveSheetIndex(0)->setCellValue('U'.$i, "X");
-							}
-						}	
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "N° NIN");				
-						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':P'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setBold(true);
-						if($j==1) {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, $numerocintravailleur);				
-						} else {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, $numerocinsuppliant);				
-						}	
-						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':P'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "N° Carte éléctorale");				
-						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':P'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setBold(true);
-						if($j==1) {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, $numerocarteelectoraletravailleur);				
-						} else {	
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, $numerocarteelectoralesuppliant);				
-						}	
-						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':P'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$i=$i + 1;
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setItalic(true);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Autres pièces");				
-						$i=$i + 1;
-						$objPHPExcel->getActiveSheet()->mergeCells('B'.$i.':M'.$i);
-						$objPHPExcel->getActiveSheet()->mergeCells('S'.$i.':AC'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i.':AB'.$i)->getFont()->setBold(true);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i.':AB'.$i)->getFont()->setName('calibri')->setSize(11);				
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Signature ou empreintes de la personne qui perçoit");				
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setName('calibri')->setSize(10);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('S'.$i, "Signature ou empreintes du chef de menage");				
-						$objPHPExcel->getActiveSheet()->getStyle('S'.$i)->getFont()->setName('calibri')->setSize(10);
-						$i=$i + 1;
-						$objPHPExcel->getActiveSheet()->mergeCells('B'.$i.':AC'.($i + 2));
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i.':AC'.($i + 2))->applyFromArray($styleArray);
-						unset($styleArray);	
-						// Saut de page AUTO
-						$objPHPExcel->getActiveSheet()->setBreak('A'.($i + 5), PHPExcel_Worksheet::BREAK_ROW);
-						$i=$i + 6;
-					}
+						}
+						// Fin Lister les enfants à charge
+						$objPHPExcel->getActiveSheet()->setBreak('A'.($i), PHPExcel_Worksheet::BREAK_ROW);
+						$i=$i + 1; // C'EST UNE MISE EN PAGE SUIVANTE
 				}	
-			}			
+			}	
+			$date_edition = date("d-m-Y");		
+			$fichier1="NON";
+			$Filename1 ="";
+			if($premier==1) {
+				$Filename1 = "Carte beneficiaire "." village " .$village_tmp." edition du ".$date_edition.".xlsx";
+				//Check if the directory already exists.
+				$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+				$objWriter->save($directoryName.$Filename1);
+				$fichier1="OK";	
+				// unset($objPHPExcel);	
+			}		
+			
+		} else {
+			// SANS ENREGISTREMENT
+			$sans_menage=$sans_menage + 1;
 		}			
-		$ile_encours=strtolower ($ile_encours);
-		$ile_encours=str_replace ('é','e',$ile_encours);
-		$ile_encours=str_replace ('ô','o',$ile_encours);
-		$ile_encours=str_replace ('î','i',$ile_encours);
-		$ile_encours=str_replace ('è','e',$ile_encours);
-		$ile_encours=str_replace ('à','a',$ile_encours);
-		$ile_encours=str_replace ('ç','c',$ile_encours);
-		$region_encours=strtolower ($region_encours );		
-		$region_encours=str_replace ('é','e',$region_encours);
-		$region_encours=str_replace ('ô','o',$region_encours);
-		$region_encours=str_replace ('î','i',$region_encours);
-		$region_encours=str_replace ('è','e',$region_encours);
-		$region_encours=str_replace ('à','a',$region_encours);
-		$region_encours=str_replace ('ç','c',$region_encours);
-		$commune_encours=strtolower ($commune_encours );
-		$commune_encours=str_replace ('é','e',$commune_encours);
-		$commune_encours=str_replace ('ô','o',$commune_encours);
-		$commune_encours=str_replace ('î','i',$commune_encours);
-		$commune_encours=str_replace ('è','e',$commune_encours);
-		$commune_encours=str_replace ('à','a',$commune_encours);
-		$commune_encours=str_replace ('ç','c',$commune_encours);
-		$village_encours=strtolower ($village_encours);
-		$village_encours=str_replace ('é','e',$village_encours);
-		$village_encours=str_replace ('ô','o',$village_encours);
-		$village_encours=str_replace ('î','i',$village_encours);
-		$village_encours=str_replace ('è','e',$village_encours);
-		$village_encours=str_replace ('à','a',$village_encours);
-		$village_encours=str_replace ('ç','c',$village_encours);
-		if($filtreile >"") {
-			$ile_encours=strtolower($filtreile);
-		}
-		if($filtreregion >"") {
-			$region_encours=strtolower($filtreregion);
-		}
-		if($filtrecommune >"") {
-			$commune_encours=strtolower($filtrecommune);
-		}
-		if($filtrevillage >"") {
-			$village_encours=strtolower($filtrevillage);
-		}
-		$date_edition = date("d-m-Y");		
-		$fichier1="NON";
-		$Filename1 ="";
-		if($premier==1) {
-			$Filename1 = "Carte beneficiaire "." village " .$village_encours." edition du ".$date_edition.".xlsx";
-			//Check if the directory already exists.
-			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-			$objWriter->save($directoryName.$Filename1);
-			$fichier1="OK";	
-			// unset($objPHPExcel);	
-		}		
 		// CARTE INAPTE
-			$objPHPExcel = new PHPExcel();
+		$objPHPExcel = new PHPExcel();
 			$objPHPExcel->getProperties()->setCreator("PFSS")
 								 ->setLastModifiedBy("PFSS")
 								 ->setTitle("Carte bénéficiaire menage inapte")
@@ -4195,36 +4362,15 @@ class Requete_export extends REST_Controller {
 			$objRichText = new PHPExcel_RichText();
 			$objRichText->createText('Carte bénéficiaire menage inapte');
 			$objPHPExcel->setActiveSheetIndex(0);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(1);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(3);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(5);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(30);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(5);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(8);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(7);
 			$objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(4);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth(4);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth(4);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth(4);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth(4);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth(15);
 			$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth(4);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth(4);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('P')->setWidth(4);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('Q')->setWidth(4);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('R')->setWidth(4);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('S')->setWidth(4);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('T')->setWidth(4);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('U')->setWidth(4);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('V')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('W')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('X')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('Y')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('Z')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('AA')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('AB')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('AC')->setWidth(3);
-			$objPHPExcel->getActiveSheet()->getColumnDimension('AD')->setWidth(1);
 			$objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);		
 			$objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE)	;		
 			$objPHPExcel->getActiveSheet()->getPageSetup()->setHorizontalCentered(true);
@@ -4233,14 +4379,16 @@ class Requete_export extends REST_Controller {
 			$objPHPExcel->getActiveSheet()->getPageMargins()->setTop(.40);
 			$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(.40);
 			$objPHPExcel->getActiveSheet()->getPageMargins()->setHeader(.17);
-			$objPHPExcel->getActiveSheet()->getPageMargins()->setFooter(.17);			
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setFooter(.17);		
 		if(isset($menages)) {	
 			$i=1;
 			$premier=0;
 			$existe_menage_inapte=0;
 			foreach ($menages as $ii => $d)	{
 				if(intval($d->inapte)>0) {
+					$id_menage=$d->id_menage;
 					$menage=$d->NumeroEnregistrement;
+					$NumeroEnregistrement=$d->NumeroEnregistrement;
 					$nomchefmenage=$d->nomchefmenage;
 					$Addresse=$d->Addresse;
 					$SexeChefMenage=$d->SexeChefMenage;
@@ -4262,194 +4410,122 @@ class Requete_export extends REST_Controller {
 					$numerocarteelectoraletravailleur=$d->numerocarteelectoraletravailleur;
 					$numerocinsuppliant=$d->numerocinsuppliant;
 					$numerocarteelectoralesuppliant=$d->numerocarteelectoralesuppliant;
-					$photo=$d->photo;		
-					$pos_jpg=strpos($photo,".jpg");						
-					$phototravailleur=$d->phototravailleur;				
+					$zip=$d->libelle;
+					$photo=$d->photo;
+					$pos_jpg_chef =0;		
+					$pos_jpg_chef =strpos($photo,".jpg");		
+					$phototravailleur=$d->phototravailleur;
+					$pos_jpg_trav =0;		
+					$pos_jpg_trav =strpos($phototravailleur,".jpg");		
 					$phototravailleursuppliant=$d->phototravailleursuppliant;
+					$pos_jpg_supp =0;		
+					$pos_jpg_supp =strpos($phototravailleursuppliant,".jpg");		
 					if($premier==0) {
-						$existe_menage_inapte=1;
 						$ile_encours = $ile;
 						$region_encours = $region;
 						$commune_encours = $commune;
-						$village_encours = $village;
 						$ile_encours=strtolower ($ile_encours);
-						$ile_encours=str_replace ('é','e',$ile_encours);
-						$ile_encours=str_replace ('ô','o',$ile_encours);
-						$ile_encours=str_replace ('î','i',$ile_encours);
-						$ile_encours=str_replace ('è','e',$ile_encours);
-						$ile_encours=str_replace ('à','a',$ile_encours);
-						$ile_encours=str_replace ('ç','c',$ile_encours);
+						$ile_encours=str_replace ($search,$replace,$ile_encours);
 						$region_encours=strtolower ($region_encours );		
-						$region_encours=str_replace ('é','e',$region_encours);
-						$region_encours=str_replace ('ô','o',$region_encours);
-						$region_encours=str_replace ('î','i',$region_encours);
-						$region_encours=str_replace ('è','e',$region_encours);
-						$region_encours=str_replace ('à','a',$region_encours);
-						$region_encours=str_replace ('ç','c',$region_encours);
+						$region_encours=str_replace ($search,$replace,$region_encours);
 						$commune_encours=strtolower ($commune_encours );
-						$commune_encours=str_replace ('é','e',$commune_encours);
-						$commune_encours=str_replace ('ô','o',$commune_encours);
-						$commune_encours=str_replace ('î','i',$commune_encours);
-						$commune_encours=str_replace ('è','e',$commune_encours);
-						$commune_encours=str_replace ('à','a',$commune_encours);
-						$commune_encours=str_replace ('ç','c',$commune_encours);
-						$village_encours=strtolower ($village_encours);
-						$village_encours=str_replace ('é','e',$village_encours);
-						$village_encours=str_replace ('ô','o',$village_encours);
-						$village_encours=str_replace ('î','i',$village_encours);
-						$village_encours=str_replace ('è','e',$village_encours);
-						$village_encours=str_replace ('à','a',$village_encours);
-						$village_encours=str_replace ('ç','c',$village_encours);
-						if($filtreile >"") {
-							$ile_encours=strtolower($filtreile);
-						}
-						if($filtreregion >"") {
-							$region_encours=strtolower($filtreregion);
-						}
-						if($filtrecommune >"") {
-							$commune_encours=strtolower($filtrecommune);
-						}
-						if($filtrevillage >"") {
-							$village_encours=strtolower($filtrevillage);
-						}
+						$commune_encours=str_replace ($search,$replace,$commune_encours);
 						$premier=1;
 					}
-					if($photo>"") {	
-						$photo=dirname(__FILE__) . "/../../../../".$photo;
-					}
-					if($phototravailleur>"") {		
+					if($phototravailleur>"") {	
 						$phototravailleur=dirname(__FILE__) . "/../../../../".$phototravailleur;
 					}
 					if($phototravailleursuppliant>"") {
 						$phototravailleursuppliant=dirname(__FILE__) . "/../../../../".$phototravailleursuppliant;
 					}
-					for($j=1;$j<=1;$j++) {
-						$objPHPExcel->getActiveSheet()->mergeCells('A'.$i.':AB'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':AB'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$i, 'PROJET DE FILETS SOCIAUX DE SECURITE');
-						$objPHPExcel->getActiveSheet()->getStyle('A'.$i)->getFont()->setName('calibri')->setSize(12);
-						$objPHPExcel->getActiveSheet()->getStyle('A'.$i)->getFont()->setBold(true);
 						$i=$i+1;
-						$objPHPExcel->getActiveSheet()->mergeCells('A'.$i.':AB'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('A'.$i.':F'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':K'.($i + 2));
 						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':AB'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$i, 'CARTE DE BENEFICIAIRE');
-						$objPHPExcel->getActiveSheet()->getStyle('A'.$i)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$i, 'CARTE DES BENEFICIAIRES ARSE');
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i)->getFont()->setName('calibri')->setSize(14);
 						$objPHPExcel->getActiveSheet()->getStyle('A'.$i)->getFont()->setBold(true);
+						$logo_arse = dirname(__FILE__) . "/../../../../app/src/".'logo_arse.png';
+						if(file_exists($logo_arse)) {
+							$gdImage = imagecreatefrompng($logo_arse);
+							// Add a drawing to the worksheetecho date('H:i:s') . " Add a drawing to the worksheet\n";
+							$objDrawing = new PHPExcel_Worksheet_MemoryDrawing();
+							$objDrawing->setName('Logo carte bénéficiaire');
+							$objDrawing->setDescription('Logo carte bénéficiaire');
+							$objDrawing->setImageResource($gdImage);
+							$objDrawing->setRenderingFunction(PHPExcel_Worksheet_MemoryDrawing::RENDERING_JPEG);
+							$objDrawing->setMimeType(PHPExcel_Worksheet_MemoryDrawing::MIMETYPE_DEFAULT);
+							// $objDrawing->setWidth(125)->setHeight(125);
+							$objDrawing->setCoordinates('J'.$i);
+							$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+						}	
+						$i=$i + 4 ;	
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':K'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, 'PROJET MAYENDELEYO');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						// Light Blue
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':K'.$i)->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => '0033FF'),
+									 'endcolor'   => array('argb' => '0033FF')
+								 )
+						 );							
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setBold(true);						
+						$i=$i + 1 ;	
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':K'.$i);
+						$objPHPExcel->getActiveSheet()->getRowDimension($i)->setRowHeight(23);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, 'PROJET DE FILETS SOCIAUX DE SECURITE');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setName('calibri')->setSize(10);
+						// Light Blue
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':K'.$i)->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => '0033FF'),
+									 'endcolor'   => array('argb' => '0033FF')
+								 )
+						 );							
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setBold(true);						
 						$i=$i+1;
-						$objPHPExcel->getActiveSheet()->mergeCells('B'.$i.':J'.$i);
-						$objPHPExcel->getActiveSheet()->mergeCells('Q'.$i.':AB'.$i);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "N° D'INSCRIPTION DU MENAGE");
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('Q'.$i, "(doit être le même que celui du cahier d'enregistrement)");
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setName('calibri')->setSize(11);
-						$objPHPExcel->getActiveSheet()->getStyle('Q'.$i)->getFont()->setName('calibri')->setSize(8);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setBold(true);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, $menage);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("K" . $i,isset($menage) ? $menage : "", PHPExcel_Cell_DataType::TYPE_STRING);			
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Adresse");
-						$styleArray = array(
-						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
-						);
-						$objPHPExcel->getActiveSheet()->mergeCells('E'.$i.':K'.$i);
-						$objPHPExcel->getActiveSheet()->mergeCells('Q'.$i.':X'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('E'.$i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('Q'.$i)->applyFromArray($styleArray);
-						unset($styleArray);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E'.$i, $Addresse);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('L'.$i, "Quartier");
-						$styleArray = array(
-						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->applyFromArray($styleArray);
-						unset($styleArray);
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Village");
-						$styleArray = array(
-						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
-						);
-						$objPHPExcel->getActiveSheet()->mergeCells('E'.$i.':K'.$i);
-						$objPHPExcel->getActiveSheet()->mergeCells('Q'.$i.':X'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('E'.$i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('Q'.$i)->applyFromArray($styleArray);
-						unset($styleArray);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E'.$i, $village);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('Q'.$i, $zip);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('L'.$i, "ZIP");
-						$styleArray = array(
-						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->applyFromArray($styleArray);
-						unset($styleArray);
-						$i=$i + 2;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "INFORMATIONS SUR LE CHEF DE MENAGE");
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setName('calibri')->setSize(11);				
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setBold(true);
-						$objPHPExcel->getActiveSheet()->mergeCells('S'.$i.':T'.$i);
-						$objPHPExcel->getActiveSheet()->mergeCells('U'.$i.':V'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('S'.$i)->getFont()->setName('calibri')->setSize(9);
-						$objPHPExcel->getActiveSheet()->getStyle('U'.$i)->getFont()->setName('calibri')->setSize(9);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('S'.$i, "Homme");
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('U'.$i, "Femme");
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Nom et prénoms");
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setName('calibri')->setSize(10);				
-						$objPHPExcel->getActiveSheet()->mergeCells('H'.$i.':Q'.$i);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H'.$i, $nomchefmenage);
-						$styleArray = array(
-						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('H'.$i)->applyFromArray($styleArray);
-						unset($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('S'.$i.':U'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('S'. $i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('U'. $i)->applyFromArray($styleArray);
-						unset($styleArray);		
-						if($SexeChefMenage=="M") {
-							$objPHPExcel->getActiveSheet()->getStyle('S'.$i)->getFont()->setBold(true);
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('S'.$i, "X");
-						} else if($SexeChefMenage=="F") {
-							$objPHPExcel->getActiveSheet()->getStyle('U'.$i)->getFont()->setBold(true);
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('U'.$i, "X");
-						}
-						$objPHPExcel->getActiveSheet()->mergeCells('W'.$i.':AC'.($i + 6));
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('W'.$i.':AC'.($i + 6))->applyFromArray($styleArray);
-						unset($styleArray);							
-						$objPHPExcel->getActiveSheet()->getStyle('W'.$i .':AC'.($i + 6))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-						$objPHPExcel->getActiveSheet()->getStyle('W'.$i .':AC'.($i + 6))->getFill()->getStartColor()->setRGB('CCCCCC');
-						$objPHPExcel->getActiveSheet()->getStyle('W'.$i)->getAlignment()->setWrapText(true);			
-						$objPHPExcel->getActiveSheet()->getStyle('W'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$objPHPExcel->getActiveSheet()->getStyle('W'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('W'.$i, "PHOTO DE LA PERSONNE QUI VA PERCEVOIR LES FONDS");
-						if ($j==1 && $photo>"" && $pos_jpg >0) {
-							if(file_exists($photo)) {
-								$gdImage = imagecreatefromjpeg($photo);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':K'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, 'CARTE DES BENEFICIAIRES');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setBold(true);	
+						$objPHPExcel->getActiveSheet()->mergeCells('B'.($i+5).':F'.($i + 16));
+						$logo_carte_beneficiaire_arse = dirname(__FILE__) . "/../../../../app/src/".'logo_carte_beneficiaire_arse.jpg';
+						if(file_exists($logo_carte_beneficiaire_arse)) {
+							$gdImage = imagecreatefromjpeg($logo_carte_beneficiaire_arse);
+							// Add a drawing to the worksheetecho date('H:i:s') . " Add a drawing to the worksheet\n";
+							$objDrawing = new PHPExcel_Worksheet_MemoryDrawing();
+							$objDrawing->setName('Logo carte bénéficiaire');
+							$objDrawing->setDescription('Logo carte bénéficiaire');
+							$objDrawing->setImageResource($gdImage);
+							$objDrawing->setRenderingFunction(PHPExcel_Worksheet_MemoryDrawing::RENDERING_JPEG);
+							$objDrawing->setMimeType(PHPExcel_Worksheet_MemoryDrawing::MIMETYPE_DEFAULT);
+							// $objDrawing->setWidth(125)->setHeight(125);
+							$objDrawing->setCoordinates('B'.$i);
+							$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+						}						
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.($i - 5).':I'.($i + 1));
+						$objPHPExcel->getActiveSheet()->mergeCells('L'.($i - 5).':N'.($i + 1));
+						if ( $phototravailleur>"" && $pos_jpg_trav >0) {
+							if(file_exists($phototravailleur)) {
+								$gdImage = imagecreatefromjpeg($phototravailleur);
 								// Add a drawing to the worksheetecho date('H:i:s') . " Add a drawing to the worksheet\n";
 								$objDrawing = new PHPExcel_Worksheet_MemoryDrawing();
-								$objDrawing->setName('Chef menage');
-								$objDrawing->setDescription('Chef menage');
+								$objDrawing->setName('Travailleur principal');
+								$objDrawing->setDescription('Travailleur principal');
 								$objDrawing->setImageResource($gdImage);
 								$objDrawing->setRenderingFunction(PHPExcel_Worksheet_MemoryDrawing::RENDERING_JPEG);
 								$objDrawing->setMimeType(PHPExcel_Worksheet_MemoryDrawing::MIMETYPE_DEFAULT);
-								$objDrawing->setCoordinates('W'.$i);
+								// $objDrawing->setWidth(125)->setHeight(125);
+								$objDrawing->setCoordinates('G'.($i - 5));
 								$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 							} else {
-								$objPHPExcel->setActiveSheetIndex(0)->getStyle('W'.$i)->getFill()->applyFromArray(
+								$objPHPExcel->setActiveSheetIndex(0)->getStyle('G'.($i - 5))->getFill()->applyFromArray(
 										 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 											 'startcolor' => array('rgb' => 'FF0000'),
 											 'endcolor'   => array('argb' => 'FF0000')
@@ -4466,20 +4542,20 @@ class Requete_export extends REST_Controller {
 								$objPHPExcel->setActiveSheetIndex(0)->setCellValue('W'.$i, "VERIFIER LA PRESENCE DU PHOTO DANS LE REPERTOIRE");
 							}	
 						}	
-						if ($j==2 && $phototravailleursuppliant>"") {
+						if ($phototravailleursuppliant>"" && $pos_jpg_supp >0) {
 							if(file_exists($phototravailleursuppliant)) {
 								$gdImage = imagecreatefromjpeg($phototravailleursuppliant);
 								// Add a drawing to the worksheetecho date('H:i:s') . " Add a drawing to the worksheet\n";
 								$objDrawing = new PHPExcel_Worksheet_MemoryDrawing();
-								$objDrawing->setName('Sample image');
-								$objDrawing->setDescription('Sample image');
+								$objDrawing->setName('Travailleur suppliant');
+								$objDrawing->setDescription('Travailleur suppliant');
 								$objDrawing->setImageResource($gdImage);
 								$objDrawing->setRenderingFunction(PHPExcel_Worksheet_MemoryDrawing::RENDERING_JPEG);
 								$objDrawing->setMimeType(PHPExcel_Worksheet_MemoryDrawing::MIMETYPE_DEFAULT);
-								$objDrawing->setCoordinates('W'.$i);
+								$objDrawing->setCoordinates('L'.($i - 5));
 								$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 							} else {
-								$objPHPExcel->setActiveSheetIndex(0)->getStyle('W'.$i)->getFill()->applyFromArray(
+								$objPHPExcel->setActiveSheetIndex(0)->getStyle('L'.($i - 5))->getFill()->applyFromArray(
 										 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
 											 'startcolor' => array('rgb' => 'FF0000'),
 											 'endcolor'   => array('argb' => 'FF0000')
@@ -4496,16 +4572,125 @@ class Requete_export extends REST_Controller {
 								$objPHPExcel->setActiveSheetIndex(0)->setCellValue('W'.$i, "VERIFIER LA PRESENCE DU PHOTO DANS LE REPERTOIRE");
 							}	
 						}	
+						$i=$i+3;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':H'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "CODE MENAGE");
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':N'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,$NumeroEnregistrement, PHPExcel_Cell_DataType::TYPE_STRING);	
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':H'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "CHEF DE MENAGE");
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':N'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,isset($nomchefmenage) ? $nomchefmenage : "", PHPExcel_Cell_DataType::TYPE_STRING);	
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "RECEPTEUR PRINCIPAL ");
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':N'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,isset($NomTravailleur) ? $NomTravailleur : "", PHPExcel_Cell_DataType::TYPE_STRING);	
+						$i=$i+1;
+						// $objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "STATUT");
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setBold(true);	
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("H" . $i,"Apte", PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':H'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'.$i, "NIN");
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,$NumeroCIN, PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':J'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, "DATE DE NAISSANCE");
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("M" . $i,$moistravailleur."/".$anneetravailleur, PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('M'.$i.':M'.$i)->getFont()->setItalic(true);
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "Ou CARTE ELECTORALE");
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,$numerocarteelectoraletravailleur, PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':J'.$i)->getFont()->setItalic(true);
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "REMPLACANT");
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':N'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,isset($NomTravailleurSuppliant) ? $NomTravailleurSuppliant : "", PHPExcel_Cell_DataType::TYPE_STRING);	
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "STATUT");
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("H" . $i,"Apte", PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':H'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'.$i, "NIN");
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, "DATE DE NAISSANCE");
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "Ou CARTE ELECTORALE");
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "ADRESSE RESPECTIF");
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,$Addresse, PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':N'.$i)->getFont()->setItalic(true);
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "ILE DE");
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->mergeCells('H'.$i.':J'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':J'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("H" . $i,$ile_original, PHPExcel_Cell_DataType::TYPE_STRING);
 						
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, "REPRESENTANT POUR MENAGE INAPTE");
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setName('calibri')->setSize(11);				
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setBold(true);
-						$objPHPExcel->getActiveSheet()->getStyle('N'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						if($j==1) {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('N'.$i, "X");
-						}	
-						$objPHPExcel->getActiveSheet()->getStyle('N'.$i)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, "PREFECTURE");
+						$objPHPExcel->getActiveSheet()->mergeCells('L'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('L'.$i.':N'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("L" . $i,$region_original, PHPExcel_Cell_DataType::TYPE_STRING);
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "COMMUNE");
+						$objPHPExcel->getActiveSheet()->mergeCells('I'.$i.':K'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i.':K'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("I" . $i,$commune_original, PHPExcel_Cell_DataType::TYPE_STRING);
+						$objPHPExcel->getActiveSheet()->getStyle('L'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('L'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('L'.$i, "ZIP");
+						$objPHPExcel->getActiveSheet()->getStyle('M'.$i.':M'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("M" . $i,$zip, PHPExcel_Cell_DataType::TYPE_STRING);
+						$i=$i+1;
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "LOT");
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'.$i, "VILLAGE");
+						$objPHPExcel->getActiveSheet()->mergeCells('K'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i.':N'.$i)->getFont()->setItalic(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("K" . $i,$village_original, PHPExcel_Cell_DataType::TYPE_STRING);
+						$i=$i+1;
 						$styleArray = array(
 						  'borders' => array(
 							'allborders' => array(
@@ -4513,224 +4698,347 @@ class Requete_export extends REST_Controller {
 							)
 						  )
 						);
-						$objPHPExcel->getActiveSheet()->getStyle('N'. $i)->applyFromArray($styleArray);
-						unset($styleArray);		
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, "TRAVAILLEUR PRINCIPAL");
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setName('calibri')->setSize(12);				
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setBold(true);
-						$objPHPExcel->getActiveSheet()->getStyle('N'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setBold(true);
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('N'. $i)->applyFromArray($styleArray);
-						unset($styleArray);		
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, "TRAVAILLEUR SUPPLEANT");
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setName('calibri')->setSize(12);				
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setBold(true);
-						$objPHPExcel->getActiveSheet()->getStyle('N'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						if($j==2) {
-							$objPHPExcel->getActiveSheet()->getStyle('N'.$i)->getFont()->setBold(true);
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('N'.$i, "X");
-						}	
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('N'. $i)->applyFromArray($styleArray);
-						unset($styleArray);		
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Nom et prénoms");
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setName('calibri')->setSize(10);
-						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':S'.$i);
-						$styleArray = array(
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':J'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);						
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "DATE DE SIGNATURE DU CONTRAT :");
+						$i=$i + 1 ;	
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':N'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, 'SIGNATURES');
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':N'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(13);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setBold(true);	
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.($i + 1).':G'.($i + 3))->getBorders()->getLeft()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);						
+						$objPHPExcel->getActiveSheet()->getStyle('J'.($i + 1).':J'.($i + 3))->getBorders()->getRight()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);						
+						$objPHPExcel->getActiveSheet()->getStyle('N'.($i + 1).':N'.($i + 3))->getBorders()->getRight()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);																								
+						$i=$i + 4 ;	
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':J'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('K'.$i.':N'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, 'Récepteur');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, 'Remplaçant');
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':J'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i.':N'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.($i + 1).':G'.($i + 3))->getBorders()->getLeft()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);						
+						$objPHPExcel->getActiveSheet()->getStyle('J'.($i + 1).':J'.($i + 3))->getBorders()->getRight()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);						
+						$objPHPExcel->getActiveSheet()->getStyle('N'.($i + 1).':N'.($i + 3))->getBorders()->getRight()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);																								
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getFont()->setItalic(true);						
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$i=$i + 4 ;	
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':J'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('K'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getRowDimension($i)->setRowHeight(30);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, 'Représentant du Comité de Protection Sociale');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, 'Directeur Régional');
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':J'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i.':N'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getFont()->setItalic(true);						
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i.':K'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$i=$i + 2 ;	
+						// $objPHPExcel->getActiveSheet()->setBreak('A'.($i), PHPExcel_Worksheet::BREAK_ROW); enlevé car crée page vide
+						// DEUXIEME PAGE  
+						$i=$i + 2 ;	
+						$objPHPExcel->getActiveSheet()->mergeCells('A'.$i.':F'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':N'.$i);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$i, 'LISTE DES ENFANTS A CHARGE');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, 'ETATS DE PAIEMENT DES FONDS DE RELEVEMENT');
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getFont()->setName('calibri')->setSize(14);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getAlignment()->setWrapText(true);
+						$i=$i + 2 ;	
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':G'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$i, 'N°');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, 'NOMS DES ENFANTS');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, 'SEXE (M/F)');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('D'.$i, 'DATE DE NAISSANCE');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E'.$i, 'AGE');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('F'.$i, 'SCOLARISES (O/N)');
+						// Blue
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':F'.$i)->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => '0000FF'),
+									 'endcolor'   => array('argb' => '0000FF')
+								 )
+						 );													
+						$objPHPExcel->getActiveSheet()->getStyle('A'.$i.':F'.$i)->applyFromArray($styleArray);
+						
+						$objPHPExcel->getActiveSheet()->mergeCells('H'.$i.':I'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':L'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('M'.$i.':N'.$i);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':I'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':L'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('M'.$i.':N'.$i)->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':N'.$i)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':N'.$i)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':N'.$i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':N'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$i.':N'.$i)->getAlignment()->setWrapText(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H'.$i, 'TRANCHE DE PAIEMENT');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, 'EMARGEMENTS BENEFICIAIRES');
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('M'.$i, 'EMARGEMENTS ET CACHET AGENCE DE PAIEMENT');
+						$styleUnderline = array(
 						  'font' => array('underline' => PHPExcel_Style_Font::UNDERLINE_SINGLE)
 						);
-						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->applyFromArray($styleArray);				
-						$i=$i + 1;
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getFont()->setName('calibri')->setSize(9);
-						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(9);
-						$objPHPExcel->getActiveSheet()->getStyle('S'.$i)->getFont()->setName('calibri')->setSize(9);
-						$objPHPExcel->getActiveSheet()->getStyle('U'.$i)->getFont()->setName('calibri')->setSize(9);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, "Age");
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "Date de naissance (mm aaaa)");
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('S'.$i, "Homme");
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('U'.$i, "Femme");
-						$i=$i + 1;
-						if($j==1) {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, $agetravailleur);
-						} else {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$i, $agesuppliant);
-						}	
-						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':H'.$i);
-						$objPHPExcel->getActiveSheet()->mergeCells('I'.$i.':L'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$objPHPExcel->getActiveSheet()->getStyle('C'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						if($j==1) {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, $moistravailleur);				
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'.$i, $anneetravailleur);				
-						} else {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, $moissuppliant);				
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'.$i, $anneesuppliant);				
-						}	
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('C'. $i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('G'. $i.':H'.$i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('I'. $i.':L'.$i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('S'. $i)->applyFromArray($styleArray);
-						$objPHPExcel->getActiveSheet()->getStyle('U'. $i)->applyFromArray($styleArray);
-						unset($styleArray);		
-						$objPHPExcel->getActiveSheet()->getStyle('S'.$i.':U'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						if($j==1) {
-							if($SexeTravailleur=="M") {
-								$objPHPExcel->getActiveSheet()->getStyle('S'.$i)->getFont()->setBold(true);
-								$objPHPExcel->setActiveSheetIndex(0)->setCellValue('S'.$i, "X");
-							} else if($SexeTravailleur=="F") {
-								$objPHPExcel->getActiveSheet()->getStyle('U'.$i)->getFont()->setBold(true);
-								$objPHPExcel->setActiveSheetIndex(0)->setCellValue('U'.$i, "X");
+						// TABLEAU A DROITE DEUXIEME PAGE
+						$i = $i + 1;
+						$k = $i;
+						$l = $i; // $l : Pour lister les enfants à charge
+						$objPHPExcel->getActiveSheet()->mergeCells('H'.$k.':I'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.($k + 8))->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->mergeCells('M'.$k.':N'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('M'.$k.':N'.($k + 8))->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.($k + 8).':L'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('J'.($k + 8).':L'.($k + 8))->getBorders()->getBottom()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);						
+						// Bleu clair
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.($k + 8))->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => '33B8FF'),
+									 'endcolor'   => array('argb' => '33B8FF')
+								 )
+						 );													
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H'.$k, 'PREMIERE TRANCHE  10%');
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Date :');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 1;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Montant reçu (KMF) : ');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 2;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Emargement du récepteur :');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 6;
+						$objPHPExcel->getActiveSheet()->mergeCells('H'.$k.':I'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.($k + 8))->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->mergeCells('M'.$k.':N'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('M'.$k.':N'.($k + 8))->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.($k + 8).':L'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('J'.($k + 8).':L'.($k + 8))->getBorders()->getBottom()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN
+								 )
+						);						
+						// Bleu foncé
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.($k + 8))->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => '164F99'),
+									 'endcolor'   => array('argb' => '164F99')
+								 )
+						 );							
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H'.$k, 'DEUXIEME TRANCHE  70%');
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Date :');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 1;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Montant reçu (KMF) : ');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 2;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Emargement du récepteur :');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 6;
+						$objPHPExcel->getActiveSheet()->mergeCells('H'.$k.':I'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.($k + 8))->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->mergeCells('M'.$k.':N'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('M'.$k.':N'.($k + 8))->applyFromArray($styleArray);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.($k + 8).':L'.($k + 8));
+						$objPHPExcel->getActiveSheet()->getStyle('J'.($k + 8).':L'.($k + 8))->getBorders()->getBottom()->applyFromArray(
+								 array(
+									 'style' => PHPExcel_Style_Border::BORDER_THIN,
+								 )
+						);						
+						// Bleu
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.($k + 4))->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => '0000FF'),
+									 'endcolor'   => array('argb' => '0000FF')
+								 )
+						 );							
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H'.$k, 'TROISIEME TRANCHE  20%');
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getFont()->setName('calibri')->setSize(12);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+						$objPHPExcel->getActiveSheet()->getStyle('H'.$k.':I'.$k)->getAlignment()->setWrapText(true);
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Date :');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 1;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Montant reçu (KMF) : ');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 2;
+						$objPHPExcel->getActiveSheet()->mergeCells('J'.$k.':L'.$k);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setName('calibri')->setSize(10);
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k.':L'.$k)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$k, 'Emargement du récepteur :');
+						$objPHPExcel->getActiveSheet()->getStyle('J'.$k)->applyFromArray($styleUnderline);
+						$k=$k + 6;
+						$i=$k;
+						// Début Lister les enfants à charge
+						$les_individus=$this->IndividuManager->findByMenage($id_menage);
+						if($les_individus) {
+							foreach($les_individus as $key=>$value) {
+								$sexe="";
+								if($value->sexe) {
+									if(intval($value->sexe)==0) {
+										$sexe="F";
+									} else if(intval($value->sexe)==1){
+										$sexe="M";
+									}
+								}
+								$objPHPExcel->getActiveSheet()->getStyle('A'.$l.':F'.$l)->applyFromArray($styleArray);
+								$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("A" . $l,($key + 1), PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("B" . $l,$value->nom, PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("C" . $l,$sexe, PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("D" . $l,$value->date_naissance, PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("E" . $l,($value->age >0 ? $value->age : ''), PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("F" . $l,$value->scolarise, PHPExcel_Cell_DataType::TYPE_STRING);
+								$objPHPExcel->getActiveSheet()->getStyle('A'.$l.':A'.$l)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+								$objPHPExcel->getActiveSheet()->getStyle('A'.$l.':A'.$l)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+								$objPHPExcel->getActiveSheet()->getStyle('C'.$l.':F'.$l)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+								$objPHPExcel->getActiveSheet()->getStyle('C'.$l.':F'.$l)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+								$l=$l + 1;
 							}
-						}	else {
-							if($SexeTravailleurSuppliant=="M") {
-								$objPHPExcel->getActiveSheet()->getStyle('S'.$i)->getFont()->setBold(true);
-								$objPHPExcel->setActiveSheetIndex(0)->setCellValue('S'.$i, "X");
-							} else if($SexeTravailleurSuppliant=="F") {
-								$objPHPExcel->getActiveSheet()->getStyle('U'.$i)->getFont()->setBold(true);
-								$objPHPExcel->setActiveSheetIndex(0)->setCellValue('U'.$i, "X");
-							}
-						}	
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "N° NIN");				
-						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':P'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setBold(true);
-						if($j==1) {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, $numerocintravailleur);				
-						} else {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, $numerocinsuppliant);				
-						}	
-						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':P'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$i=$i + 1;
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "N° Carte éléctorale");				
-						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':P'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('J'.$i)->getFont()->setBold(true);
-						if($j==1) {
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, $numerocarteelectoraletravailleur);				
-						} else {	
-							$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$i, $numerocarteelectoralesuppliant);				
-						}	
-						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':P'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-						$i=$i + 1;
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setItalic(true);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Autres pièces");				
-						$i=$i + 1;
-						$objPHPExcel->getActiveSheet()->mergeCells('B'.$i.':M'.$i);
-						$objPHPExcel->getActiveSheet()->mergeCells('S'.$i.':AC'.$i);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i.':AB'.$i)->getFont()->setBold(true);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i.':AB'.$i)->getFont()->setName('calibri')->setSize(11);				
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Signature ou empreintes de la personne qui perçoit");				
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setName('calibri')->setSize(10);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('S'.$i, "Signature ou empreintes du chef de menage");				
-						$objPHPExcel->getActiveSheet()->getStyle('S'.$i)->getFont()->setName('calibri')->setSize(10);
-						$i=$i + 1;
-						$objPHPExcel->getActiveSheet()->mergeCells('B'.$i.':AC'.($i + 2));
-						$styleArray = array(
-						  'borders' => array(
-							'allborders' => array(
-							  'style' => PHPExcel_Style_Border::BORDER_THIN
-							)
-						  )
-						);
-						$objPHPExcel->getActiveSheet()->getStyle('B'.$i.':AC'.($i + 2))->applyFromArray($styleArray);
-						unset($styleArray);	
-						// Saut de page AUTO
-						$objPHPExcel->getActiveSheet()->setBreak('A'.($i + 5), PHPExcel_Worksheet::BREAK_ROW);
-						$i=$i + 6;
-					}
+						}
+						// Fin Lister les enfants à charge
+						$objPHPExcel->getActiveSheet()->setBreak('A'.($i), PHPExcel_Worksheet::BREAK_ROW);
+						$i=$i + 1; // C'EST UNE MISE EN PAGE SUIVANTE
 				}	
 			}			
-		}			
-		$ile_encours=strtolower ($ile_encours);
-		$ile_encours=str_replace ('é','e',$ile_encours);
-		$ile_encours=str_replace ('ô','o',$ile_encours);
-		$ile_encours=str_replace ('î','i',$ile_encours);
-		$ile_encours=str_replace ('è','e',$ile_encours);
-		$ile_encours=str_replace ('à','a',$ile_encours);
-		$ile_encours=str_replace ('ç','c',$ile_encours);
-		$region_encours=strtolower ($region_encours );		
-		$region_encours=str_replace ('é','e',$region_encours);
-		$region_encours=str_replace ('ô','o',$region_encours);
-		$region_encours=str_replace ('î','i',$region_encours);
-		$region_encours=str_replace ('è','e',$region_encours);
-		$region_encours=str_replace ('à','a',$region_encours);
-		$region_encours=str_replace ('ç','c',$region_encours);
-		$commune_encours=strtolower ($commune_encours );
-		$commune_encours=str_replace ('é','e',$commune_encours);
-		$commune_encours=str_replace ('ô','o',$commune_encours);
-		$commune_encours=str_replace ('î','i',$commune_encours);
-		$commune_encours=str_replace ('è','e',$commune_encours);
-		$commune_encours=str_replace ('à','a',$commune_encours);
-		$commune_encours=str_replace ('ç','c',$commune_encours);
-		$village_encours=strtolower ($village_encours);
-		$village_encours=str_replace ('é','e',$village_encours);
-		$village_encours=str_replace ('ô','o',$village_encours);
-		$village_encours=str_replace ('î','i',$village_encours);
-		$village_encours=str_replace ('è','e',$village_encours);
-		$village_encours=str_replace ('à','a',$village_encours);
-		$village_encours=str_replace ('ç','c',$village_encours);
-		if($filtreile >"") {
-			$ile_encours=strtolower($filtreile);
-		}
-		if($filtreregion >"") {
-			$region_encours=strtolower($filtreregion);
-		}
-		if($filtrecommune >"") {
-			$commune_encours=strtolower($filtrecommune);
-		}
-		if($filtrevillage >"") {
-			$village_encours=strtolower($filtrevillage);
-		}
-		$date_edition = date("d-m-Y");	
-		$fichier2="NON";
-		$Filename2 ="";
-		if($premier==1) {
-			$Filename2 ="Carte beneficiaire "."village " .$village_encours." edition du ".$date_edition." (MENAGE INAPTE)".".xlsx";
-			//Check if the directory already exists.
-			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-			$objWriter->save($directoryName.$Filename2);
-			$fichier2="OK";				
-		}		
-				$this->response([
-					'status' => TRUE,
-					'retour' =>	     "OK",
-					'ile' =>	     $ile_encours,
-					'region' =>	     $region_encours,
-					'commune' =>	 $commune_encours,
-					'village' =>	 $village_encours,
-					'nom_ile' =>	 $ile,
-					'microprojet' => $microprojet,
-					'date_edition'=> $date_edition,	
-					'fichier1' => $fichier1,
-					'fichier2' => $fichier2,
-					'chemin' => $ile_tmp."/".$region_tmp."/".$commune_tmp."/".$village_tmp."/",
-					'name_file1' => $Filename1,
-					'name_file2' => $Filename2,
-					'message' => 'Get file success',
-				], REST_Controller::HTTP_OK);		
+			$date_edition = date("d-m-Y");	
+			$fichier2="NON";
+			$Filename2 ="";
+			if($premier==1) {
+				$Filename2 ="Carte beneficiaire "."village " .$village_tmp." edition du ".$date_edition." (MENAGE INAPTE)".".xlsx";
+				//Check if the directory already exists.
+				$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+				$objWriter->save($directoryName.$Filename2);
+				$fichier2="OK";				
+			}	
+		} else {
+			// SANS ENREGISTREMENT
+			$sans_menage=$sans_menage + 1;
+		}	
+		if($sans_menage==2) {
+			$this->response([
+				'status' => FALSE,
+				'retour' =>	     "NON",
+				'ile' =>	     $ile,
+				'region' =>	     $region,
+				'commune' =>	 $commune,
+				'village' =>	 $village,
+				'nom_ile' =>	 $ile,
+				'microprojet' => $microprojet,
+				'date_edition'=> $date_edition,	
+				'fichier1' => $fichier1,
+				'fichier2' => $fichier2,
+				'chemin' => $ile_tmp."/".$region_tmp."/".$commune_tmp."/".$village_tmp."/",
+				'name_file1' => $Filename1,
+				'name_file2' => $Filename2,
+				'message' => 'Aucun ménage bénéficiaire pour le filtre choisi !. Merci',
+			], REST_Controller::HTTP_OK);				
+		} else {	
+			$this->response([
+				'status' => TRUE,
+				'retour' =>	     "OK",
+				'ile' =>	     $ile,
+				'region' =>	     $region,
+				'commune' =>	 $commune,
+				'village' =>	 $village,
+				'nom_ile' =>	 $ile,
+				'microprojet' => $microprojet,
+				'date_edition'=> $date_edition,	
+				'fichier1' => $fichier1,
+				'fichier2' => $fichier2,
+				'chemin' => $ile_tmp."/".$region_tmp."/".$commune_tmp."/".$village_tmp."/",
+				'name_file1' => $Filename1,
+				'name_file2' => $Filename2,
+				'menages' => $menages,
+				'message' => 'Get file success',
+			], REST_Controller::HTTP_OK);	
+		}	
 	}	
 
 }

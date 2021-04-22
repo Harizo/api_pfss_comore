@@ -10,13 +10,55 @@ class Infrastructure extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('infrastructure_model', 'InfrastructureManager');
+        $this->load->model('type_infrastructure_model', 'Type_infrastructureManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
         $id_type_infrastructure = $this->get('id_type_infrastructure');
-        if ($menu=="getinfrastructurebytype") {
+        $id_communaute = $this->get('id_communaute');
+        if ($menu=="getinfrastructurebycommunauteandchoisi") {
+               
+            $infrastructure = $this->InfrastructureManager->getinfrastructurebycommunauteandchoisi($id_communaute);
+                if ($infrastructure) {
+                    //$data = $infrastructure;
+                    foreach ($infrastructure as $key => $value)
+                    {
+                        $type_infrastructure = $this->Type_infrastructureManager->findById($value->id_type_infrastructure);
+                        $data[$key]['id'] = $value->id;
+                        $data[$key]['code'] = $value->code;
+                        $data[$key]['libelle'] = $value->libelle;
+                        $data[$key]['statu'] = $value->statu;
+                        $data[$key]['id_communaute'] = $value->id_communaute;
+                        $data[$key]['type_infrastructure'] = $type_infrastructure;
+                        
+                    };
+
+                } else
+                    $data = array();
+            
+        } elseif ($menu=="getinfrastructurebycommunauteandeligible") {
+               
+            $infrastructure = $this->InfrastructureManager->getinfrastructurebycommunauteandeligible($id_communaute);
+                if ($infrastructure) {
+                    //$data = $infrastructure;
+                    foreach ($infrastructure as $key => $value)
+                    {
+                        $type_infrastructure = $this->Type_infrastructureManager->findById($value->id_type_infrastructure);
+                        $data[$key]['id'] = $value->id;
+                        $data[$key]['code'] = $value->code;
+                        $data[$key]['libelle'] = $value->libelle;
+                        $data[$key]['statu'] = $value->statu;
+                        $data[$key]['id_communaute'] = $value->id_communaute;
+                        $data[$key]['type_infrastructure'] = $type_infrastructure;
+                        
+                    };
+
+                } else
+                    $data = array();
+            
+        } elseif ($menu=="getinfrastructurebytype") {
                
             $infrastructure = $this->InfrastructureManager->getinfrastructurebytype($id_type_infrastructure);
                 if ($infrastructure) {
@@ -76,7 +118,9 @@ class Infrastructure extends REST_Controller {
                 $data = array(
                     'code' => $this->post('code'),
                     'libelle' => $this->post('libelle'),
-                    'id_type_infrastructure' => $this->post('id_type_infrastructure')
+                    'id_type_infrastructure' => $this->post('id_type_infrastructure'),
+                    'id_communaute' => $this->post('id_communaute'),
+                    'statu' => $this->post('statu')
                 );               
                 if (!$data) {
                     $this->response([
@@ -107,7 +151,9 @@ class Infrastructure extends REST_Controller {
                     $data = array(
                         'code' => $this->post('code'),
                         'libelle' => $this->post('libelle'),
-                        'id_type_infrastructure' => $this->post('id_type_infrastructure')
+                        'id_type_infrastructure' => $this->post('id_type_infrastructure'),
+                        'id_communaute' => $this->post('id_communaute'),
+                        'statu' => $this->post('statu')
                     );
                     if (!$data) {
                         $this->response([
@@ -136,7 +182,9 @@ class Infrastructure extends REST_Controller {
                     $data = array(
                         'code' => $this->post('code'),
                         'libelle' => $this->post('libelle'),
-                        'id_type_infrastructure' => $this->post('id_type_infrastructure')
+                        'id_type_infrastructure' => $this->post('id_type_infrastructure'),
+                        'id_communaute' => $this->post('id_communaute'),
+                        'statu' => $this->post('statu')
                     );              
                     if (!$data || !$id) {
                         $this->response([

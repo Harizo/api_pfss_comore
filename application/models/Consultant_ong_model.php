@@ -37,6 +37,7 @@ class Consultant_ong_model extends CI_Model {
 		// Affectation des valeurs
         return array(
             'code' =>  $cons_ong['code'],
+            'nom_consultant'  =>  $cons_ong['nom_consultant'],
             'raison_social'  =>  $cons_ong['raison_social'],                       
             'contact'    =>  $cons_ong['contact'],                       
             'fonction_contact'    =>  $cons_ong['fonction_contact'],                       
@@ -49,6 +50,7 @@ class Consultant_ong_model extends CI_Model {
 		// Affectation des valeurs
         return array(
             'code' =>  $cons_ong['code'],
+            'nom_consultant'  =>  $cons_ong['nom_consultant'],
             'raison_social'  =>  $cons_ong['raison_social'],                       
             'contact'    =>  $cons_ong['contact'],                       
             'fonction_contact'    =>  $cons_ong['fonction_contact'],                       
@@ -65,6 +67,21 @@ class Consultant_ong_model extends CI_Model {
         }else{
             return null;
         }  
+    }
+    
+    public function getconsultantbyile($cle_etrangere) {
+		// Selection de tous les enregitrements
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where("ile_id", $cle_etrangere)
+                        ->order_by('id')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
     }
     public function findAll() {
 		// Selection de tous les enregitrements

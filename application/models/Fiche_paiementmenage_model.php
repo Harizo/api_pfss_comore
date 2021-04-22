@@ -80,7 +80,7 @@ class Fiche_paiementmenage_model extends CI_Model {
 		// Selection de tous les enregitrements
 		 $requete="SELECT fp.id,i.id as ile_id,i.ile,r.id as region_id,r.region,c.id as commune_id,c.commune,"
 				."fp.village_id as village_id,v.village,"
-				."fp.activite_id,act.detail as activite,fpp.agex_id,ag.code,"
+				."fp.activite_id,act.detail as activite,fpp.agex_id,ag.identifiant_agex,"
 				."v.zone_id,z.zone,ifnull(date_format(fpp.datedu,'%Y-%m-%d'),'') as datedu,ifnull(date_format(fpp.datefin,'%Y-%m-%d'),'') as datefin,fp.nombrejourdetravail,"
 				."fpp.fichepaiement_id,ifnull(date_format(fp.datepaiement,'%Y-%m-%d'),'') as datepaiement,"
 				."fp.microprojet_id,mic.description as microprojet,mic.code as code_sous_projet,"

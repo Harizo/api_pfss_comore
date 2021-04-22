@@ -7,6 +7,7 @@ class Consultant_ong extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('consultant_ong_model', 'ConsultantongManager');
+        $this->load->model('ile_model', 'IleManager');
     }
     public function index_get() {
         $id = $this->get('id');
@@ -16,9 +17,49 @@ class Consultant_ong extends REST_Controller {
 			$data = $this->ConsultantongManager->findById($id);
             if (!$data)
                 $data = array();
-		}  else  {
-			$data = $this->ConsultantongManager->findAll();
-            if (!$data)
+		}  
+        elseif($cle_etrangere)
+        {
+			$tmp = $this->ConsultantongManager->getconsultantbyile($cle_etrangere);
+            if ($tmp)
+            {
+                foreach ($tmp as $key => $value)
+                {
+                    $ile = $this->IleManager->findById($value->ile_id);
+                    $data[$key]['id'] = $value->id;
+                    $data[$key]['code'] = $value->code;
+                    $data[$key]['nom_consultant']    = $value->nom_consultant;
+                    $data[$key]['raison_social']  = $value->raison_social;
+                    $data[$key]['contact']    = $value->contact;
+                    $data[$key]['fonction_contact']    = $value->fonction_contact;
+                    $data[$key]['telephone_contact']    = $value->telephone_contact;
+                    $data[$key]['adresse']    = $value->adresse;
+                    $data[$key]['ile']    = $ile;
+                }
+            }
+            else
+                $data = array();
+		} 
+        else
+        {
+			$tmp = $this->ConsultantongManager->findAll();
+            if ($tmp)
+            {
+                foreach ($tmp as $key => $value)
+                {
+                    $ile = $this->IleManager->findById($value->ile_id);
+                    $data[$key]['id'] = $value->id;
+                    $data[$key]['code'] = $value->code;
+                    $data[$key]['nom_consultant']    = $value->nom_consultant;
+                    $data[$key]['raison_social']  = $value->raison_social;
+                    $data[$key]['contact']    = $value->contact;
+                    $data[$key]['fonction_contact']    = $value->fonction_contact;
+                    $data[$key]['telephone_contact']    = $value->telephone_contact;
+                    $data[$key]['adresse']    = $value->adresse;
+                    $data[$key]['ile']    = $ile;
+                }
+            }
+            else
                 $data = array();
         }
         if (count($data)>0) {
@@ -42,6 +83,7 @@ class Consultant_ong extends REST_Controller {
 		// Affectation des valeurs des colonnes de la table
 		$data = array(
 			'code' => $this->post('code'),
+			'nom_consultant'    => $this->post('nom_consultant'),
 			'raison_social'  => $this->post('raison_social'),
 			'contact'    => $this->post('contact'),
 			'fonction_contact'    => $this->post('fonction_contact'),

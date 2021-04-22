@@ -7,12 +7,36 @@ class Fichepresence_bienetre extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('fichepresence_bienetre_model', 'FichepresencebienetreManager');
+        $this->load->model('menage_model', 'MenageManager');
     }
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
+        $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
+        $menu = $this->get('menu');
         $data = array() ;
-		if($id) {
+		if($menu=="getfichepresencebygroupe") {
+			$tmp = $this->FichepresencebienetreManager->getfichepresencebygroupe($id_groupe_ml_pl);
+            if ($tmp)
+            {
+                foreach ($tmp as $key => $value)
+                {
+                    
+                    $menage = $this->MenageManager->findById($value->menage_id);
+                    $data[$key]['id']                   = $value->id;
+                    $data[$key]['id_groupe_ml_pl']      = $value->id_groupe_ml_pl;
+                    $data[$key]['date_presence']        = $value->date_presence;
+                    $data[$key]['menage_id' ]           = $value->menage_id;
+                    $data[$key]['enfant_moins_six_ans'] = $value->enfant_moins_six_ans;
+                    $data[$key]['numero_ligne'] = $value->numero_ligne;
+                    $data[$key]['menage'] = $menage;
+                }
+            }
+            else $data = array();
+            
+		} 
+        elseif($id)
+        {
 			$data = $this->FichepresencebienetreManager->findById($id);
             if (!$data)
                 $data = array();
@@ -48,6 +72,7 @@ class Fichepresence_bienetre extends REST_Controller {
 			'date_presence'        => $this->post('date_presence'),
 			'menage_id'            => $this->post('menage_id'),
 			'enfant_moins_six_ans' => $this->post('enfant_moins_six_ans'),
+			'numero_ligne' => $this->post('numero_ligne')
 		);               
          if ($supprimer == 0)  {
             if ($id == 0) {
@@ -81,7 +106,7 @@ class Fichepresence_bienetre extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-				// Mise à jour d'un enregistrement
+				// Mise ï¿½ jour d'un enregistrement
                 $update = $this->FichepresencebienetreManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([

@@ -19,21 +19,24 @@ class Menage extends REST_Controller {
         $cle_etrangere = $this->get('cle_etrangere');
         $statut = $this->get('statut');
         $id_sous_projet = $this->get('id_sous_projet');
+        $beneficiaire = $this->get('beneficiaire');
 
         $max_id = $this->get('max_id');
 		$data=array();
         if ($max_id == 1) {
             $data = $this->menageManager->find_max_id();
+        } else if ($cle_etrangere && $statut && $id_sous_projet && $beneficiaire) {
+			$data = $this->menageManager->findAllByVillageAndBeneficiaireStatutAndSousProjet($cle_etrangere,$statut,$id_sous_projet);
         } else if ($cle_etrangere && $statut && $id_sous_projet) {
 			$data = $this->menageManager->findAllByVillageAndStatutAndSousProjet($cle_etrangere,$statut,$id_sous_projet);
         }else if ($cle_etrangere && $statut) {
 			$data = $this->menageManager->findAllByVillageAndStatut($cle_etrangere,$statut);
         } else if($cle_etrangere) {
-			$data = $this->menageManager->findAllByVillage($cle_etrangere);			
+			$data = $this->menageManager->findAllByVillage($cle_etrangere);		
 		} else if ($id) {                 
-			$data = $this->menageManager->findById($id);                                        
+			$data = $this->menageManager->findById($id);
 		} else {
-			$data = $this->menageManager->findAll();                  
+			$data = $this->menageManager->findAll();
 		}  
         if (count($data)>0) {
             $this->response([
@@ -59,6 +62,7 @@ class Menage extends REST_Controller {
 			'DateInscription' => $this->post('DateInscription'),
 			'village_id' => $this->post('village_id'),
 			'NumeroEnregistrement' => $this->post('NumeroEnregistrement'),
+			'identifiant_menage' => $this->post('identifiant_menage'),
 			'nomchefmenage' => $this->post('nomchefmenage'),
 			'PersonneInscription' => $this->post('PersonneInscription'),
 			'agechefdemenage' => $this->post('agechefdemenage'),

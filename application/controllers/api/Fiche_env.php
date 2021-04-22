@@ -38,8 +38,8 @@ class Fiche_env extends REST_Controller {
                         //$data[$key]['region'] = $region;      
                         //$data[$key]['commune'] = $commune;       
                         $data[$key]['composante_sousprojet'] = $value-> composante_sousprojet;      
-                        $data[$key]['localisation_sousprojet'] = $value-> localisation_sousprojet;      
-                        $data[$key]['localisation_geo'] = $value-> localisation_geo;      
+                        //$data[$key]['localisation_sousprojet'] = $value-> localisation_sousprojet;      
+                       // $data[$key]['localisation_geo'] = $value-> localisation_geo;      
                         $data[$key]['composante_zone_susce'] = $value-> composante_zone_susce;      
                         $data[$key]['probleme_env'] = $value-> probleme_env;      
                         $data[$key]['mesure_envisage'] = $value-> mesure_envisage;    
@@ -99,8 +99,8 @@ class Fiche_env extends REST_Controller {
                     //'id_region'=> $this->post( 'id_region'),      
                     //'id_commune'=> $this->post( 'id_commune'),       
                     'composante_sousprojet'=> $this->post( 'composante_sousprojet'),      
-                    'localisation_sousprojet'=> $this->post( 'localisation_sousprojet'),      
-                    'localisation_geo'=> $this->post( 'localisation_geo'),      
+                    //'localisation_sousprojet'=> $this->post( 'localisation_sousprojet'),      
+                    //'localisation_geo'=> $this->post( 'localisation_geo'),      
                     'composante_zone_susce'=> $this->post( 'composante_zone_susce'),      
                     'probleme_env'=> $this->post( 'probleme_env'),      
                     'mesure_envisage'=> $this->post( 'mesure_envisage'),    
@@ -145,8 +145,8 @@ class Fiche_env extends REST_Controller {
                         //'id_region'=> $this->post( 'id_region'),      
                         //'id_commune'=> $this->post( 'id_commune'),       
                         'composante_sousprojet'=> $this->post( 'composante_sousprojet'),      
-                        'localisation_sousprojet'=> $this->post( 'localisation_sousprojet'),      
-                        'localisation_geo'=> $this->post( 'localisation_geo'),      
+                        //'localisation_sousprojet'=> $this->post( 'localisation_sousprojet'),      
+                        //'localisation_geo'=> $this->post( 'localisation_geo'),      
                         'composante_zone_susce'=> $this->post( 'composante_zone_susce'),      
                         'probleme_env'=> $this->post( 'probleme_env'),      
                         'mesure_envisage'=> $this->post( 'mesure_envisage'),    
@@ -189,8 +189,8 @@ class Fiche_env extends REST_Controller {
                         //'id_region'=> $this->post( 'id_region'),      
                         //'id_commune'=> $this->post( 'id_commune'),       
                         'composante_sousprojet'=> $this->post( 'composante_sousprojet'),      
-                        'localisation_sousprojet'=> $this->post( 'localisation_sousprojet'),      
-                        'localisation_geo'=> $this->post( 'localisation_geo'),      
+                        //'localisation_sousprojet'=> $this->post( 'localisation_sousprojet'),      
+                        //'localisation_geo'=> $this->post( 'localisation_geo'),      
                         'composante_zone_susce'=> $this->post( 'composante_zone_susce'),      
                         'probleme_env'=> $this->post( 'probleme_env'),      
                         'mesure_envisage'=> $this->post( 'mesure_envisage'),    
