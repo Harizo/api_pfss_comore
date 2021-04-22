@@ -3,49 +3,25 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Fichepresence_bienetre extends REST_Controller {
+class Probleme_solution_mlpl extends REST_Controller {
     public function __construct() {
         parent::__construct();
-        $this->load->model('fichepresence_bienetre_model', 'FichepresencebienetreManager');
-        $this->load->model('menage_model', 'MenageManager');
+        $this->load->model('probleme_solution_mlpl_model', 'Probleme_solution_mlplManager');
     }
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
-        $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
-        $menu = $this->get('menu');
         $data = array() ;
-		if($menu=="getfichepresencebygroupe") {
-			$tmp = $this->FichepresencebienetreManager->getfichepresencebygroupe($id_groupe_ml_pl);
-            if ($tmp)
-            {
-                foreach ($tmp as $key => $value)
-                {
-                    
-                    $menage = $this->MenageManager->findById($value->menage_id);
-                    $data[$key]['id']                   = $value->id;
-                    $data[$key]['id_groupe_ml_pl']      = $value->id_groupe_ml_pl;
-                    $data[$key]['date_presence']        = $value->date_presence;
-                    $data[$key]['menage_id' ]           = $value->menage_id;
-                    $data[$key]['enfant_moins_six_ans'] = $value->enfant_moins_six_ans;
-                    $data[$key]['numero_ligne'] = $value->numero_ligne;
-                    $data[$key]['menage'] = $menage;
-                }
-            }
-            else $data = array();
-            
-		} 
-        elseif($id)
-        {
-			$data = $this->FichepresencebienetreManager->findById($id);
+		if($id) {
+			$data = $this->Probleme_solution_mlplManager->findById($id);
             if (!$data)
                 $data = array();
-		} else if ($cle_etrangere)  {
-            $data = $this->FichepresencebienetreManager->findAllByGroupemlpl($cle_etrangere);
+		}  else if($cle_etrangere) {
+			$data = $this->Probleme_solution_mlplManager->getprobleme_solutionbyfichesupervision($cle_etrangere);
             if (!$data)
                 $data = array();
-        } else  {
-			$data = $this->FichepresencebienetreManager->findAll();
+		} else {	
+			$data = $this->Probleme_solution_mlplManager->findAll();
             if (!$data)
                 $data = array();
         }
@@ -68,11 +44,9 @@ class Fichepresence_bienetre extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
 		// Affectation des valeurs des colonnes de la table
 		$data = array(
-			'id_groupe_ml_pl'      => $this->post('id_groupe_ml_pl'),
-			'date_presence'        => $this->post('date_presence'),
-			'menage_id'            => $this->post('menage_id'),
-			'enfant_moins_six_ans' => $this->post('enfant_moins_six_ans'),
-			'numero_ligne' => $this->post('numero_ligne')
+			'id_fiche_supervision_mlpl' => $this->post('id_fiche_supervision_mlpl'),
+			'probleme' => $this->post('probleme'),
+			'solution'  => $this->post('solution')
 		);               
          if ($supprimer == 0)  {
             if ($id == 0) {
@@ -84,7 +58,7 @@ class Fichepresence_bienetre extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Ajout d'un enregistrement
-                $dataId = $this->FichepresencebienetreManager->add($data);
+                $dataId = $this->Probleme_solution_mlplManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -107,7 +81,7 @@ class Fichepresence_bienetre extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Mise � jour d'un enregistrement
-                $update = $this->FichepresencebienetreManager->update($id, $data);              
+                $update = $this->Probleme_solution_mlplManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -130,7 +104,7 @@ class Fichepresence_bienetre extends REST_Controller {
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregistrement
-            $delete = $this->FichepresencebienetreManager->delete($id);          
+            $delete = $this->Probleme_solution_mlplManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,

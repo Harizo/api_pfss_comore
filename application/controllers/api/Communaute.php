@@ -18,7 +18,17 @@ class Communaute extends REST_Controller {
         $id = $this->get('id');
         $menu = $this->get('menu');
         $id_commune = $this->get('id_commune');
-        if ($menu=="getcommunautebycommune") {
+        if ($menu=="getcommunautebycommune_direct") {
+               
+            $communaute = $this->CommunauteManager->getcommunautebycommune($id_commune);
+                if ($communaute) {
+                    $data = $communaute;
+                    
+
+                } else
+                    $data = array();
+            
+        } elseif ($menu=="getcommunautebycommune") {
                
             $communaute = $this->CommunauteManager->getcommunautebycommune($id_commune);
                 if ($communaute) {

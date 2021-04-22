@@ -3,49 +3,44 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Fichepresence_bienetre extends REST_Controller {
+class Livrable_mlpl extends REST_Controller {
     public function __construct() {
         parent::__construct();
-        $this->load->model('fichepresence_bienetre_model', 'FichepresencebienetreManager');
-        $this->load->model('menage_model', 'MenageManager');
+        $this->load->model('livrable_mlpl_model', 'Livrable_mlplManager');
+        $this->load->model('contrat_consultant_ong_model', 'Contrat_consultant_ongManager');
     }
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
-        $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
-        $menu = $this->get('menu');
         $data = array() ;
-		if($menu=="getfichepresencebygroupe") {
-			$tmp = $this->FichepresencebienetreManager->getfichepresencebygroupe($id_groupe_ml_pl);
+		if($id) {
+			$data = $this->Livrable_mlplManager->findById($id);
+            if (!$data)
+                $data = array();
+		}  else  if($cle_etrangere) {
+			$tmp = $this->Livrable_mlplManager->findByGoupemlpl($cle_etrangere);
             if ($tmp)
             {
                 foreach ($tmp as $key => $value)
                 {
-                    
-                    $menage = $this->MenageManager->findById($value->menage_id);
-                    $data[$key]['id']                   = $value->id;
-                    $data[$key]['id_groupe_ml_pl']      = $value->id_groupe_ml_pl;
-                    $data[$key]['date_presence']        = $value->date_presence;
-                    $data[$key]['menage_id' ]           = $value->menage_id;
-                    $data[$key]['enfant_moins_six_ans'] = $value->enfant_moins_six_ans;
-                    $data[$key]['numero_ligne'] = $value->numero_ligne;
-                    $data[$key]['menage'] = $menage;
+                    $contrat_consultant = $this->Contrat_consultant_ongManager->findById($value->id_contrat_consultant);
+                    $data[$key]['contrat_consultant']        = $contrat_consultant;
+                    $data[$key]['id']                        = $value->id;
+                    $data[$key]['id_groupemlpl']             = $value->id_groupemlpl;
+                    $data[$key]['activite_concernee']        = $value->activite_concernee;
+                    $data[$key]['intitule_livrable']         = $value->intitule_livrable;
+                    $data[$key]['date_prevue_remise']        = $value->date_prevue_remise;
+                    $data[$key]['date_effective_reception']  = $value->date_effective_reception;
+                    $data[$key]['intervenant']               = $value->intervenant;
+                    $data[$key]['nbr_commune_touchee']       = $value->nbr_commune_touchee;
+                    $data[$key]['nbr_village_touchee']       = $value->nbr_village_touchee;
+                    $data[$key]['observation']               = $value->observation;
                 }
             }
-            else $data = array();
-            
-		} 
-        elseif($id)
-        {
-			$data = $this->FichepresencebienetreManager->findById($id);
-            if (!$data)
+            else
                 $data = array();
-		} else if ($cle_etrangere)  {
-            $data = $this->FichepresencebienetreManager->findAllByGroupemlpl($cle_etrangere);
-            if (!$data)
-                $data = array();
-        } else  {
-			$data = $this->FichepresencebienetreManager->findAll();
+		} else {	
+			$data = $this->Livrable_mlplManager->findAll();
             if (!$data)
                 $data = array();
         }
@@ -68,11 +63,16 @@ class Fichepresence_bienetre extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
 		// Affectation des valeurs des colonnes de la table
 		$data = array(
-			'id_groupe_ml_pl'      => $this->post('id_groupe_ml_pl'),
-			'date_presence'        => $this->post('date_presence'),
-			'menage_id'            => $this->post('menage_id'),
-			'enfant_moins_six_ans' => $this->post('enfant_moins_six_ans'),
-			'numero_ligne' => $this->post('numero_ligne')
+			'id_contrat_consultant'     => $this->post('id_contrat_consultant'),
+			'id_groupemlpl'             => $this->post('id_groupemlpl'),
+			'activite_concernee'        => $this->post('activite_concernee'),
+			'intitule_livrable'         => $this->post('intitule_livrable'),
+			'date_prevue_remise'        => $this->post('date_prevue_remise'),
+			'date_effective_reception'  => $this->post('date_effective_reception'),
+			'intervenant'               => $this->post('intervenant'),
+			'nbr_commune_touchee'       => $this->post('nbr_commune_touchee'),
+			'nbr_village_touchee'       => $this->post('nbr_village_touchee'),
+			'observation'               => $this->post('observation')
 		);               
          if ($supprimer == 0)  {
             if ($id == 0) {
@@ -84,7 +84,7 @@ class Fichepresence_bienetre extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Ajout d'un enregistrement
-                $dataId = $this->FichepresencebienetreManager->add($data);
+                $dataId = $this->Livrable_mlplManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -107,7 +107,7 @@ class Fichepresence_bienetre extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Mise � jour d'un enregistrement
-                $update = $this->FichepresencebienetreManager->update($id, $data);              
+                $update = $this->Livrable_mlplManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -130,7 +130,7 @@ class Fichepresence_bienetre extends REST_Controller {
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregistrement
-            $delete = $this->FichepresencebienetreManager->delete($id);          
+            $delete = $this->Livrable_mlplManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,

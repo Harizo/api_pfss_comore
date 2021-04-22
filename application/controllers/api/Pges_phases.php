@@ -1,73 +1,37 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
-//harizo
+
 // afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Infrastructure extends REST_Controller {
+class Pges_phases extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('infrastructure_model', 'InfrastructureManager');
-        $this->load->model('type_infrastructure_model', 'Type_infrastructureManager');
+        $this->load->model('pges_phases_model', 'Pges_phasesManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_type_infrastructure = $this->get('id_type_infrastructure');
-        $id_communaute = $this->get('id_communaute');
-        if ($menu=="getinfrastructurebycommunauteandchoisi") {
+        $id_pges = $this->get('id_pges');
+        if ($menu=="getphasesbypges") {
                
-            $infrastructure = $this->InfrastructureManager->getinfrastructurebycommunauteandchoisi($id_communaute);
-                if ($infrastructure) {
-                    //$data = $infrastructure;
-                    foreach ($infrastructure as $key => $value)
+            $pges_phases = $this->Pges_phasesManager->getphasesbypges($id_pges);
+                if ($pges_phases) {
+                    $data = $pges_phases;
+                    /*foreach ($pges_phases as $key => $value)
                     {
-                        $type_infrastructure = $this->Type_infrastructureManager->findById($value->id_type_infrastructure);
-                        $data[$key]['id'] = $value->id;
-                        $data[$key]['code'] = $value->code;
-                        $data[$key]['libelle'] = $value->libelle;
-                        $data[$key]['statu'] = $value->statu;
-                        $data[$key]['id_communaute'] = $value->id_communaute;
-                        $data[$key]['type_infrastructure'] = $type_infrastructure;
-                        
-                    };
+                        $ile = $this->IleManager->findById($value->calendrier_execution);
+                        $region = $this->RegionManager->findById($value->cout_estimatif);
+                        $commune = $this->CommuneManager->findById($value->id_commune);
 
-                } else
-                    $data = array();
-            
-        } elseif ($menu=="getinfrastructurebycommunauteandeligible") {
-               
-            $infrastructure = $this->InfrastructureManager->getinfrastructurebycommunauteandeligible($id_communaute);
-                if ($infrastructure) {
-                    //$data = $infrastructure;
-                    foreach ($infrastructure as $key => $value)
-                    {
-                        $type_infrastructure = $this->Type_infrastructureManager->findById($value->id_type_infrastructure);
                         $data[$key]['id'] = $value->id;
-                        $data[$key]['code'] = $value->code;
-                        $data[$key]['libelle'] = $value->libelle;
-                        $data[$key]['statu'] = $value->statu;
-                        $data[$key]['id_communaute'] = $value->id_communaute;
-                        $data[$key]['type_infrastructure'] = $type_infrastructure;
-                        
-                    };
-
-                } else
-                    $data = array();
-            
-        } elseif ($menu=="getinfrastructurebytype") {
-               
-            $infrastructure = $this->InfrastructureManager->getinfrastructurebytype($id_type_infrastructure);
-                if ($infrastructure) {
-                    $data = $infrastructure;
-                    /*foreach ($infrastructure as $key => $value) {
-                        $data[$key]['id'] = $value->id;
-                        $data[$key]['code'] = $value->code;
-                        $data[$key]['libelle'] = $value->libelle;
-                        
+                        $data[$key]['impacts'] = $value-> impacts;      
+                        $data[$key]['mesures'] = $value-> mesures;      
+                        $data[$key]['responsable'] = $value-> responsable;
+                        $data[$key]['id_pges'] = $value->id_pges;                        
                     };*/
 
                 } else
@@ -75,23 +39,18 @@ class Infrastructure extends REST_Controller {
             
         } elseif ($id) {
                
-                $data = $this->InfrastructureManager->findById($id);
-                /*$data['id'] = $infrastructure->id;
-                $data['code'] = $infrastructure->code;
-                $data['libelle'] = $infrastructure->libelle;*/
+                $data = $this->Pges_phasesManager->findById($id);
+                /*$data['id'] = $pges_phases->id;
+                $data['code'] = $pges_phases->code;
+                $data['description'] = $pges_phases->description;*/
                 
-            } else {
-                $infrastructure = $this->InfrastructureManager->findAll();
-                if ($infrastructure) {
-                    $data = $infrastructure;
-                    /*foreach ($infrastructure as $key => $value) {
-                        $data[$key]['id'] = $value->id;
-                        $data[$key]['code'] = $value->code;
-                        $data[$key]['libelle'] = $value->libelle;
-                        
-                    };*/
+            } else 
+            {
+               /* $pges_phases = $this->Pges_phasesManager->findAll();
+                if ($pges_phases) {
+                    $data = $pges_phases;
 
-                } else
+                } else*/
                     $data = array();
             }
         
@@ -116,11 +75,13 @@ class Infrastructure extends REST_Controller {
         if ($supprimer == 0) {
             if ($id == 0) {
                 $data = array(
-                    'code' => $this->post('code'),
-                    'libelle' => $this->post('libelle'),
-                    'id_type_infrastructure' => $this->post('id_type_infrastructure'),
-                    'id_communaute' => $this->post('id_communaute'),
-                    'statu' => $this->post('statu')
+                    'description'=> $this->post( 'description'), 
+                    'impacts'=> $this->post( 'impacts'),      
+                    'mesures'=> $this->post( 'mesures'),      
+                    'responsable'=> $this->post( 'responsable'),
+                    'calendrier_execution'=> $this->post( 'calendrier_execution'),      
+                    'cout_estimatif'=> $this->post( 'cout_estimatif'), 
+                    'id_pges' => $this->post('id_pges')
                 );               
                 if (!$data) {
                     $this->response([
@@ -129,7 +90,7 @@ class Infrastructure extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->InfrastructureManager->add($data);              
+                $dataId = $this->Pges_phasesManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -149,11 +110,13 @@ class Infrastructure extends REST_Controller {
                 if ($etat_download)
                 {   
                     $data = array(
-                        'code' => $this->post('code'),
-                        'libelle' => $this->post('libelle'),
-                        'id_type_infrastructure' => $this->post('id_type_infrastructure'),
-                        'id_communaute' => $this->post('id_communaute'),
-                        'statu' => $this->post('statu')
+                        'description'=> $this->post( 'description'),
+                        'impacts'=> $this->post( 'impacts'),      
+                        'mesures'=> $this->post( 'mesures'),      
+                        'responsable'=> $this->post( 'responsable'),
+                        'calendrier_execution'=> $this->post( 'calendrier_execution'),      
+                        'cout_estimatif'=> $this->post( 'cout_estimatif'), 
+                        'id_pges' => $this->post('id_pges')
                     );
                     if (!$data) {
                         $this->response([
@@ -162,7 +125,7 @@ class Infrastructure extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_BAD_REQUEST);
                     }
-                    $dataId = $this->InfrastructureManager->add_down($data, $id);              
+                    $dataId = $this->Pges_phasesManager->add_down($data, $id);              
                     if (!is_null($dataId)) {
                         $this->response([
                             'status' => TRUE,
@@ -180,11 +143,13 @@ class Infrastructure extends REST_Controller {
                 else
                 {
                     $data = array(
-                        'code' => $this->post('code'),
-                        'libelle' => $this->post('libelle'),
-                        'id_type_infrastructure' => $this->post('id_type_infrastructure'),
-                        'id_communaute' => $this->post('id_communaute'),
-                        'statu' => $this->post('statu')
+                        'description'=> $this->post( 'description'),
+                        'impacts'=> $this->post( 'impacts'),      
+                        'mesures'=> $this->post( 'mesures'),      
+                        'responsable'=> $this->post( 'responsable'),
+                        'calendrier_execution'=> $this->post( 'calendrier_execution'),      
+                        'cout_estimatif'=> $this->post( 'cout_estimatif'),
+                        'id_pges' => $this->post('id_pges')
                     );              
                     if (!$data || !$id) {
                         $this->response([
@@ -193,7 +158,7 @@ class Infrastructure extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_BAD_REQUEST);
                     }
-                    $update = $this->InfrastructureManager->update($id, $data);              
+                    $update = $this->Pges_phasesManager->update($id, $data);              
                     if(!is_null($update)){
                         $this->response([
                             'status' => TRUE, 
@@ -218,7 +183,7 @@ class Infrastructure extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
-            $delete = $this->InfrastructureManager->delete($id);          
+            $delete = $this->Pges_phasesManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,

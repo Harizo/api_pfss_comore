@@ -1,11 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Fichepresence_bienetre_model extends CI_Model {
-    protected $table = 'fichepresence_bienetre';
+class Livrable_mlpl_model extends CI_Model {
+    protected $table = 'livrable_mlpl';
 
-    public function add($fiche_presence)  {
+    public function add($livrable)  {
 		// Ajout d'un enregitrement
-        $this->db->set($this->_set($fiche_presence))
+        $this->db->set($this->_set($livrable))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1) {
             return $this->db->insert_id();
@@ -13,9 +13,9 @@ class Fichepresence_bienetre_model extends CI_Model {
             return null;
         }                    
     }
-    public function update($id, $fiche_presence)  {
+    public function update($id, $livrable)  {
 		// Mise à jour d'un enregitrement
-        $this->db->set($this->_set($fiche_presence))
+        $this->db->set($this->_set($livrable))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -24,15 +24,20 @@ class Fichepresence_bienetre_model extends CI_Model {
             return null;
         }                      
     }
-    public function _set($fiche_presence) {
+    public function _set($livrable) {
 		// Affectation des valeurs
-        return array(
-            'id_groupe_ml_pl'      => $fiche_presence['id_groupe_ml_pl'],
-            'date_presence'        => $fiche_presence['date_presence'],                       
-            'menage_id'            => $fiche_presence['menage_id'],                       
-            'enfant_moins_six_ans' => $fiche_presence['enfant_moins_six_ans'],                      
-            'numero_ligne'         => $fiche_presence['numero_ligne']                       
-        );
+        return array(            
+            'id_contrat_consultant'     => $livrable['id_contrat_consultant'],
+			'id_groupemlpl'             => $livrable['id_groupemlpl'],
+			'activite_concernee'        => $livrable['activite_concernee'],
+			'intitule_livrable'         => $livrable['intitule_livrable'],
+			'date_prevue_remise'        => $livrable['date_prevue_remise'],
+			'date_effective_reception'  => $livrable['date_effective_reception'],
+			'intervenant'               => $livrable['intervenant'],
+			'nbr_commune_touchee'       => $livrable['nbr_commune_touchee'],
+			'nbr_village_touchee'       => $livrable['nbr_village_touchee'],
+			'observation'               => $livrable['observation']
+         );
     }
     public function delete($id) {
 		// Suppression d'un enregitrement
@@ -56,11 +61,11 @@ class Fichepresence_bienetre_model extends CI_Model {
             return null;
         }                 
     }
-    public function getfichepresencebygroupe($id_groupe_ml_pl) {
+    public function findByGoupemlpl($id_groupemlpl) {
 		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("id_groupe_ml_pl", $id_groupe_ml_pl)
+                        ->where("id_groupemlpl", $id_groupemlpl)
                         ->order_by('id')
                         ->get()
                         ->result();
@@ -69,15 +74,6 @@ class Fichepresence_bienetre_model extends CI_Model {
         }else{
             return null;
         }                 
-    }
-    public function findAllByGroupemlpl($id_groupe_ml_pl)  {     
-		// Selection par id_groupe_ml_pl
-        $this->db->where("id_groupe_ml_pl", $id_groupe_ml_pl);
-        $q = $this->db->get($this->table);
-        if ($q->num_rows() > 0) {
-            return $q->row();
-        }
-        return null;  
     }
     public function findById($id) {
 		// Selection par id
