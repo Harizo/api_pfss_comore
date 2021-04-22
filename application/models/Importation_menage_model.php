@@ -82,14 +82,14 @@ class Importation_menage_model extends CI_Model
         return $query->result();
 	}	
 	public function selection_identifiant_menage($identifiant) {
-		$requete="select count(*) as nombre from menage_test where identifiant_menage='".$identifiant."'";
+		$requete="select count(*) as nombre from menage where identifiant_menage='".$identifiant."'";
 		$query = $this->db->query($requete);
         return $query->result();
 	}
 	
     public function addARSE($arse) {
         $this->db->set($this->_setARSE($arse))
-                            ->insert("menage_test");
+                            ->insert("menage");
         if($this->db->affected_rows() === 1)
         {
             return $this->db->insert_id();
@@ -151,7 +151,7 @@ class Importation_menage_model extends CI_Model
 	
     public function MiseajourStatut($statut,$liste_menage_id) {
 		$this->db->trans_begin();
-		$this->table="menage_test";
+		$this->table="menage";
 		$requete = "update " .$this->table ." set statut='".$statut."' where id in ".$liste_menage_id;
 		$query= $this->db->query($requete);		
 			
@@ -164,19 +164,19 @@ class Importation_menage_model extends CI_Model
 		}
 	}
 	public function selectionMenage_Par_Identifiant($identifiant_menage) {
-		$this->table="menage_test";
+		$this->table="menage";
 		$requete="select id,village_id,DateInscription from ".$this->table ." where identifiant_menage='".$identifiant_menage."'";
 		$query = $this->db->query($requete);
         return $query->result();
 	}	
 	public function getIdMaxMenage() {
-		$this->table="menage_test";
+		$this->table="menage";
 		$requete="select ifnull(max(id),0) as id from ".$this->table;
 		$query = $this->db->query($requete);
         return $query->result();
 	}	
 	public function MenageInseresDernierement($id_max_menage) {
-		$this->table="menage_test";
+		$this->table="menage";
 		$requete="select * from ".$this->table ." where id >=".$id_max_menage;
 		$query = $this->db->query($requete);
         return $query->result();

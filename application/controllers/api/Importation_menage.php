@@ -1399,7 +1399,7 @@ class Importation_menage extends REST_Controller {
 			// INSERTION DANS TABLE MENAGE
 			$ou = strrpos($requete,",");
 			$requete = substr($requete,0,$ou);
-			$requete = "insert into menage_test(statut ,village_id,point_inscription,NumeroEnregistrement,DateInscription,milieu,zip,Addresse,nomchefmenage,SexeChefMenage,chef_frequente_ecole,niveau_instruction_chef,chef_menage_travail,activite_chef_menage,NumeroCIN,NumeroCarteElectorale,telephone_chef_menage,nom_conjoint,sexe_conjoint,conjoint_frequente_ecole,niveau_instruction_conjoint,conjoint_travail,activite_conjoint,nin_conjoint,carte_electorale_conjoint,telephone_conjoint,taille_menage,nombre_personne_plus_soixantedixans,nombre_enfant_moins_quinze_ans,nombre_enfant_non_scolarise,nombre_personne_handicape,nombre_adulte_travail,nombre_membre_a_etranger,maison_non_dure,acces_electricite,acces_eau_robinet,logement_endommage,niveau_degat_logement,rehabilitation,beneficiaire_autre_programme,membre_fonctionnaire,antenne_parabolique,possede_frigo,identifiant_menage,score_obtenu,rang_obtenu,id_sous_projet) values ".$requete;
+			$requete = "insert into menage(statut ,village_id,point_inscription,NumeroEnregistrement,DateInscription,milieu,zip,Addresse,nomchefmenage,SexeChefMenage,chef_frequente_ecole,niveau_instruction_chef,chef_menage_travail,activite_chef_menage,NumeroCIN,NumeroCarteElectorale,telephone_chef_menage,nom_conjoint,sexe_conjoint,conjoint_frequente_ecole,niveau_instruction_conjoint,conjoint_travail,activite_conjoint,nin_conjoint,carte_electorale_conjoint,telephone_conjoint,taille_menage,nombre_personne_plus_soixantedixans,nombre_enfant_moins_quinze_ans,nombre_enfant_non_scolarise,nombre_personne_handicape,nombre_adulte_travail,nombre_membre_a_etranger,maison_non_dure,acces_electricite,acces_eau_robinet,logement_endommage,niveau_degat_logement,rehabilitation,beneficiaire_autre_programme,membre_fonctionnaire,antenne_parabolique,possede_frigo,identifiant_menage,score_obtenu,rang_obtenu,id_sous_projet) values ".$requete;
 			$count_update = $this->RequeteimportManager->Execution_requete($requete);
 			
 			//////////////////////////////////////////////////////////////////////////////////////
@@ -1559,7 +1559,7 @@ class Importation_menage extends REST_Controller {
 			// INSERTION DANS MENAGE BENEFICIAIRE
 			$ou = strrpos($requete,",");
 			$requete = substr($requete,0,$ou);
-			$requete = "insert into menage_beneficiaire_test(id_menage ,id_sous_projet,date_inscription) values ".$requete;
+			$requete = "insert into menage_beneficiaire(id_menage ,id_sous_projet,date_inscription) values ".$requete;
 			$count_update = $this->RequeteimportManager->Execution_requete($requete);			
 			//////////////////////////////////////////////////////////////////////////////////////
 			// FIN LECTURE FEUILLE 3 : BENEFICIAIRE
