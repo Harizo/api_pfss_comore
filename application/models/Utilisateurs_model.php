@@ -76,10 +76,10 @@ class Utilisateurs_model extends CI_Model
         );
     }
 
-    public function reinitpwd($courriel,$pwd,$token)
+    public function reinitpwd($pwd,$token)
     {
         $this->db->set('password', $pwd)
-                 ->where('email', $courriel)
+                // ->where('email', $courriel)
                  ->where('token', $token)
                  ->update($this->table);
         if($this->db->affected_rows() === 1)
@@ -98,6 +98,7 @@ class Utilisateurs_model extends CI_Model
             'prenom'                =>      $utilisateurs['prenom'],
             'email'                 =>      $utilisateurs['email'],
             'password'              =>      $utilisateurs['password'],
+            'id_ile'              =>      $utilisateurs['id_ile'],
             'enabled'               =>      $utilisateurs['enabled'],
             'token'                 =>      $utilisateurs['token'],
             'roles'                 =>      $utilisateurs['roles']

@@ -17,11 +17,11 @@ class Mail extends REST_Controller {
         set_time_limit(0);
         ini_set ('memory_limit', '2048M');
 
-        $adresse_serveur = "http://registrebeneficiaires.mg" ;
-        $base_url_serveur = $adresse_serveur."/2019/population/api/index.php/api" ;
+        /*$adresse_serveur = "http://registrebeneficiaires.mg" ;
+        $base_url_serveur = $adresse_serveur."/2019/population/api/index.php/api" ;*/
 
-        /*$adresse_serveur = "http://localhost:3000" ;
-        $base_url_serveur = "http://localhost"."/2019/population/api/index.php/api" ;*/
+        $adresse_serveur = "http://localhost:3000" ;
+        $base_url_serveur = "http://localhost"."/2020/pfss_comores/api/index.php/api" ;
 
 
         //FIN url SERVEUR
@@ -31,8 +31,8 @@ class Mail extends REST_Controller {
         $token = $this->get('token');
         $actif = $this->get('actif');
         $date = $this->get('date');
-        $sender = "registrebeneficiaire@gmail.com";
-        $mdpsender = "Registre2020";
+        $sender = "mis.pfss.app@gmail.com";
+        $mdpsender = "MisMdp2021";
         if ($actif == 0) {
             // Envoi mail code de confirmation
             $data['activer'] = $base_url_serveur . "/mail?actif=1&courriel=" . $courriel . "&token=" . $token;
@@ -87,6 +87,7 @@ class Mail extends REST_Controller {
             $mail->Username = $sender;
             $mail->Password = $mdpsender;
             $mail->SMTPSecure = 'tls';
+          //  $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
             $mail->SMTPOptions = array(
                 'ssl' => array(

@@ -295,12 +295,13 @@
 <body bgcolor="#f7f7f7">
 <table align="center" cellpadding="0" cellspacing="0" class="container-for-gmail-android" width="100%">
     <tr>
-        <td align="left" valign="top" width="100%" style="background:repeat-x url(http://s3.amazonaws.com/swu-filepicker/4E687TRe69Ld95IDWyEg_bg_top_02.jpg) #ffffff;">
+        <td align="left" valign="top" width="100%" style="background-color:#f7f7f7">
             <center>
-                <table cellspacing="0" cellpadding="0" width="100%" bgcolor="#ffffff" background="http://s3.amazonaws.com/swu-filepicker/4E687TRe69Ld95IDWyEg_bg_top_02.jpg" style="background-color:transparent">
+                <table cellspacing="0" cellpadding="0" width="100%"  style="background-color:#f7f7f7">
                     <tr>
                         <td width="100%" height="80" valign="top" style="text-align: center; vertical-align:middle;">
-                            <h1>MINISTERE DE LA POPULATION, DE LA PROTECTION SOCIALE ET DE LA PROMOTION DE LA FEMME</h1>
+                            <h1>Ministère de la Santé, de la Solidarité, de la Protection Sociale et de la Promotion du Genre</h1> <br> 
+                            <h2>Projet de Filet Sociaux de Sécurité</h2>
                         </td>
                     </tr>
                 </table>
@@ -317,8 +318,10 @@
                         </td>
                     </tr>
                     <tr>
+                        
+
                         <td class="free-text">
-                            Bienvenue dans l'application WEB du minist&eacute;re de la Population, pour r&eacute;initialiser votre mot de passe, veuillez cliquer sur le bouton R&eacute;initialiser,
+                            Bienvenue dans l'application WEB MIS, pour r&eacute;initialiser votre mot de passe, veuillez cliquer sur le bouton R&eacute;initialiser,
                         </td>
                     </tr>
                     <tr>
