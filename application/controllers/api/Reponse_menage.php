@@ -9,7 +9,7 @@ class Reponse_menage extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('reponse_menage_model', 'VariableMenageManager');
+        $this->load->model('reponse_menage_model', 'ReponseMenageManager');
         $this->load->model('liste_variable_model', 'ListeVariableManager');
 		$this->load->model('variable_model', 'VariableManager');
 		$this->load->model('menage_model', 'MenageManager');
@@ -27,7 +27,7 @@ class Reponse_menage extends REST_Controller {
 			$indice_choix_unique=0;
 			$indice_choix_multiple=0;
 			// Selection liste variable
-            $temporaire = $this->VariableMenageManager->findAllByIdMenage($cle_etrangere);
+            $temporaire = $this->ReponseMenageManager->findAllByIdMenage($cle_etrangere);
             if ($temporaire) {
 				// Variable utile pour controler la saisie des nombres prévu d'individu/ménage/groupe
 				// Le champ est actif si la variable correspondante = 1
@@ -69,10 +69,10 @@ class Reponse_menage extends REST_Controller {
             if ($id) {
                 $data = array();
 				// Selection par id
-                $data = $this->VariableMenageManager->findById($id);
+                $data = $this->ReponseMenageManager->findById($id);
             } else {
 				// Selection de tous les enregistrements
-                $menu = $this->VariableMenageManager->findAll();
+                $menu = $this->ReponseMenageManager->findAll();
                 if ($menu) {
                     foreach ($menu as $key => $value) {
 						// Affectation des valeurs dans un tableau
@@ -142,7 +142,7 @@ class Reponse_menage extends REST_Controller {
 			$id_liste_validation_beneficiaire=$temporaire;
 		}
 		// Supprimer d'abord les variables existantes dans la table; puis réinsérer après
-		$nombre_enregistrement_supprime= $this->VariableMenageManager->deleteByMenage($id_intervention);
+		$nombre_enregistrement_supprime= $this->ReponseMenageManager->deleteByMenage($id_intervention);
 		if($nombre_reponse_menage_choix_multiple >0) {
 			// Ajout détail liste variable à choix multiple
 			for($i=1;$i<=$nombre_reponse_menage_choix_multiple;$i++) {
@@ -158,7 +158,7 @@ class Reponse_menage extends REST_Controller {
 					'id_liste_variable' => $id_liste_variable,
 					'id_menage' => $id_menage ,
 				);
-				$retour = $this->VariableMenageManager->add($data);     
+				$retour = $this->ReponseMenageManager->add($data);     
 			}
 		}
 		if($nombre_reponse_menage_choix_unique >0) {
@@ -171,7 +171,7 @@ class Reponse_menage extends REST_Controller {
 					'id_liste_variable' => $id_liste_variable,
 					'id_menage' => $id_menage ,
 				);
-				$retour = $this->VariableMenageManager->add($data);     
+				$retour = $this->ReponseMenageManager->add($data);     
 			}
 		}	
 			$data=array();
@@ -181,7 +181,7 @@ class Reponse_menage extends REST_Controller {
             $data_choix_unique = array();
 			$indice_choix_multiple=0;
 			// Selection liste variable
-            $temporaire = $this->VariableMenageManager->findAllByIdMenage($id_intervention);
+            $temporaire = $this->ReponseMenageManager->findAllByIdMenage($id_intervention);
             if ($temporaire) {
 				// Variable utile pour controler la saisie des nombres prévu d'individu/ménage/groupe
 				// Le champ est actif si la variable correspondante = 1

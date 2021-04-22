@@ -125,5 +125,53 @@ class Upload_fichier extends CI_Controller {
 		} 
 		echo json_encode($valeur_retour);
 	}  
+	public function upload_fichier() {	
+		$erreur="aucun";
+		$replace=array('e','e','e','a','o','c','_','_','_');
+		$search= array('é','è','ê','à','ö','ç',' ','&','°');
+		$repertoire= $_POST['repertoire'];
+		$repertoire=str_replace($search,$replace,$repertoire);
+		
+		//The name of the directory that we need to create.
+		$directoryName = dirname(__FILE__) ."/../../../../" .$repertoire."/";
+		//Check if the directory already exists.
+		if(!is_dir($directoryName)){
+			//Directory does not exist, so lets create it.
+			mkdir($directoryName, 0777,true);
+		}				
+
+		$emplacement=array();
+		$emplacement[0]=dirname(__FILE__) ."/../../../../" .$repertoire;
+		$config['upload_path']          = dirname(__FILE__) ."/../../../../".$repertoire."/";
+		$config['allowed_types'] = 'gif|jpg|png|xls|xlsx|doc|docx|pdf|txt';
+		$config['max_size'] = 222048;
+		$config['overwrite'] = TRUE;
+		$retour =$emplacement;
+		if (isset($_FILES['file']['tmp_name'])) {
+			$name=$_FILES['file']['name'];
+			$name1=str_replace($search,$replace,$name);
+			$emplacement[1]=$name1;
+			$emplacement[2]=$repertoire."/";
+			$config['file_name'] = $name1;
+			$this->load->library('upload', $config);
+			$this->upload->initialize($config);
+			$ff=$this->upload->do_upload('file');
+			// UNE FOIS LE FICHIER ENREGISTRE DANS LE SERVEUR => Controler les données
+			// Contrôler les données envoyés par l'acteur
+			$valeur_retour=array();
+			$valeur_retour["nom_fichier"] = $emplacement[1];
+			$valeur_retour["repertoire"] = $emplacement[2];
+			$valeur_retour["reponse"] = "OK";
+			
+		} else {
+			$valeur_retour=array();
+			$valeur_retour["nom_fichier"] = "inexistant";
+			$valeur_retour["repertoire"] = "introuvable";
+			$valeur_retour["reponse"] = "ERREUR";
+			echo json_encode($valeur_retour);
+            // echo 'File upload not found';
+		} 
+		echo json_encode($valeur_retour);
+	}  
 
 } ?>	

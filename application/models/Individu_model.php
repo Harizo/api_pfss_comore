@@ -90,7 +90,21 @@ class Individu_model extends CI_Model
             return null;
         }                 
     }
-
+	 public function findByMenage($menage_id) {
+		$requete="select ind.id_serveur_centrale,ind.menage_id,concat_ws(' ',ind.prenom,ind.nom) as nom,DATE_FORMAT(ind.date_naissance, '%d/%m/%Y') as date_naissance,"
+				." floor((datediff(now(),IFNULL(ind.date_naissance, now())) / 365)) as age,"
+				." ind.activite,ind.aptitude,ind.lienparental,ind.travailleur,ind.scolarise,ind.sexe,lp.description as liendeparente"
+				." from individu as ind"
+				." left outer join liendeparente as lp on lp.id=ind.lienparental"
+				." where (ind.nom>'' or ind.prenom >'') and "
+				." lower(lp.description) in('fils','fille','enfant') and ind.menage_id =".$menage_id;
+				$result = $this->db->query($requete)->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                  
+	 }	
     public function findById($id)
     {
         $this->db->where("id", $id);

@@ -74,6 +74,7 @@ class Menage_model extends CI_Model
             'DateInscription'       =>      $menage['DateInscription'],
             'village_id'            =>      $menage['village_id'],                       
             'NumeroEnregistrement'  =>      $menage['NumeroEnregistrement'],                       
+            'identifiant_menage'    =>      $menage['identifiant_menage'],                       
             'nomchefmenage'         =>      $menage['nomchefmenage'],                       
             'PersonneInscription'   =>      $menage['PersonneInscription'],                       
             'agechefdemenage'       =>      $menage['agechefdemenage'],                       
@@ -236,11 +237,13 @@ class Menage_model extends CI_Model
             return null;
         }                 
     }
-    public function findAllByVillageAndStatutAndSousProjet($village_id,$statut,$id_sous_projet)
+    public function findAllByVillageAndBeneficiaireStatutAndSousProjet($village_id,$statut,$id_sous_projet)
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->join('menage_beneficiaire', 'menage_beneficiaire.id_menage = menage.id')
+                        // ->join('see_village', 'menage.village_id = see_village.id')
+                        // ->join('zip', 'zip.id = see_village.id_zip')
                         ->where('menage.statut', $statut)
                         ->where('menage.village_id', $village_id)
                         ->where('menage_beneficiaire.id_sous_projet', $id_sous_projet)
@@ -252,14 +255,14 @@ class Menage_model extends CI_Model
         }else{
             return null;
         }                  
-		
-		
+    }
+    public function findAllByVillageAndStatutAndSousProjet($village_id,$statut,$id_sous_projet)
+    {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('id')
-                        ->where("village_id", $village_id)
-                        ->where("statut", $statut)
-                        ->where("statut", $statut)
+                        ->where('menage.statut', $statut)
+                        ->where('menage.village_id', $village_id)
+                        ->where('menage.id_sous_projet', $id_sous_projet)
                         ->get()
                         ->result();
         if($result)
@@ -267,7 +270,7 @@ class Menage_model extends CI_Model
             return $result;
         }else{
             return null;
-        }                 
+        }                  
     }
 
     public function find_max_id()
