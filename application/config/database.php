@@ -78,6 +78,7 @@ $db['default'] = array(
 	'hostname' => 'localhost',
 	'username' => 'root',
 	'password' => '',
+	//'password' => 'Pfss@2021',
 	'database' => 'pfss_db',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',

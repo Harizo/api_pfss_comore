@@ -140,8 +140,9 @@ class Utilisateurs extends REST_Controller {
         $reinitpwd = sha1($this->get('reinitpwd'));
         $reinitpwdtoken = $this->get('reinitpwdtoken');
 
-        if ($courriel && $reinitpwd && $reinitpwdtoken) {
-            $data = $this->UserManager->reinitpwd($courriel, $reinitpwd, $reinitpwdtoken);
+        //if ($courriel && $reinitpwd && $reinitpwdtoken) {
+        if ( $reinitpwd && $reinitpwdtoken) {
+            $data = $this->UserManager->reinitpwd($reinitpwd, $reinitpwdtoken);
             if (!$data)
                 $data = array();
         }
@@ -268,10 +269,10 @@ class Utilisateurs extends REST_Controller {
                 $data = array(
                     'nom' => $this->post('nom'),
                     'prenom' => $this->post('prenom'),
-                    // 'sigle' => $this->post('sigle'),
+                     'id_ile' => $this->post('id_ile'),
                     'email' => $this->post('email'),
-                    'password' => ($this->post('password')),
-                    //'password' => sha1($this->post('password')),
+                   
+                    'password' => sha1($this->post('password')),
                     'enabled' => 0,
                     'token' => bin2hex(openssl_random_pseudo_bytes(32)),
                     'roles' => serialize($getrole)
