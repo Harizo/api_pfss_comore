@@ -32,6 +32,7 @@ class Contrat_agep_model extends CI_Model {
             'id_sous_projet'    => $contrat_agep['id_sous_projet'],
             'objet_contrat'     => $contrat_agep['objet_contrat'],
             'montant_contrat'    => $contrat_agep['montant_contrat'],
+            'montant_a_effectue_prevu'    => $contrat_agep['montant_a_effectue_prevu'],
             'modalite_contrat'  => $contrat_agep['modalite_contrat'],
             'date_signature'    => $contrat_agep['date_signature'],
             'date_prevu_fin'    => $contrat_agep['date_prevu_fin'],

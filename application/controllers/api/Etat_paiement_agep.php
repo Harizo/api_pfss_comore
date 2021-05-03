@@ -37,7 +37,7 @@ class Etat_paiement_agep extends REST_Controller {
                     $data[$key]['menage'] = $menage;
                     $data[$key]['tranche'] = $value->tranche;
                     $data[$key]['pourcentage'] = $value->pourcentage;
-                    $data[$key]['montant_total_prevu'] = $value->montant_total_prevu;
+                    //$data[$key]['montant_total_prevu'] = $value->montant_total_prevu;
                     $data[$key]['montant_percu'] = $value->montant_percu;
                     $data[$key]['date_paiement'] = $value->date_paiement;
                     $data[$key]['moyen_transfert'] = $value->moyen_transfert;
@@ -90,7 +90,7 @@ class Etat_paiement_agep extends REST_Controller {
                 'id_contrat_agep'=> $this->post('id_contrat_agep'),
                 'tranche'=> $this->post('tranche'),
                 'pourcentage'=> $this->post('pourcentage'),
-                'montant_total_prevu'=> $this->post('montant_total_prevu'),
+                //'montant_total_prevu'=> $this->post('montant_total_prevu'),
                 'montant_percu'=> $this->post('montant_percu'),
                 'date_paiement'=> $this->post('date_paiement'),
                 'moyen_transfert'=> $this->post('moyen_transfert'),
@@ -111,7 +111,7 @@ class Etat_paiement_agep extends REST_Controller {
                 'id_contrat_agep'=> $this->post('id_contrat_agep'),
                 'tranche'=> $this->post('tranche'),
                 'pourcentage'=> $this->post('pourcentage'),
-                'montant_total_prevu'=> $this->post('montant_total_prevu'),
+                //'montant_total_prevu'=> $this->post('montant_total_prevu'),
                 'montant_percu'=> $this->post('montant_percu'),
                 'date_paiement'=> $this->post('date_paiement'),
                 'moyen_transfert'=> $this->post('moyen_transfert'),

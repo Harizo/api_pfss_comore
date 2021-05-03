@@ -34,6 +34,7 @@ class Contrat_agep extends REST_Controller {
                     $data[$key]['nbr_jour_restant']      = $value->nbr_jour_restant;
                     $data[$key]['objet_contrat']      = $value->objet_contrat;
                     $data[$key]['montant_contrat']    = $value->montant_contrat;
+                    $data[$key]['montant_a_effectue_prevu']    = $value->montant_a_effectue_prevu;
                     $data[$key]['modalite_contrat']   = $value->modalite_contrat;
                     $data[$key]['date_signature']     = $value->date_signature;
                     $data[$key]['date_prevu_fin']     = $value->date_prevu_fin;
@@ -67,6 +68,7 @@ class Contrat_agep extends REST_Controller {
                     $data[$key]['sous_projet']        = $sous_projet;
                     $data[$key]['objet_contrat']      = $value->objet_contrat;
                     $data[$key]['montant_contrat']    = $value->montant_contrat;
+                    $data[$key]['montant_a_effectue_prevu']    = $value->montant_a_effectue_prevu;
                     $data[$key]['modalite_contrat']   = $value->modalite_contrat;
                     $data[$key]['date_signature']     = $value->date_signature;
                     $data[$key]['date_prevu_fin']     = $value->date_prevu_fin;
@@ -104,6 +106,7 @@ class Contrat_agep extends REST_Controller {
             'id_sous_projet'     => $this->post('id_sous_projet'),
             'objet_contrat'      => $this->post('objet_contrat'),
             'montant_contrat'      => $this->post('montant_contrat'),
+            'montant_a_effectue_prevu'      => $this->post('montant_a_effectue_prevu'),
             'modalite_contrat'   => $this->post('modalite_contrat'),
             'date_signature'     => $this->post('date_signature'),
             'date_prevu_fin'    => $this->post('date_prevu_fin'),

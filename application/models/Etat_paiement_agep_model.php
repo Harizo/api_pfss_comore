@@ -35,7 +35,7 @@ class Etat_paiement_agep_model extends CI_Model {
             'id_menage'             => $etat_paiement_agep['id_menage'],
             'tranche'               => $etat_paiement_agep['tranche'],
             'pourcentage'           => $etat_paiement_agep['pourcentage'],
-            'montant_total_prevu'   => $etat_paiement_agep['montant_total_prevu'],
+            //'montant_total_prevu'   => $etat_paiement_agep['montant_total_prevu'],
             'montant_percu'         => $etat_paiement_agep['montant_percu'],
             'date_paiement'         => $etat_paiement_agep['date_paiement'],
             'moyen_transfert'       => $etat_paiement_agep['moyen_transfert'],
