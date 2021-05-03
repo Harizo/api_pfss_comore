@@ -157,14 +157,21 @@ class Requete_export extends REST_Controller {
 					$this->exportcartebeneficiaire($apiUrlbase,$menages,$nom_ile,$region,$commune,$village,$zone_id,$zip,$code_zip,$microprojet,$ile_id,$region_id,$commune_id,$village_id);
 				}	
 			} else if($fiche_recepteur || $fiche_paiement_arse) {
+					$nombre_menage_beneficiaire=0;
+					$nombre_travailleur_homme=0;
+					$nombre_travailleur_femme=0;
+					$nombre_suppleant_homme=0;
+					$nombre_suppleant_femme=0;					
 				$menages=$this->RequeteexportManager->Etat_recepteur($id_sous_projet,$village_id);
 				$ret = $this->RequeteexportManager->Nombre_travailleur_par_sexe($id_sous_projet,$village_id);
-				foreach($ret as $k=>$v) {
-					$nombre_menage_beneficiaire=$v->nombre_menage_beneficiaire;
-					$nombre_travailleur_homme=$v->nombre_travailleur_homme;
-					$nombre_travailleur_femme=$v->nombre_travailleur_femme;
-					$nombre_suppleant_homme=$v->nombre_suppleant_homme;
-					$nombre_suppleant_femme=$v->nombre_suppleant_femme;					
+				if($ret) {
+					foreach($ret as $k=>$v) {
+						$nombre_menage_beneficiaire=$v->nombre_menage_beneficiaire;
+						$nombre_travailleur_homme=$v->nombre_travailleur_homme;
+						$nombre_travailleur_femme=$v->nombre_travailleur_femme;
+						$nombre_suppleant_homme=$v->nombre_suppleant_homme;
+						$nombre_suppleant_femme=$v->nombre_suppleant_femme;	
+					}		
 				}
 				if($fiche_recepteur) {
 					$this->exportficherecepteur($menages,$nom_ile,$region,$commune,$village,$nombre_menage_beneficiaire,$nombre_travailleur_homme,$nombre_travailleur_femme,$nombre_suppleant_homme,$nombre_suppleant_femme);
@@ -5308,11 +5315,11 @@ class Requete_export extends REST_Controller {
 			// SANS ENREGISTREMENT
 			$sans_menage=$sans_menage + 1;
 		}
-		if($sans_menage=$sans_menage==0) {
-			$date_edition = date("d-m-Y");	
 			$fichier="NON";
+			$date_edition = date("d-m-Y");	
+		if($sans_menage=$sans_menage==0) {
 			$Filename ="";
-			$Filename ="fiche recepteut "."village " .$village_tmp." edition du ".$date_edition.".xlsx";
+			$Filename ="fiche recepteut "."village " .$village_tmp.".xlsx";
 			//Check if the directory already exists.
 			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 			$objWriter->save($directoryName.$Filename);
