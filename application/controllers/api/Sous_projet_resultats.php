@@ -15,10 +15,10 @@ class Sous_projet_resultats extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getsous_projet_resultatsbysousprojet") {
+        $id_sous_projet_localisation = $this->get('id_sous_projet_localisation');
+        if ($menu=="getsous_projet_resultatsbysousprojet_localisation") {
                
-            $sous_projet_resultats = $this->Sous_projet_resultatsManager->getsous_projet_resultatsbysousprojet($id_sous_projet);
+            $sous_projet_resultats = $this->Sous_projet_resultatsManager->getsous_projet_resultatsbysousprojet_localisation($id_sous_projet_localisation);
                 if ($sous_projet_resultats) {
                     $data = $sous_projet_resultats;
                     /*foreach ($sous_projet_resultats as $key => $value) {
@@ -71,7 +71,7 @@ class Sous_projet_resultats extends REST_Controller {
                 $data = array(
                     'quantite' => $this->post('quantite'),
                     'description' => $this->post('description'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                 );               
                 if (!$data) {
                     $this->response([
@@ -102,7 +102,7 @@ class Sous_projet_resultats extends REST_Controller {
                     $data = array(
                         'quantite' => $this->post('quantite'),
                         'description' => $this->post('description'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );
                     if (!$data) {
                         $this->response([
@@ -131,7 +131,7 @@ class Sous_projet_resultats extends REST_Controller {
                     $data = array(
                         'quantite' => $this->post('quantite'),
                         'description' => $this->post('description'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );              
                     if (!$data || !$id) {
                         $this->response([

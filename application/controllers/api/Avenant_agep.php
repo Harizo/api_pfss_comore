@@ -4,49 +4,29 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Contrat_agep extends REST_Controller {
+class Avenant_agep extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('contrat_agep_model', 'Contrat_agepManager');
-        $this->load->model('sous_projet_model', 'Sous_projetManager');
-        $this->load->model('agence_p_model', 'Agence_pManager');
+        $this->load->model('avenant_agep_model', 'Avenat_agepManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
 		$data = array();
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-		if ($menu=='getcontrat_agepBysousprojet') 
+        $id_contrat_agep = $this->get('id_contrat_agep');
+		if ($menu=='getavenant_agepBycontrat') 
         {
-			$tmp = $this->Contrat_agepManager->getcontrat_agepBysousprojet($id_sous_projet);
+			$tmp = $this->Avenat_agepManager->getavenant_agepBycontrat($id_contrat_agep);
 			if ($tmp) 
-            {   
-                foreach ($tmp as $key => $value)
-                {   
-                    //$sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
-                    $agep = $this->Agence_pManager->findById($value->id_agep);
-                    $data[$key]['id']                 = $value->id;
-                    $data[$key]['numero_contrat']     = $value->numero_contrat;
-                    $data[$key]['agep']               = $agep;
-                    //$data[$key]['sous_projet']        = $sous_projet;
-                    $data[$key]['nbr_jour_restant']      = $value->nbr_jour_restant;
-                    $data[$key]['objet_contrat']      = $value->objet_contrat;
-                    $data[$key]['montant_contrat']    = $value->montant_contrat;
-                    $data[$key]['modalite_contrat']   = $value->modalite_contrat;
-                    $data[$key]['date_signature']     = $value->date_signature;
-                    $data[$key]['date_prevu_fin']     = $value->date_prevu_fin;
-                    $data[$key]['noms_signataires']   = $value->noms_signataires;
-                    $data[$key]['id_sous_projet']        = $id_sous_projet;
-                    $data[$key]['statu']             = $value->statu;
-                }
-				//$data=$tmp;
+            { 
+				$data=$tmp;
 			}
 		} 
         elseif ($id) 
         {
-			$tmp = $this->Contrat_agepManager->findById($id);
+			$tmp = $this->Avenat_agepManager->findById($id);
 			if($tmp) 
             {
 				$data=$tmp;
@@ -54,26 +34,10 @@ class Contrat_agep extends REST_Controller {
 		} 
         else 
         {			
-			$tmp = $this->Contrat_agepManager->findAll();
+			$tmp = $this->Avenat_agepManager->findAll();
 			if ($tmp) 
-            {   
-                foreach ($tmp as $key => $value)
-                {   
-                    $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
-                    $agep = $this->Agence_pManager->findById($value->id_agep);
-                    $data[$key]['id']                 = $value->id;
-                    $data[$key]['numero_contrat']     = $value->numero_contrat;
-                    $data[$key]['agep']               = $agep;
-                    $data[$key]['sous_projet']        = $sous_projet;
-                    $data[$key]['objet_contrat']      = $value->objet_contrat;
-                    $data[$key]['montant_contrat']    = $value->montant_contrat;
-                    $data[$key]['modalite_contrat']   = $value->modalite_contrat;
-                    $data[$key]['date_signature']     = $value->date_signature;
-                    $data[$key]['date_prevu_fin']     = $value->date_prevu_fin;
-                    $data[$key]['noms_signataires']   = $value->noms_signataires;
-                    $data[$key]['statu']             = $value->statu;
-                }
-				//$data=$tmp;
+            {  
+				$data=$tmp;
 			}
 		}
         if (count($data)>0) {
@@ -99,12 +63,12 @@ class Contrat_agep extends REST_Controller {
 
 		$data = array(
 			
-            'numero_contrat'     => $this->post('numero_contrat'),
-            'id_agep'            => $this->post('id_agep'),
-            'id_sous_projet'     => $this->post('id_sous_projet'),
-            'objet_contrat'      => $this->post('objet_contrat'),
-            'montant_contrat'      => $this->post('montant_contrat'),
-            'modalite_contrat'   => $this->post('modalite_contrat'),
+            'numero_avenant'     => $this->post('numero_avenant'),
+            //'id_agep'            => $this->post('id_agep'),
+            'id_contrat_agep'     => $this->post('id_contrat_agep'),
+            'objet_avenant'      => $this->post('objet_avenant'),
+            'montant_avenant'      => $this->post('montant_avenant'),
+            'modalite_avenant'   => $this->post('modalite_avenant'),
             'date_signature'     => $this->post('date_signature'),
             'date_prevu_fin'    => $this->post('date_prevu_fin'),
             'noms_signataires'   => $this->post('noms_signataires'),
@@ -120,7 +84,7 @@ class Contrat_agep extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->Contrat_agepManager->add($data);              
+                $dataId = $this->Avenat_agepManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -145,7 +109,7 @@ class Contrat_agep extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->Contrat_agepManager->update($id, $data);              
+                $update = $this->Avenat_agepManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -172,7 +136,7 @@ class Contrat_agep extends REST_Controller {
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
 
-            $delete = $this->Contrat_agepManager->delete($id);   
+            $delete = $this->Avenat_agepManager->delete($id);   
 
             if (!is_null($delete)) 
             {

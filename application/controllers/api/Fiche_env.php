@@ -18,10 +18,10 @@ class Fiche_env extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getfiche_envbysousprojet") {
+        $id_sous_projet_localisation = $this->get('id_sous_projet_localisation');
+        if ($menu=="getfiche_envbysousprojet_localisation") {
                
-            $fiche_env = $this->FicheManager->getfiche_envbysousprojet($id_sous_projet);
+            $fiche_env = $this->FicheManager->getfiche_envbysousprojet_localisation($id_sous_projet_localisation);
                 if ($fiche_env) {
                     //$data = $fiche_env;
                     foreach ($fiche_env as $key => $value)
@@ -48,7 +48,7 @@ class Fiche_env extends REST_Controller {
                         $data[$key]['date_visa_rt'] = $value-> date_visa_rt;     
                         $data[$key]['date_visa_ugp'] = $value-> date_visa_ugp;     
                         $data[$key]['date_visa_be'] = $value-> date_visa_be;
-                        $data[$key]['id_sous_projet'] = $value->id_sous_projet;                        
+                        $data[$key]['id_sous_projet_localisation'] = $value->id_sous_projet_localisation;                        
                     };
 
                 } else
@@ -109,7 +109,7 @@ class Fiche_env extends REST_Controller {
                     'date_visa_rt'=> $this->post( 'date_visa_rt'),     
                     'date_visa_ugp'=> $this->post( 'date_visa_ugp'),     
                     'date_visa_be'=> $this->post( 'date_visa_be'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                 );               
                 if (!$data) {
                     $this->response([
@@ -155,7 +155,7 @@ class Fiche_env extends REST_Controller {
                         'date_visa_rt'=> $this->post( 'date_visa_rt'),     
                         'date_visa_ugp'=> $this->post( 'date_visa_ugp'),     
                         'date_visa_be'=> $this->post( 'date_visa_be'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );
                     if (!$data) {
                         $this->response([
@@ -199,7 +199,7 @@ class Fiche_env extends REST_Controller {
                         'date_visa_rt'=> $this->post( 'date_visa_rt'),     
                         'date_visa_ugp'=> $this->post( 'date_visa_ugp'),     
                         'date_visa_be'=> $this->post( 'date_visa_be'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );              
                     if (!$data || !$id) {
                         $this->response([

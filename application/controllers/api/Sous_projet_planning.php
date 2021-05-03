@@ -15,10 +15,10 @@ class Sous_projet_planning extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getsous_projet_planningbysousprojet") {
+        $id_sous_projet_localisation = $this->get('id_sous_projet_localisation');
+        if ($menu=="getsous_projet_planningbysousprojet_localisation") {
                
-            $sous_projet_planning = $this->Sous_projet_planningManager->getsous_projet_planningbysousprojet($id_sous_projet);
+            $sous_projet_planning = $this->Sous_projet_planningManager->getsous_projet_planningbysousprojet_localisation($id_sous_projet_localisation);
                 if ($sous_projet_planning) {
                     $data = $sous_projet_planning;
                     /*foreach ($sous_projet_planning as $key => $value) {
@@ -72,7 +72,7 @@ class Sous_projet_planning extends REST_Controller {
                     'code' => $this->post('code'),
                     'phase_activite' => $this->post('phase_activite'),
                     'numero_phase' => $this->post('numero_phase'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                 );               
                 if (!$data) {
                     $this->response([
@@ -104,7 +104,7 @@ class Sous_projet_planning extends REST_Controller {
                         'code' => $this->post('code'),
                         'phase_activite' => $this->post('phase_activite'),
                         'numero_phase' => $this->post('numero_phase'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );
                     if (!$data) {
                         $this->response([
@@ -134,7 +134,7 @@ class Sous_projet_planning extends REST_Controller {
                         'code' => $this->post('code'),
                         'phase_activite' => $this->post('phase_activite'),
                         'numero_phase' => $this->post('numero_phase'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );              
                     if (!$data || !$id) {
                         $this->response([

@@ -15,10 +15,10 @@ class Etude_env extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getetude_envbysousprojet") {
+        $id_sous_projet_localisation = $this->get('id_sous_projet_localisation');
+        if ($menu=="getetude_envbysousprojet_localisation") {
                
-            $etude_env = $this->Etude_envManager->getetude_envbysousprojet($id_sous_projet);
+            $etude_env = $this->Etude_envManager->getetude_envbysousprojet_localisation($id_sous_projet_localisation);
                 if ($etude_env) {
                     $data = $etude_env;
                     /*foreach ($etude_env as $key => $value) {
@@ -74,7 +74,7 @@ class Etude_env extends REST_Controller {
                     'description_impacts' => $this->post('description_impacts'),
                     'mesure' => $this->post('mesure'),
                     'plan_gestion' => $this->post('plan_gestion'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                 );               
                 if (!$data) {
                     $this->response([
@@ -108,7 +108,7 @@ class Etude_env extends REST_Controller {
                         'description_impacts' => $this->post('description_impacts'),
                         'mesure' => $this->post('mesure'),
                         'plan_gestion' => $this->post('plan_gestion'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );
                     if (!$data) {
                         $this->response([
@@ -140,7 +140,7 @@ class Etude_env extends REST_Controller {
                         'description_impacts' => $this->post('description_impacts'),
                         'mesure' => $this->post('mesure'),
                         'plan_gestion' => $this->post('plan_gestion'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );              
                     if (!$data || !$id) {
                         $this->response([

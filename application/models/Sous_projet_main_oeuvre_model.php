@@ -40,7 +40,7 @@ class Sous_projet_main_oeuvre_model extends CI_Model
             'remuneration_jour' =>      $sous_projet_main_oeuvre['remuneration_jour'],
             'nbr_jour' =>      $sous_projet_main_oeuvre['nbr_jour'],
             'remuneration_total' =>      $sous_projet_main_oeuvre['remuneration_total'],
-            'id_sous_projet' =>      $sous_projet_main_oeuvre['id_sous_projet']                      
+            'id_sous_projet_localisation' =>      $sous_projet_main_oeuvre['id_sous_projet_localisation']                      
         );
     }
 
@@ -63,7 +63,7 @@ class Sous_projet_main_oeuvre_model extends CI_Model
             'remuneration_jour' =>      $sous_projet_main_oeuvre['remuneration_jour'],
             'nbr_jour' =>      $sous_projet_main_oeuvre['nbr_jour'],
             'remuneration_total' =>      $sous_projet_main_oeuvre['remuneration_total'],
-            'id_sous_projet' =>      $sous_projet_main_oeuvre['id_sous_projet'] 
+            'id_sous_projet_localisation' =>      $sous_projet_main_oeuvre['id_sous_projet_localisation'] 
         );
     }
 
@@ -94,11 +94,11 @@ class Sous_projet_main_oeuvre_model extends CI_Model
         }                 
     }
 
-    public function getsous_projet_main_oeuvrebysousprojet($id_sous_projet)
+    public function getsous_projet_main_oeuvrebysousprojet_localisation($id_sous_projet_localisation)
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
+                        ->where('id_sous_projet_localisation',$id_sous_projet_localisation)
                         ->order_by('activite')
                         ->get()
                         ->result();

@@ -15,10 +15,10 @@ class Convention_mod extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getconvention_modbysousprojet") {
+        $id_sous_projet_localisation = $this->get('id_sous_projet_localisation');
+        if ($menu=="getconvention_modbysousprojet_localisation") {
                
-            $convention_mod = $this->Convention_modManager->getconvention_modbysousprojet($id_sous_projet);
+            $convention_mod = $this->Convention_modManager->getconvention_modbysousprojet_localisation($id_sous_projet_localisation);
                 if ($convention_mod) {
                     $data = $convention_mod;
                     /*foreach ($convention_mod as $key => $value) {
@@ -75,7 +75,7 @@ class Convention_mod extends REST_Controller {
                     'nom_signataire' => $this->post('nom_signataire'),
                     'date_signature' => $this->post('date_signature'),
                     'date_prevu_recep' => $this->post('date_prevu_recep'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                 );               
                 if (!$data) {
                     $this->response([
@@ -110,7 +110,7 @@ class Convention_mod extends REST_Controller {
                         'nom_signataire' => $this->post('nom_signataire'),
                         'date_signature' => $this->post('date_signature'),
                         'date_prevu_recep' => $this->post('date_prevu_recep'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );
                     if (!$data) {
                         $this->response([
@@ -143,7 +143,7 @@ class Convention_mod extends REST_Controller {
                         'nom_signataire' => $this->post('nom_signataire'),
                         'date_signature' => $this->post('date_signature'),
                         'date_prevu_recep' => $this->post('date_prevu_recep'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );              
                     if (!$data || !$id) {
                         $this->response([

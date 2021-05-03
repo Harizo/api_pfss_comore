@@ -15,10 +15,10 @@ class Sous_projet_main_oeuvre extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getsous_projet_main_oeuvrebysousprojet") {
+        $id_sous_projet_localisation = $this->get('id_sous_projet_localisation');
+        if ($menu=="getsous_projet_main_oeuvrebysousprojet_localisation") {
                
-            $sous_projet_main_oeuvre = $this->Sous_projet_main_oeuvreManager->getsous_projet_main_oeuvrebysousprojet($id_sous_projet);
+            $sous_projet_main_oeuvre = $this->Sous_projet_main_oeuvreManager->getsous_projet_main_oeuvrebysousprojet_localisation($id_sous_projet_localisation);
                 if ($sous_projet_main_oeuvre) {
                     $data = $sous_projet_main_oeuvre;
                     /*foreach ($sous_projet_main_oeuvre as $key => $value) {
@@ -75,7 +75,7 @@ class Sous_projet_main_oeuvre extends REST_Controller {
                         'remuneration_jour' => $this->post('remuneration_jour'),                        
                         'nbr_jour' => $this->post('nbr_jour'),
                         'remuneration_total' => $this->post('remuneration_total'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                 );               
                 if (!$data) {
                     $this->response([
@@ -110,7 +110,7 @@ class Sous_projet_main_oeuvre extends REST_Controller {
                         'remuneration_jour' => $this->post('remuneration_jour'),                        
                         'nbr_jour' => $this->post('nbr_jour'),
                         'remuneration_total' => $this->post('remuneration_total'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );
                     if (!$data) {
                         $this->response([
@@ -143,7 +143,7 @@ class Sous_projet_main_oeuvre extends REST_Controller {
                         'remuneration_jour' => $this->post('remuneration_jour'),                        
                         'nbr_jour' => $this->post('nbr_jour'),
                         'remuneration_total' => $this->post('remuneration_total'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );              
                     if (!$data || !$id) {
                         $this->response([

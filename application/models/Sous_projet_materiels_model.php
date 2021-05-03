@@ -39,7 +39,7 @@ class Sous_projet_materiels_model extends CI_Model
             'quantite'    =>      $sous_projet_materiels['quantite'],
             'prix_unitaire' =>      $sous_projet_materiels['prix_unitaire'],
             'prix_total' =>      $sous_projet_materiels['prix_total'],
-            'id_sous_projet' =>      $sous_projet_materiels['id_sous_projet']                      
+            'id_sous_projet_localisation' =>      $sous_projet_materiels['id_sous_projet_localisation']                      
         );
     }
 
@@ -61,7 +61,7 @@ class Sous_projet_materiels_model extends CI_Model
             'quantite'    =>      $sous_projet_materiels['quantite'],
             'prix_unitaire' =>      $sous_projet_materiels['prix_unitaire'],
             'prix_total' =>      $sous_projet_materiels['prix_total'],
-            'id_sous_projet' =>      $sous_projet_materiels['id_sous_projet'] 
+            'id_sous_projet_localisation' =>      $sous_projet_materiels['id_sous_projet_localisation'] 
         );
     }
 
@@ -92,11 +92,11 @@ class Sous_projet_materiels_model extends CI_Model
         }                 
     }
 
-    public function getsous_projet_materielsbysousprojet($id_sous_projet)
+    public function getsous_projet_materielsbysousprojet_localisation($id_sous_projet_localisation)
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
+                        ->where('id_sous_projet_localisation',$id_sous_projet_localisation)
                         ->order_by('designation')
                         ->get()
                         ->result();

@@ -38,7 +38,7 @@ class Sous_projet_travaux_model extends CI_Model
             'unite' =>      $sous_projet_travaux['unite'],
             'quantite'    =>      $sous_projet_travaux['quantite'],
             'observation' =>      $sous_projet_travaux['observation'],
-            'id_sous_projet' =>      $sous_projet_travaux['id_sous_projet']                      
+            'id_sous_projet_localisation' =>      $sous_projet_travaux['id_sous_projet_localisation']                      
         );
     }
 
@@ -59,7 +59,7 @@ class Sous_projet_travaux_model extends CI_Model
             'unite' =>      $sous_projet_travaux['unite'],
             'quantite'    =>      $sous_projet_travaux['quantite'],
             'observation' =>      $sous_projet_travaux['observation'],
-            'id_sous_projet' =>      $sous_projet_travaux['id_sous_projet'] 
+            'id_sous_projet_localisation' =>      $sous_projet_travaux['id_sous_projet_localisation'] 
         );
     }
 
@@ -90,11 +90,11 @@ class Sous_projet_travaux_model extends CI_Model
         }                 
     }
 
-    public function getsous_projet_travauxbysousprojet($id_sous_projet)
+    public function getsous_projet_travauxbysousprojet_localisation($id_sous_projet_localisation)
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
+                        ->where('id_sous_projet_localisation',$id_sous_projet_localisation)
                         ->order_by('activites')
                         ->get()
                         ->result();

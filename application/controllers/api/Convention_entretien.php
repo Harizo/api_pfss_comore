@@ -15,10 +15,10 @@ class Convention_entretien extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getconvention_entretienbysousprojet") {
+        $id_sous_projet_localisation = $this->get('id_sous_projet_localisation');
+        if ($menu=="getconvention_entretienbysousprojet_localisation") {
                
-            $convention_entretien = $this->Convention_entretienManager->getconvention_entretienbysousprojet($id_sous_projet);
+            $convention_entretien = $this->Convention_entretienManager->getconvention_entretienbysousprojet_localisation($id_sous_projet_localisation);
                 if ($convention_entretien) {
                     $data = $convention_entretien;
                     /*foreach ($convention_entretien as $key => $value) {
@@ -74,7 +74,7 @@ class Convention_entretien extends REST_Controller {
                     'montant_travaux' => $this->post('montant_travaux'),
                     'nom_signataire' => $this->post('nom_signataire'),
                     'date_signature' => $this->post('date_signature'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                 );               
                 if (!$data) {
                     $this->response([
@@ -108,7 +108,7 @@ class Convention_entretien extends REST_Controller {
                         'montant_travaux' => $this->post('montant_travaux'),
                         'nom_signataire' => $this->post('nom_signataire'),
                         'date_signature' => $this->post('date_signature'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );
                     if (!$data) {
                         $this->response([
@@ -140,7 +140,7 @@ class Convention_entretien extends REST_Controller {
                         'montant_travaux' => $this->post('montant_travaux'),
                         'nom_signataire' => $this->post('nom_signataire'),
                         'date_signature' => $this->post('date_signature'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );              
                     if (!$data || !$id) {
                         $this->response([

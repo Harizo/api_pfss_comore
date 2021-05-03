@@ -39,7 +39,7 @@ class Convention_entretien_model extends CI_Model
             'montant_travaux' => $convention_entretien['montant_travaux'],
             'nom_signataire' => $convention_entretien['nom_signataire'],
             'date_signature' => $convention_entretien['date_signature'],
-            'id_sous_projet' =>      $convention_entretien['id_sous_projet']                      
+            'id_sous_projet_localisation' =>      $convention_entretien['id_sous_projet_localisation']                      
         );
     }
 
@@ -60,7 +60,7 @@ class Convention_entretien_model extends CI_Model
             'montant_travaux' => $convention_entretien['montant_travaux'],
             'nom_signataire' => $convention_entretien['nom_signataire'],
             'date_signature' => $convention_entretien['date_signature'],
-            'id_sous_projet' =>      $convention_entretien['id_sous_projet'] 
+            'id_sous_projet_localisation' =>      $convention_entretien['id_sous_projet_localisation'] 
         );
     }
 
@@ -80,7 +80,7 @@ class Convention_entretien_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('id_sous_projet')
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)
@@ -92,12 +92,12 @@ class Convention_entretien_model extends CI_Model
     }
     
 
-    public function getconvention_entretienbysousprojet($id_sous_projet)
+    public function getconvention_entretienbysousprojet_localisation($id_sous_projet_localisation)
     {
         $result =  $this->db->select("*")
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
-                        ->order_by('id_sous_projet')
+                        ->where('id_sous_projet_localisation',$id_sous_projet_localisation)
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)

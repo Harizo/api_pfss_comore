@@ -40,6 +40,11 @@ class Etat_paiement_agep_model extends CI_Model {
             'date_paiement'         => $etat_paiement_agep['date_paiement'],
             'moyen_transfert'       => $etat_paiement_agep['moyen_transfert'],
             'situation_paiement'    => $etat_paiement_agep['situation_paiement'],
+            'id_ile' => $etat_paiement_agep['id_ile'],
+            'id_region' => $etat_paiement_agep['id_region'],
+            'id_commune' => $etat_paiement_agep['id_commune'],
+            'id_village' => $etat_paiement_agep['id_village'],
+            'id_communaute' => $etat_paiement_agep['id_communaute']
         );
     }
     public function delete($id)  {

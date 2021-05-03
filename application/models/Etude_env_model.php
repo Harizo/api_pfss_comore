@@ -39,7 +39,7 @@ class Etude_env_model extends CI_Model
             'description_impacts' => $etude_env['description_impacts'],
             'mesure' => $etude_env['mesure'],
             'plan_gestion' => $etude_env['plan_gestion'],
-            'id_sous_projet' =>      $etude_env['id_sous_projet']                      
+            'id_sous_projet_localisation' =>      $etude_env['id_sous_projet_localisation']                      
         );
     }
 
@@ -60,7 +60,7 @@ class Etude_env_model extends CI_Model
             'description_impacts' => $etude_env['description_impacts'],
             'mesure' => $etude_env['mesure'],
             'plan_gestion' => $etude_env['plan_gestion'],
-            'id_sous_projet' =>      $etude_env['id_sous_projet'] 
+            'id_sous_projet_localisation' =>      $etude_env['id_sous_projet_localisation'] 
         );
     }
 
@@ -80,7 +80,7 @@ class Etude_env_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('id_sous_projet')
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)
@@ -92,12 +92,12 @@ class Etude_env_model extends CI_Model
     }
     
 
-    public function getetude_envbysousprojet($id_sous_projet)
+    public function getetude_envbysousprojet_localisation($id_sous_projet_localisation)
     {
         $result =  $this->db->select("*")
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
-                        ->order_by('id_sous_projet')
+                        ->where('id_sous_projet_localisation',$id_sous_projet_localisation)
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)

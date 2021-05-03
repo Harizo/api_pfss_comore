@@ -15,10 +15,10 @@ class Filtration_env extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getfiltration_envbysousprojet") {
+        $id_sous_projet_localisation = $this->get('id_sous_projet_localisation');
+        if ($menu=="getfiltration_envbysousprojet_localisation") {
                
-            $filtration_env = $this->FiltrationManager->getfiltration_envbysousprojet($id_sous_projet);
+            $filtration_env = $this->FiltrationManager->getfiltration_envbysousprojet_localisation($id_sous_projet_localisation);
                 if ($filtration_env) {
                     $data = $filtration_env;
                     /*foreach ($filtration_env as $key => $value) {
@@ -83,7 +83,7 @@ class Filtration_env extends REST_Controller {
                     'environnement_naturel' => $this->post('environnement_naturel'),
                     'date_visa_rt_ibd' => $this->post('date_visa_rt_ibd'),
                     'date_visa_res' => $this->post('date_visa_res'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                 );               
                 if (!$data) {
                     $this->response([
@@ -126,7 +126,7 @@ class Filtration_env extends REST_Controller {
                         'environnement_naturel' => $this->post('environnement_naturel'),
                         'date_visa_rt_ibd' => $this->post('date_visa_rt_ibd'),
                         'date_visa_res' => $this->post('date_visa_res'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );
                     if (!$data) {
                         $this->response([
@@ -167,7 +167,7 @@ class Filtration_env extends REST_Controller {
                         'environnement_naturel' => $this->post('environnement_naturel'),
                         'date_visa_rt_ibd' => $this->post('date_visa_rt_ibd'),
                         'date_visa_res' => $this->post('date_visa_res'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );              
                     if (!$data || !$id) {
                         $this->response([

@@ -15,7 +15,23 @@ class Pges extends REST_Controller {
 
     public function index_get() {
         $id = $this->get('id');
-        if ($id) {
+        $menu = $this->get('menu');
+        $id_sous_projet = $this->get('id_sous_projet');
+        if ($menu=='getpgesBysousprojet') {
+               
+            $tmp = $this->PgesManager->getpgesBysousprojet($id_sous_projet);
+            if ($tmp)
+            {
+                $data=$tmp;
+            }
+            else {
+                $data=array();
+            }
+            
+            
+        } 
+        elseif ($id)
+        {
                
                 $data = $this->PgesManager->findById($id);
                 /*$data['id'] = $pges->id;

@@ -38,7 +38,7 @@ class Aspects_env_model extends CI_Model
             'emplace_site' => $aspect_env['emplace_site'],
             'etat_initial_recepteur' => $aspect_env['etat_initial_recepteur'],
             'classification_sous_projet' => $aspect_env['classification_sous_projet'],
-            'id_sous_projet' =>      $aspect_env['id_sous_projet']                      
+            'id_sous_projet_localisation' =>      $aspect_env['id_sous_projet_localisation']                      
         );
     }
 
@@ -58,7 +58,7 @@ class Aspects_env_model extends CI_Model
             'emplace_site' => $aspect_env['emplace_site'],
             'etat_initial_recepteur' => $aspect_env['etat_initial_recepteur'],
             'classification_sous_projet' => $aspect_env['classification_sous_projet'],
-            'id_sous_projet' =>      $aspect_env['id_sous_projet'] 
+            'id_sous_projet_localisation' =>      $aspect_env['id_sous_projet_localisation'] 
         );
     }
 
@@ -78,7 +78,7 @@ class Aspects_env_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('id_sous_projet')
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)
@@ -90,12 +90,12 @@ class Aspects_env_model extends CI_Model
     }
     
 
-    public function getaspects_envbysousprojet($id_sous_projet)
+    public function getaspects_envbysousprojet_localisation($id_sous_projet_localisation)
     {
         $result =  $this->db->select("*")
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
-                        ->order_by('id_sous_projet')
+                        ->where('id_sous_projet_localisation',$id_sous_projet_localisation)
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)

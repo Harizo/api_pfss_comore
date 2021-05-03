@@ -39,7 +39,7 @@ class Sauvegarde_env_model extends CI_Model
             'resultats' =>      $sauvegarde_env['resultats'],
             'methodologie' =>      $sauvegarde_env['methodologie'],
             'mesures_environnement' =>      $sauvegarde_env['mesures_environnement'],
-            'id_sous_projet' =>      $sauvegarde_env['id_sous_projet']                      
+            'id_sous_projet_localisation' =>      $sauvegarde_env['id_sous_projet_localisation']                      
         );
     }
 
@@ -60,7 +60,7 @@ class Sauvegarde_env_model extends CI_Model
             'resultats' =>      $sauvegarde_env['resultats'],
             'methodologie' =>      $sauvegarde_env['methodologie'],
             'mesures_environnement' =>      $sauvegarde_env['mesures_environnement'],
-            'id_sous_projet' =>      $sauvegarde_env['id_sous_projet'] 
+            'id_sous_projet_localisation' =>      $sauvegarde_env['id_sous_projet_localisation'] 
         );
     }
 
@@ -80,7 +80,7 @@ class Sauvegarde_env_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('id_sous_projet')
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)
@@ -91,12 +91,12 @@ class Sauvegarde_env_model extends CI_Model
         }                 
     }
 
-    public function getsauvegarde_envbysousprojet($id_sous_projet)
+    public function getsauvegarde_envbysousprojet_localisation($id_sous_projet_localisation)
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
-                        ->order_by('id_sous_projet')
+                        ->where('id_sous_projet_localisation',$id_sous_projet_localisation)
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)
