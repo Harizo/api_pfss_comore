@@ -38,21 +38,21 @@ class Sous_projet_model extends CI_Model
     public function _set($sous_projet)  {
         return array(
             'code'         => $sous_projet['code'],
-            'intitule' => $sous_projet['intitule'],
+            //'intitule' => $sous_projet['intitule'],
             'nature' => $sous_projet['nature'],
             'type' => $sous_projet['type'],
             'description' => $sous_projet['description'],
-            'description_activite' => $sous_projet['description_activite'],
+            'objectif' => $sous_projet['objectif'],
+            'duree' => $sous_projet['duree'],
+           /* 'description_activite' => $sous_projet['description_activite'],
             'presentantion_communaute' => $sous_projet['presentantion_communaute'],
             'ref_dgsc' => $sous_projet['ref_dgsc'],
             'nbr_menage_participant' => $sous_projet['nbr_menage_participant'],
             'nbr_menage_nonparticipant' => $sous_projet['nbr_menage_nonparticipant'],
             'population_total' => $sous_projet['population_total'],
-            'objectif' => $sous_projet['objectif'],
-            'duree' => $sous_projet['duree'],
             'id_commune' => $sous_projet['id_commune'],
             'id_village' => $sous_projet['id_village'],
-            'id_communaute' => $sous_projet['id_communaute'],
+            'id_communaute' => $sous_projet['id_communaute'],*/
             'id_par'  => $sous_projet['id_par'],
         );
     }
@@ -64,17 +64,17 @@ class Sous_projet_model extends CI_Model
             'nature' => $sous_projet['nature'],
             'type' => $sous_projet['type'],
             'description' => $sous_projet['description'],
-            'description_activite' => $sous_projet['description_activite'],
+            'objectif' => $sous_projet['objectif'],
+            'duree' => $sous_projet['duree'],
+            /*'description_activite' => $sous_projet['description_activite'],
             'presentantion_communaute' => $sous_projet['presentantion_communaute'],
             'ref_dgsc' => $sous_projet['ref_dgsc'],
             'nbr_menage_participant' => $sous_projet['nbr_menage_participant'],
             'nbr_menage_nonparticipant' => $sous_projet['nbr_menage_nonparticipant'],
             'population_total' => $sous_projet['population_total'],
-            'objectif' => $sous_projet['objectif'],
-            'duree' => $sous_projet['duree'],
             'id_commune' => $sous_projet['id_commune'],
             'id_village' => $sous_projet['id_village'],
-            'id_communaute' => $sous_projet['id_communaute'],
+            'id_communaute' => $sous_projet['id_communaute'],*/
             'id_par' => $sous_projet['id_par'],
         );
     }

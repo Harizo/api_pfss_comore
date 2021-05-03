@@ -70,7 +70,7 @@ class Calendrier_activites extends REST_Controller {
                 $data = array(
                     'mois'       => $this->post('mois'),
                     'activite'  => $this->post('activite'),
-                    'duree'  => $this->post('duree'),      
+                    'numero'  => $this->post('numero'),      
                     'id_pac'    => $this->post('id_pac')
                 );               
                 if (!$data) {
@@ -102,7 +102,7 @@ class Calendrier_activites extends REST_Controller {
                     $data = array(
                         'mois'       => $this->post('mois'),
                         'activite'  => $this->post('activite'),
-                        'duree'  => $this->post('duree'),      
+                        'numero'  => $this->post('numero'),      
                         'id_pac'    => $this->post('id_pac')
                     );
                     if (!$data) {
@@ -132,7 +132,7 @@ class Calendrier_activites extends REST_Controller {
                     $data = array(
                         'mois'       => $this->post('mois'),
                         'activite'  => $this->post('activite'),
-                        'duree'  => $this->post('duree'),      
+                        'numero'  => $this->post('numero'),      
                         'id_pac'    => $this->post('id_pac')
                     );              
                     if (!$data || !$id) {

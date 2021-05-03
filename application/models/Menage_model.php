@@ -237,6 +237,19 @@ class Menage_model extends CI_Model
             return null;
         }                 
     }
+    public function findAllByVillageAndPreselectionnneStatutAndSousProjet($village_id,$statut,$id_sous_projet)
+    {
+		$requete="select * from menage as m"
+                ." where m.id_sous_projet=".$id_sous_projet." and m.village_id=".$village_id." and statut in('PRESELECTIONNE','BENEFICIAIRE')"
+				." and m.village_id=".$village_id;	
+				$result = $this->db->query($requete)->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                  
+    }
     public function findAllByVillageAndBeneficiaireStatutAndSousProjet($village_id,$statut,$id_sous_projet)
     {
         $result =  $this->db->select('*')
@@ -247,6 +260,21 @@ class Menage_model extends CI_Model
                         ->where('menage.statut', $statut)
                         ->where('menage.village_id', $village_id)
                         ->where('menage_beneficiaire.id_sous_projet', $id_sous_projet)
+                        ->get()
+                        ->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                  
+    }
+    public function findAllByVillageAndSousProjet($village_id,$id_sous_projet)
+    {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where('menage.id_sous_projet', $id_sous_projet)
+                        ->where('menage.village_id', $village_id)
                         ->get()
                         ->result();
         if($result)

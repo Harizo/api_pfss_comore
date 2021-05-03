@@ -6,6 +6,11 @@ class Etat_paiement_agep extends REST_Controller {
         parent::__construct();
         $this->load->model('etat_paiement_agep_model', 'Etat_paiement_agepManager');
         $this->load->model('menage_model', 'MenageManager');
+        $this->load->model('ile_model', 'IleManager');
+        $this->load->model('region_model', 'RegionManager');
+        $this->load->model('commune_model', 'CommuneManager');
+        $this->load->model('village_model', 'VillageManager');
+        $this->load->model('communaute_model', 'CommunauteManager');
     }
     public function index_get() {
         $id = $this->get('id');
@@ -21,17 +26,28 @@ class Etat_paiement_agep extends REST_Controller {
                 foreach ($tmp as $key => $value) 
                 {   
                     $menage = $this->MenageManager->findById($value->id_menage);
+                    $ile= $this->IleManager->findById($value->id_ile);
+                    $region= $this->RegionManager->findById($value->id_region);
+                    $commune= $this->CommuneManager->findById($value->id_commune);
+                    $communaute= $this->CommunauteManager->findById($value->id_communaute);
+                    $village= $this->VillageManager->findById($value->id_village);
                     $data[$key]['id'] = $value->id;
                     $data[$key]['numero_ordre_paiement'] = $value->numero_ordre_paiement;
                     $data[$key]['activite_concerne'] = $value->activite_concerne;
                     $data[$key]['menage'] = $menage;
                     $data[$key]['tranche'] = $value->tranche;
                     $data[$key]['pourcentage'] = $value->pourcentage;
-                    $data[$key]['montant_total_prevu'] = $value->montant_total_prevu;
+                    //$data[$key]['montant_total_prevu'] = $value->montant_total_prevu;
                     $data[$key]['montant_percu'] = $value->montant_percu;
                     $data[$key]['date_paiement'] = $value->date_paiement;
                     $data[$key]['moyen_transfert'] = $value->moyen_transfert;
                     $data[$key]['situation_paiement'] = $value->situation_paiement;
+                    $data[$key]['ile']= $ile;
+                    $data[$key]['region']= $region;
+                    $data[$key]['commune']= $commune;
+                    $data[$key]['commune']= $commune;
+                    $data[$key]['village']= $village;
+                    $data[$key]['communaute']= $communaute;
                 }               
             }
         } 
@@ -64,19 +80,50 @@ class Etat_paiement_agep extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
-		$data = array(
-            'numero_ordre_paiement'=> $this->post('numero_ordre_paiement'),
-            'activite_concerne'=> $this->post('activite_concerne'),
-            'id_menage'=> $this->post('id_menage'),
-            'id_contrat_agep'=> $this->post('id_contrat_agep'),
-            'tranche'=> $this->post('tranche'),
-            'pourcentage'=> $this->post('pourcentage'),
-            'montant_total_prevu'=> $this->post('montant_total_prevu'),
-            'montant_percu'=> $this->post('montant_percu'),
-            'date_paiement'=> $this->post('date_paiement'),
-            'moyen_transfert'=> $this->post('moyen_transfert'),
-            'situation_paiement'=> $this->post('situation_paiement')
-		);               
+        $id_sous_projet = $this->post('id_sous_projet') ;
+        if ($this->post('activite_concerne')=='IDB')
+        {
+            $data = array(
+                'numero_ordre_paiement'=> $this->post('numero_ordre_paiement'),
+                'activite_concerne'=> $this->post('activite_concerne'),
+                'id_menage'=> $this->post('id_menage'),
+                'id_contrat_agep'=> $this->post('id_contrat_agep'),
+                'tranche'=> $this->post('tranche'),
+                'pourcentage'=> $this->post('pourcentage'),
+                //'montant_total_prevu'=> $this->post('montant_total_prevu'),
+                'montant_percu'=> $this->post('montant_percu'),
+                'date_paiement'=> $this->post('date_paiement'),
+                'moyen_transfert'=> $this->post('moyen_transfert'),
+                'situation_paiement'=> $this->post('situation_paiement'),
+                'id_ile' => $this->post('id_ile') ,
+                'id_region' => $this->post('id_region') ,
+                'id_commune' => $this->post('id_commune') ,
+                'id_village' => null ,
+                'id_communaute' => $this->post('id_communaute') 
+            );
+        }
+        else
+        {
+            $data = array(
+                'numero_ordre_paiement'=> $this->post('numero_ordre_paiement'),
+                'activite_concerne'=> $this->post('activite_concerne'),
+                'id_menage'=> $this->post('id_menage'),
+                'id_contrat_agep'=> $this->post('id_contrat_agep'),
+                'tranche'=> $this->post('tranche'),
+                'pourcentage'=> $this->post('pourcentage'),
+                //'montant_total_prevu'=> $this->post('montant_total_prevu'),
+                'montant_percu'=> $this->post('montant_percu'),
+                'date_paiement'=> $this->post('date_paiement'),
+                'moyen_transfert'=> $this->post('moyen_transfert'),
+                'situation_paiement'=> $this->post('situation_paiement'),
+                'id_ile' => $this->post('id_ile') ,
+                'id_region' => $this->post('id_region') ,
+                'id_commune' => $this->post('id_commune') ,
+                'id_village' => $this->post('id_village') ,
+                'id_communaute' => null 
+            );
+        }
+		               
         if ($supprimer == 0) {
             if ($id == 0) {
                 if (!$data) {

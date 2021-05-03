@@ -94,10 +94,12 @@ class Menage_beneficiaire_model extends CI_Model {
     public function getmenageBysous_projet($id_sous_projet)   {
 		// Selection par intervention
         $result =  $this->db->select('menage.id as id,
-                                        menage.NumeroEnregistrement as NumeroEnregistrement,
+                                        menage.identifiant_menage as identifiant_menage,
                                         menage.NomTravailleurSuppliant as NomTravailleurSuppliant,
+                                        menage.nomchefmenage as nomchefmenage,
                                         menage.AgeInscrire as AgeInscrire,
-                                        menage.SexeTravailleurSuppliant as SexeTravailleurSuppliant
+                                        menage.SexeTravailleurSuppliant as SexeTravailleurSuppliant,
+                                        menage.SexeChefMenage as SexeChefMenage
                                         ')
                         ->from($this->table)
                         ->join('menage', 'menage.id = menage_beneficiaire.id_menage')

@@ -946,12 +946,19 @@ class Importation_menage extends REST_Controller {
 				if(intval($possede_frigo)==2) {
 					$possede_frigo=0;
 				}
-				if($agechefdemenage=="") {
+				if(intval($id_sous_projet) ==1 || intval($id_sous_projet) ==2) {
+					// 1 : ACT , 2 : ARSE
 					$agechefdemenage=null;
-				}
-				if($age_conjoint=="") {
 					$age_conjoint=null;
-				}
+					$quartier = null;
+				} else {
+					if($agechefdemenage=="") {
+						$agechefdemenage=null;
+					}
+					if($age_conjoint=="") {
+						$age_conjoint=null;
+					}
+				}	
 				// Formatage valeur
 				// Controle info erronnée
 				if(!$date_inscription) {

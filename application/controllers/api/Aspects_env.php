@@ -15,10 +15,10 @@ class Aspects_env extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getaspects_envbysousprojet") {
+        $id_sous_projet_localisation = $this->get('id_sous_projet_localisation');
+        if ($menu=="getaspects_envbysousprojet_localisation") {
                
-            $aspects_env = $this->Aspects_envManager->getaspects_envbysousprojet($id_sous_projet);
+            $aspects_env = $this->Aspects_envManager->getaspects_envbysousprojet_localisation($id_sous_projet_localisation);
                 if ($aspects_env) {
                     $data = $aspects_env;
                     /*foreach ($aspects_env as $key => $value) {
@@ -73,7 +73,7 @@ class Aspects_env extends REST_Controller {
                     'emplace_site' => $this->post('emplace_site'),
                     'etat_initial_recepteur' => $this->post('etat_initial_recepteur'),
                     'classification_sous_projet' => $this->post('classification_sous_projet'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                 );               
                 if (!$data) {
                     $this->response([
@@ -106,7 +106,7 @@ class Aspects_env extends REST_Controller {
                         'emplace_site' => $this->post('emplace_site'),
                         'etat_initial_recepteur' => $this->post('etat_initial_recepteur'),
                         'classification_sous_projet' => $this->post('classification_sous_projet'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );
                     if (!$data) {
                         $this->response([
@@ -137,7 +137,7 @@ class Aspects_env extends REST_Controller {
                         'emplace_site' => $this->post('emplace_site'),
                         'etat_initial_recepteur' => $this->post('etat_initial_recepteur'),
                         'classification_sous_projet' => $this->post('classification_sous_projet'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );              
                     if (!$data || !$id) {
                         $this->response([

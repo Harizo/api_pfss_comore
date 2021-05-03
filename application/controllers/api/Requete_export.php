@@ -29,6 +29,8 @@ class Requete_export extends REST_Controller {
 		$export = $this->get('export'); 
         $fiche_presence= $this->get('fiche_presence');
         $fiche_paiement= $this->get('fiche_paiement');
+        $fiche_recepteur= $this->get('fiche_recepteur');
+        $fiche_paiement_arse= $this->get('fiche_paiement_arse');
         $liste_etat_presence= $this->get('liste_etat_presence');
         $liste_etat_paiement= $this->get('liste_etat_paiement');
         $detail_etat_presence= $this->get('detail_etat_presence');
@@ -121,11 +123,11 @@ class Requete_export extends REST_Controller {
 						$microprojet_id =$v->microprojet_id;
 					}	
 				}
-				$ag = $this->AgencepaiementManager->findById($agep_id);
+				$ag = $this->AgencepaiementManager->findByIdArray($agep_id);
 				$nom_agep="";
 				if(count($ag) >0) {
 					foreach($ag as $k=>$v) {
-					$nom_agep=$v->Nom;
+						$nom_agep=$v->raison_social;
 					}
 				}
 				$agex = $this->AgexManager->findById($agex_id);
@@ -153,6 +155,24 @@ class Requete_export extends REST_Controller {
 					$this->exportcartebeneficiaireARSE($apiUrlbase,$menages,$nom_ile,$region,$commune,$village,$zone_id,$zip,$code_zip,$microprojet,$ile_id,$region_id,$commune_id,$village_id);
 				} else {
 					$this->exportcartebeneficiaire($apiUrlbase,$menages,$nom_ile,$region,$commune,$village,$zone_id,$zip,$code_zip,$microprojet,$ile_id,$region_id,$commune_id,$village_id);
+				}	
+			} else if($fiche_recepteur || $fiche_paiement_arse) {
+				$menages=$this->RequeteexportManager->Etat_recepteur($id_sous_projet,$village_id);
+				$ret = $this->RequeteexportManager->Nombre_travailleur_par_sexe($id_sous_projet,$village_id);
+				foreach($ret as $k=>$v) {
+					$nombre_menage_beneficiaire=$v->nombre_menage_beneficiaire;
+					$nombre_travailleur_homme=$v->nombre_travailleur_homme;
+					$nombre_travailleur_femme=$v->nombre_travailleur_femme;
+					$nombre_suppleant_homme=$v->nombre_suppleant_homme;
+					$nombre_suppleant_femme=$v->nombre_suppleant_femme;					
+				}
+				if($fiche_recepteur) {
+					$this->exportficherecepteur($menages,$nom_ile,$region,$commune,$village,$nombre_menage_beneficiaire,$nombre_travailleur_homme,$nombre_travailleur_femme,$nombre_suppleant_homme,$nombre_suppleant_femme);
+				} else {
+					$titre= $this->get('titre');
+					$montant_a_payer= $this->get('montant_a_payer');
+					$pourcentage= $this->get('pourcentage');
+					$this->exportetatpaiementarse($menages,$nom_ile,$region,$commune,$village,$nombre_menage_beneficiaire,$nombre_travailleur_homme,$nombre_travailleur_femme,$nombre_suppleant_homme,$nombre_suppleant_femme,$pourcentage,$montant_a_payer,$titre);
 				}	
 			}
 		} else {
@@ -193,7 +213,9 @@ class Requete_export extends REST_Controller {
 				$data=$this->RequeteexportManager->Fiche_etat_de_paiement($village_id);
 			} else if($detail_etat_presence) {
 				$data=$this->RequeteexportManager->Detail_fiche_etat_de_paiement($id_fichepresence);
-			}	
+			} else if($fiche_paiement_arse || $fiche_recepteur) {
+				$data=$this->RequeteexportManager->Etat_recepteur($id_sous_projet,$village_id);
+			}		
 			if (count($data)>0) {
 				$this->response([
 					'status' => TRUE,
@@ -3143,6 +3165,8 @@ class Requete_export extends REST_Controller {
 			$objPHPExcel->getActiveSheet()->getColumnDimension('AB')->setWidth(3);
 			$objPHPExcel->getActiveSheet()->getColumnDimension('AC')->setWidth(3);
 			$objPHPExcel->getActiveSheet()->getColumnDimension('AD')->setWidth(1);
+			$objPHPExcel->getActiveSheet()->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(5, 8);
+			$objPHPExcel->getActiveSheet()->getPageSetup()->setScale(90);
 			$objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A5);		
 			$objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE)	;		
 			$objPHPExcel->getActiveSheet()->getPageSetup()->setHorizontalCentered(true);
@@ -5040,7 +5064,492 @@ class Requete_export extends REST_Controller {
 			], REST_Controller::HTTP_OK);	
 		}	
 	}	
-
+	public function exportficherecepteur($menages,$nom_ile,$region,$commune,$village,$nombre_menage_beneficiaire,$nombre_travailleur_homme,$nombre_travailleur_femme,$nombre_suppleant_homme,$nombre_suppleant_femme) {
+        require_once 'Classes/PHPExcel.php';
+        require_once 'Classes/PHPExcel/IOFactory.php';
+        set_time_limit(0);
+        ini_set ('memory_limit', '2048M');
+		$search= array('é','ô','Ô','î','Î','è','ê','à','ö','ç','&','°',"'");
+		$replace=array('e','o','o','i','i','e','e','a','o','c','_','_','');
+		$ile_original = $nom_ile;
+		$region_original = $region;
+		$commune_original = $commune;
+		$village_original = $village;
+		$ile_tmp = $nom_ile;
+		$region_tmp = $region;
+		$commune_tmp=$commune;		
+		$village_tmp=$village;	
+		$ile_tmp=str_replace ($search,$replace,$ile_tmp );
+		$region_tmp=str_replace ($search,$replace,$region_tmp );
+		$commune_tmp=str_replace ($search,$replace,$commune_tmp );
+		$village_tmp=str_replace ($search,$replace,$village_tmp );	
+		
+			$ile_tmp = strtolower($ile_tmp);
+			$region_tmp = strtolower($region_tmp);
+			$commune_tmp = strtolower($commune_tmp);
+			$village_tmp = strtolower($village_tmp);
+			
+			$directoryName = dirname(__FILE__) . "/../../../../exportexcel/".$ile_tmp."/".$region_tmp."/".$commune_tmp."/".$village_tmp."/";
+			if(!is_dir($directoryName)) {
+				mkdir($directoryName, 0777,true);
+			}
+			$objPHPExcel = new PHPExcel();
+			$objPHPExcel->getProperties()->setCreator("PFSS")
+								 ->setLastModifiedBy("PFSS")
+								 ->setTitle("Fiche recepteur ARSE")
+								 ->setSubject("Fiche recepteur ARSE")
+								 ->setDescription("Fiche recepteur ARSE")
+								 ->setKeywords("Fiche recepteur ARSE")
+								 ->setCategory("Fiche recepteur ARSE");
+			$objRichText = new PHPExcel_RichText();
+			$objRichText->createText('Fiche recepteur');
+			$objPHPExcel->setActiveSheetIndex(0);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(7);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(17);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(30);
+			
+			$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(30);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(9);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(5);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(11);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(11);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(11);
+			
+			$objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth(30);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth(9);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth(5);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth(11);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth(11);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth(11);
+			
+			$objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);		
+			$objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE)	;		
+			$objPHPExcel->getActiveSheet()->getPageSetup()->setHorizontalCentered(true);
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setLeft(.2);
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setRight(.2);
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setTop(.40);
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(.40);
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setHeader(.17);
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setFooter(.17);	
+		$sans_menage=0; // au cas où il n'y a pas de bénéficiaire	
+		$ligne=13;
+		if(isset($menages)) {	
+			$i=1;
+			$premier=0;		
+			$objPHPExcel->getActiveSheet()->mergeCells('A1:O1');	
+			$objPHPExcel->getActiveSheet()->mergeCells('A2:O2');	
+			$objPHPExcel->getActiveSheet()->mergeCells('A3:O3');	
+			$objPHPExcel->getActiveSheet()->mergeCells('A4:O4');	
+			$objPHPExcel->getActiveSheet()->getStyle('A1:A4')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+			$objPHPExcel->getActiveSheet()->getStyle('A1:A4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A1', 'UNION DES COMORES');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A2', 'Unité – Solidarité – Développement');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A3', 'LISTE DES RECEPTEURS PRINCIPAUX ET SUPPLEANTS DU PROJET FSS');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A4', 'IDENTIFICATION DE LA LOCALITE');
+			$objPHPExcel->getActiveSheet()->getStyle('A1:A4')->getFont()->setName('calibri')->setSize(12);
+			$objPHPExcel->getActiveSheet()->getStyle('D5:D7')->getFont()->setName('calibri')->setSize(12);
+			$objPHPExcel->getActiveSheet()->getStyle('J5:J7')->getFont()->setName('calibri')->setSize(12);
+			$objPHPExcel->getActiveSheet()->getStyle('A1:A4')->getFont()->setBold(true);						
+			$logo1_fiche_arse = dirname(__FILE__) . "/../../../../app/src/".'logo1_fiche_arse.png';
+			if(file_exists($logo1_fiche_arse)) {
+				$gdImage = imagecreatefrompng($logo1_fiche_arse);
+				// Add a drawing to the worksheetecho date('H:i:s') . " Add a drawing to the worksheet\n";
+				$objDrawing = new PHPExcel_Worksheet_MemoryDrawing();
+				$objDrawing->setName('Logo fiche recepteur ARSE');
+				$objDrawing->setDescription('Logo fiche recepteur ARSE');
+				$objDrawing->setImageResource($gdImage);
+				$objDrawing->setRenderingFunction(PHPExcel_Worksheet_MemoryDrawing::RENDERING_JPEG);
+				$objDrawing->setMimeType(PHPExcel_Worksheet_MemoryDrawing::MIMETYPE_DEFAULT);
+				// $objDrawing->setWidth(125)->setHeight(125);
+				$objDrawing->setCoordinates('A1');
+				$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+			}	
+			$logo2_fiche_arse = dirname(__FILE__) . "/../../../../app/src/".'logo2_fiche_arse.png';
+			if(file_exists($logo2_fiche_arse)) {
+				$gdImage = imagecreatefrompng($logo2_fiche_arse);
+				// Add a drawing to the worksheetecho date('H:i:s') . " Add a drawing to the worksheet\n";
+				$objDrawing = new PHPExcel_Worksheet_MemoryDrawing();
+				$objDrawing->setName('Logo fiche recepteur ARSE');
+				$objDrawing->setDescription('Logo fiche recepteur ARSE');
+				$objDrawing->setImageResource($gdImage);
+				$objDrawing->setRenderingFunction(PHPExcel_Worksheet_MemoryDrawing::RENDERING_JPEG);
+				$objDrawing->setMimeType(PHPExcel_Worksheet_MemoryDrawing::MIMETYPE_DEFAULT);
+				// $objDrawing->setWidth(125)->setHeight(125);
+				$objDrawing->setCoordinates('O1');
+				$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+			}	
+			$styleArray = array(
+			  'borders' => array(
+				'allborders' => array(
+				  'style' => PHPExcel_Style_Border::BORDER_THIN
+				)
+			  )
+			);
+			$objPHPExcel->getActiveSheet()->mergeCells('A5:C5');	
+			$objPHPExcel->getActiveSheet()->mergeCells('A6:C6');	
+			$objPHPExcel->getActiveSheet()->mergeCells('A7:C7');	
+			$objPHPExcel->getActiveSheet()->mergeCells('A8:C8');	
+			$objPHPExcel->getActiveSheet()->mergeCells('A9:C9');	
+			$objPHPExcel->getActiveSheet()->mergeCells('A10:C10');	
+			$objPHPExcel->getActiveSheet()->mergeCells('H9:J9');	
+			$objPHPExcel->getActiveSheet()->mergeCells('H10:J10');	
+			$objPHPExcel->getActiveSheet()->getStyle('A5:C10')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+			$objPHPExcel->getActiveSheet()->getStyle('A5:A10')->getFont()->setName('calibri')->setSize(11);
+			$objPHPExcel->getActiveSheet()->getStyle('A5:A10')->getFont()->setBold(true);						
+			$objPHPExcel->getActiveSheet()->getStyle('H5:H10')->getFont()->setName('calibri')->setSize(11);
+			$objPHPExcel->getActiveSheet()->getStyle('H5:H10')->getFont()->setBold(true);						
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A5', 'Ile :');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A6', 'Commune :');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A7', "Point d'inscription :");
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A8', "Nombre de ménages bénéficiaires :");
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A9', "Nombre de recepteurs principaux Femmes :");
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A10', "Nombre de recepteurs suppléants Femmes :");
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H9', "Nombre de recepteurs principaux Hommes :");
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H10', "Nombre de recepteurs suppléants Hommes :");
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H5', "Lot :");
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H6', "Village :");
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H7', "Milieu");
+			$objPHPExcel->getActiveSheet()->mergeCells('D11:I11');	
+			$objPHPExcel->getActiveSheet()->mergeCells('D11:I11');	
+			$objPHPExcel->getActiveSheet()->mergeCells('J11:O11');	
+			$objPHPExcel->getActiveSheet()->mergeCells('J11:O11');	
+			$objPHPExcel->getActiveSheet()->mergeCells('A11:A12');	
+			$objPHPExcel->getActiveSheet()->mergeCells('B11:B12');	
+			$objPHPExcel->getActiveSheet()->mergeCells('C11:C12');	
+			$objPHPExcel->getActiveSheet()->getStyle('A11:O12')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+			$objPHPExcel->getActiveSheet()->getStyle('A11:O12')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A11', 'N°');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B11', 'Code ID ménage');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C11', 'Chef de ménage');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('D11', 'Recepteur principal');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J11', 'Recepteur suppléant');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('D12', 'Nom et prénoms');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E12', 'Statut ou lien de parenté');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('F12', 'Sexe  H/F');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G12', 'Date de Naissance');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H12', "N°Pièces d'identité");
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('I12', 'N°carte éléctorale');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J12', 'Nom et prénoms');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K12', 'Statut ou lien de parenté');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('L12', 'Sexe  H/F');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('M12', 'Date de Naissance');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('N12', "N°Pièces d'identité");
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('O12', 'N°carte éléctorale');
+			$objPHPExcel->getActiveSheet()->getStyle('A11:O12')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+			$objPHPExcel->getActiveSheet()->getStyle('A11:O12')->getFont()->setName('calibri')->setSize(11);
+			$objPHPExcel->getActiveSheet()->getStyle('A11:O12')->getFont()->setBold(true);						
+			$objPHPExcel->getActiveSheet()->getStyle('A11:O12')->applyFromArray($styleArray);
+			$objPHPExcel->getActiveSheet()->getStyle('A5:O12')->getAlignment()->setWrapText(true);
+			$objPHPExcel->getActiveSheet()->getStyle('D8:D10')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+			$objPHPExcel->getActiveSheet()->getStyle('K8:K10')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("D8",$nombre_menage_beneficiaire, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("D9",$nombre_travailleur_femme, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("D10",$nombre_suppleant_femme, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("K9",$nombre_travailleur_homme, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("K10",$nombre_suppleant_homme, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("D5",$ile_original, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("D6",$commune_original, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J6",$village_original, PHPExcel_Cell_DataType::TYPE_STRING);
+			foreach ($menages as $ii => $d) {
+				if(intval($d->inapte)==0) {					
+					$identifiant_menage=$d->identifiant_menage;
+					$menage=$d->NumeroEnregistrement;
+					$NumeroEnregistrement=$d->NumeroEnregistrement;
+					$nomchefmenage=$d->nomchefmenage;
+					$Addresse=$d->Addresse;
+					$SexeChefMenage=$d->SexeChefMenage;
+					$NomTravailleur=$d->NomTravailleur;
+					$SexeTravailleur=$d->SexeTravailleur;
+					$NomTravailleurSuppliant=$d->NomTravailleurSuppliant;
+					$SexeTravailleurSuppliant=$d->SexeTravailleurSuppliant;
+					$datedenaissancetravailleur=$d->datedenaissancetravailleur;
+					$moistravailleur=substr($datedenaissancetravailleur,5,2);
+					$anneetravailleur=substr($datedenaissancetravailleur,0,4);
+					$agetravailleur=$d->agetravailleur;
+					$datedenaissancesuppliant=$d->datedenaissancesuppliant;
+					$moissuppliant=substr($datedenaissancesuppliant,5,2);
+					$anneesuppliant=substr($datedenaissancesuppliant,0,4);
+					$agesuppliant=$d->agesuppliant;
+					$NumeroCIN=$d->NumeroCIN;
+					$NumeroCarteElectorale=$d->NumeroCarteElectorale;
+					$numerocintravailleur=$d->numerocintravailleur;
+					$numerocarteelectoraletravailleur=$d->numerocarteelectoraletravailleur;
+					$numerocinsuppliant=$d->numerocinsuppliant;
+					$numerocarteelectoralesuppliant=$d->numerocarteelectoralesuppliant;
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$ligne, ($ii +1));
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$ligne, $identifiant_menage);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$ligne, $nomchefmenage);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('D'.$ligne, $NomTravailleur);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('F'.$ligne, $SexeTravailleur);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$ligne, $datedenaissancetravailleur);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("H".$ligne,$numerocintravailleur, PHPExcel_Cell_DataType::TYPE_STRING);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("I".$ligne,$numerocarteelectoraletravailleur, PHPExcel_Cell_DataType::TYPE_STRING);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'.$ligne, $NomTravailleurSuppliant);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('L'.$ligne, $SexeTravailleurSuppliant);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('M'.$ligne, $datedenaissancesuppliant);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("N".$ligne,$numerocinsuppliant, PHPExcel_Cell_DataType::TYPE_STRING);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("O".$ligne,$numerocarteelectoralesuppliant, PHPExcel_Cell_DataType::TYPE_STRING);
+					$objPHPExcel->getActiveSheet()->getStyle('A'.$ligne.':B'.$ligne)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+					$objPHPExcel->getActiveSheet()->getStyle('A'.$ligne.':B'.$ligne)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+					$objPHPExcel->getActiveSheet()->getStyle('C'.$ligne.':O'.$ligne)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+					$objPHPExcel->getActiveSheet()->getStyle('F'.$ligne.':I'.$ligne)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+					$objPHPExcel->getActiveSheet()->getStyle('F'.$ligne.':I'.$ligne)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+					$objPHPExcel->getActiveSheet()->getStyle('L'.$ligne.':O'.$ligne)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+					$objPHPExcel->getActiveSheet()->getStyle('L'.$ligne.':O'.$ligne)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+					$objPHPExcel->getActiveSheet()->getStyle('A'.$ligne.':O'.$ligne)->applyFromArray($styleArray);
+						$i=$i + 1; // C'EST UNE MISE EN PAGE SUIVANTE
+					$ligne=$ligne + 1;	
+				}	
+				$fichier1="OK";	
+				// unset($objPHPExcel);	
+			}		
+			
+		} else {
+			// SANS ENREGISTREMENT
+			$sans_menage=$sans_menage + 1;
+		}
+		if($sans_menage=$sans_menage==0) {
+			$date_edition = date("d-m-Y");	
+			$fichier="NON";
+			$Filename ="";
+			$Filename ="fiche recepteut "."village " .$village_tmp." edition du ".$date_edition.".xlsx";
+			//Check if the directory already exists.
+			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+			$objWriter->save($directoryName.$Filename);
+			$fichier="OK";				
+			
+			$this->response([
+				'status' => TRUE,
+				'retour' =>	     "OK",
+				'date_edition'=> $date_edition,	
+				'fichier' => $fichier,
+				'chemin' => $ile_tmp."/".$region_tmp."/".$commune_tmp."/".$village_tmp."/",
+				'name_file' => $Filename,
+				'menages' => $menages,
+				'message' => 'Get file success',
+			], REST_Controller::HTTP_OK);	
+			
+		} else {
+			$this->response([
+				'status' => FALSE,
+				'retour' =>	     "OK",
+				'date_edition'=> $date_edition,	
+				'chemin' => $ile_tmp."/".$region_tmp."/".$commune_tmp."/".$village_tmp."/",
+				'message' => 'Aucun ménage bénéficiaire pour le filtre seléctinné!.',
+			], REST_Controller::HTTP_OK);	
+			
+		}
+	}	
+	public function exportetatpaiementarse($menages,$nom_ile,$region,$commune,$village,$nombre_menage_beneficiaire,$nombre_travailleur_homme,$nombre_travailleur_femme,$nombre_suppleant_homme,$nombre_suppleant_femme,$pourcentage,$montant_a_payer,$titre) {
+        require_once 'Classes/PHPExcel.php';
+        require_once 'Classes/PHPExcel/IOFactory.php';
+        set_time_limit(0);
+        ini_set ('memory_limit', '2048M');
+		$search= array('é','ô','Ô','î','Î','è','ê','à','ö','ç','&','°',"'");
+		$replace=array('e','o','o','i','i','e','e','a','o','c','_','_','');
+		$ile_original = $nom_ile;
+		$region_original = $region;
+		$commune_original = $commune;
+		$village_original = $village;
+		$ile_tmp = $nom_ile;
+		$region_tmp = $region;
+		$commune_tmp=$commune;		
+		$village_tmp=$village;	
+		$ile_tmp=str_replace ($search,$replace,$ile_tmp );
+		$region_tmp=str_replace ($search,$replace,$region_tmp );
+		$commune_tmp=str_replace ($search,$replace,$commune_tmp );
+		$village_tmp=str_replace ($search,$replace,$village_tmp );	
+		
+			$ile_tmp = strtolower($ile_tmp);
+			$region_tmp = strtolower($region_tmp);
+			$commune_tmp = strtolower($commune_tmp);
+			$village_tmp = strtolower($village_tmp);
+			
+			$directoryName = dirname(__FILE__) . "/../../../../exportexcel/".$ile_tmp."/".$region_tmp."/".$commune_tmp."/".$village_tmp."/";
+			if(!is_dir($directoryName)) {
+				mkdir($directoryName, 0777,true);
+			}
+			$objPHPExcel = new PHPExcel();
+			$objPHPExcel->getProperties()->setCreator("PFSS")
+								 ->setLastModifiedBy("PFSS")
+								 ->setTitle("Etat paiement ARSE")
+								 ->setSubject("Etat paiement ARSE")
+								 ->setDescription("Etat paiement ARSE")
+								 ->setKeywords("Etat paiement ARSE")
+								 ->setCategory("Etat paiement ARSE");
+			$objRichText = new PHPExcel_RichText();
+			$objRichText->createText('Fiche recepteur');
+			$objPHPExcel->setActiveSheetIndex(0);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(7);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(24);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(34);
+			
+			$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(13);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(34);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(13);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(13);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(14);
+			
+			$objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);		
+			$objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE)	;		
+			$objPHPExcel->getActiveSheet()->getPageSetup()->setHorizontalCentered(true);
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setLeft(.2);
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setRight(.2);
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setTop(.40);
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setBottom(.40);
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setHeader(.17);
+			$objPHPExcel->getActiveSheet()->getPageMargins()->setFooter(.17);	
+		$sans_menage=0; // au cas où il n'y a pas de bénéficiaire	
+		$ligne=9;
+		if(isset($menages)) {	
+			$i=1;
+			$premier=0;		
+			$objPHPExcel->getActiveSheet()->getStyle('C1:C4')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+			$objPHPExcel->getActiveSheet()->getStyle('C1:C4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C1', 'Unité de Gestion du PFSS');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C2', 'Bureau Régional de Ngazidja');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C3', 'TEL 773 28 89');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C4', 'Mbouéni, Moroni');
+			$objPHPExcel->getActiveSheet()->mergeCells('C5:E5');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C5', 'ETAT DE PAIEMENT VILLAGE : '.strtoupper($village_original));
+			$objPHPExcel->getActiveSheet()->getStyle('C1:C4')->getFont()->setName('calibri')->setSize(14);
+			$objPHPExcel->getActiveSheet()->getStyle('C5')->getFont()->setName('calibri')->setSize(16);
+			$objPHPExcel->getActiveSheet()->getStyle('C4:C5')->getFont()->setBold(true);						
+			$logo1_paiement_arse = dirname(__FILE__) . "/../../../../app/src/".'logo1_paiement_arse.png';
+			if(file_exists($logo1_paiement_arse)) {
+				$gdImage = imagecreatefrompng($logo1_paiement_arse);
+				// Add a drawing to the worksheetecho date('H:i:s') . " Add a drawing to the worksheet\n";
+				$objDrawing = new PHPExcel_Worksheet_MemoryDrawing();
+				$objDrawing->setName('Logo fiche recepteur ARSE');
+				$objDrawing->setDescription('Logo fiche recepteur ARSE');
+				$objDrawing->setImageResource($gdImage);
+				$objDrawing->setRenderingFunction(PHPExcel_Worksheet_MemoryDrawing::RENDERING_JPEG);
+				$objDrawing->setMimeType(PHPExcel_Worksheet_MemoryDrawing::MIMETYPE_DEFAULT);
+				// $objDrawing->setWidth(125)->setHeight(125);
+				$objDrawing->setCoordinates('A1');
+				$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+			}	
+			$logo2_paiement_arse = dirname(__FILE__) . "/../../../../app/src/".'logo2_paiement_arse.png';
+			if(file_exists($logo2_paiement_arse)) {
+				$gdImage = imagecreatefrompng($logo2_paiement_arse);
+				// Add a drawing to the worksheetecho date('H:i:s') . " Add a drawing to the worksheet\n";
+				$objDrawing = new PHPExcel_Worksheet_MemoryDrawing();
+				$objDrawing->setName('Logo fiche paiement ARSE');
+				$objDrawing->setDescription('Logo fiche paiement ARSE');
+				$objDrawing->setImageResource($gdImage);
+				$objDrawing->setRenderingFunction(PHPExcel_Worksheet_MemoryDrawing::RENDERING_JPEG);
+				$objDrawing->setMimeType(PHPExcel_Worksheet_MemoryDrawing::MIMETYPE_DEFAULT);
+				// $objDrawing->setWidth(125)->setHeight(125);
+				$objDrawing->setCoordinates('G1');
+				$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+			}	
+			$styleArray = array(
+			  'borders' => array(
+				'allborders' => array(
+				  'style' => PHPExcel_Style_Border::BORDER_THIN
+				)
+			  )
+			);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('F7', 'Etape : ');
+			$objPHPExcel->getActiveSheet()->mergeCells('G7:H7');
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit("G7",$titre.  " de ".$pourcentage."%", PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->getStyle('F7:H7')->getFont()->setName('calibri')->setSize(12);
+			$objPHPExcel->getActiveSheet()->getStyle('F7:H7')->getFont()->setBold(true);						
+			$objPHPExcel->getActiveSheet()->getStyle('F7:H7')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+			$objPHPExcel->getActiveSheet()->getStyle('F7')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A8', 'N°');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B8', 'Code ID ménage');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C8', 'Recepteur principal');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('D8', 'Montant payé');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E8', 'Recepteur suppléant');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('F8', 'Montant payé');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G8', 'Montant total à payer');
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H8', 'Emargement');
+			$objPHPExcel->getActiveSheet()->getStyle('A8:H8')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+			$objPHPExcel->getActiveSheet()->getStyle('A8:H8')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+			$objPHPExcel->getActiveSheet()->getStyle('A8:H8')->getFont()->setName('calibri')->setSize(11);
+			$objPHPExcel->getActiveSheet()->getStyle('A8:H8')->getFont()->setBold(true);						
+			$objPHPExcel->getActiveSheet()->getStyle('A8:H8')->applyFromArray($styleArray);
+			$objPHPExcel->getActiveSheet()->getStyle('A5:H8')->getAlignment()->setWrapText(true);
+			foreach ($menages as $ii => $d) {
+				if(intval($d->inapte)==0) {					
+					$identifiant_menage=$d->identifiant_menage;
+					$menage=$d->NumeroEnregistrement;
+					$NumeroEnregistrement=$d->NumeroEnregistrement;
+					$nomchefmenage=$d->nomchefmenage;
+					$Addresse=$d->Addresse;
+					$SexeChefMenage=$d->SexeChefMenage;
+					$NomTravailleur=$d->NomTravailleur;
+					$SexeTravailleur=$d->SexeTravailleur;
+					$NomTravailleurSuppliant=$d->NomTravailleurSuppliant;
+					$SexeTravailleurSuppliant=$d->SexeTravailleurSuppliant;
+					$datedenaissancetravailleur=$d->datedenaissancetravailleur;
+					$moistravailleur=substr($datedenaissancetravailleur,5,2);
+					$anneetravailleur=substr($datedenaissancetravailleur,0,4);
+					$agetravailleur=$d->agetravailleur;
+					$datedenaissancesuppliant=$d->datedenaissancesuppliant;
+					$moissuppliant=substr($datedenaissancesuppliant,5,2);
+					$anneesuppliant=substr($datedenaissancesuppliant,0,4);
+					$agesuppliant=$d->agesuppliant;
+					$NumeroCIN=$d->NumeroCIN;
+					$NumeroCarteElectorale=$d->NumeroCarteElectorale;
+					$numerocintravailleur=$d->numerocintravailleur;
+					$numerocarteelectoraletravailleur=$d->numerocarteelectoraletravailleur;
+					$numerocinsuppliant=$d->numerocinsuppliant;
+					$numerocarteelectoralesuppliant=$d->numerocarteelectoralesuppliant;
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$ligne, ($ii +1));
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$ligne, $identifiant_menage);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'.$ligne, $NomTravailleur);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E'.$ligne, $NomTravailleurSuppliant);
+					$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$ligne, $montant_a_payer);
+					$objPHPExcel->getActiveSheet()->getStyle('A'.$ligne.':B'.$ligne)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+					$objPHPExcel->getActiveSheet()->getStyle('A'.$ligne.':B'.$ligne)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+					$objPHPExcel->getActiveSheet()->getStyle('C'.$ligne.':H'.$ligne)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+					$objPHPExcel->getActiveSheet()->getStyle('C'.$ligne.':H'.$ligne)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+					$objPHPExcel->getActiveSheet()->getStyle('A'.$ligne.':H'.$ligne)->applyFromArray($styleArray);
+						$i=$i + 1; // C'EST UNE MISE EN PAGE SUIVANTE
+					$ligne=$ligne + 1;	
+				}	
+				$fichier1="OK";	
+				// unset($objPHPExcel);	
+			}		
+			
+		} else {
+			// SANS ENREGISTREMENT
+			$sans_menage=$sans_menage + 1;
+		}
+			$fichier="NON";
+		if($sans_menage=$sans_menage==0) {
+			$date_edition = date("d-m-Y");	
+			$Filename ="";
+			$Filename ="Etat de paiement ARSE "."village " .$village_tmp.".xlsx";
+			//Check if the directory already exists.
+			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+			$objWriter->save($directoryName.$Filename);
+			$fichier="OK";				
+			
+			$this->response([
+				'status' => TRUE,
+				'retour' =>	     "OK",
+				'date_edition'=> $date_edition,	
+				'fichier' => $fichier,
+				'chemin' => $ile_tmp."/".$region_tmp."/".$commune_tmp."/".$village_tmp."/",
+				'name_file' => $Filename,
+				'menages' => $menages,
+				'message' => 'Get file success',
+			], REST_Controller::HTTP_OK);	
+			
+		} else {
+			$this->response([
+				'status' => FALSE,
+				'retour' =>	     "OK",
+				'date_edition'=> $date_edition,	
+				'chemin' => $ile_tmp."/".$region_tmp."/".$commune_tmp."/".$village_tmp."/",
+				'message' => 'Aucun ménage bénéficiaire pour le filtre seléctinné!.',
+			], REST_Controller::HTTP_OK);	
+			
+		}
+	}	
 }
 /* End of file controllername.php */
 /* Location: ./application/controllers/controllername.php */

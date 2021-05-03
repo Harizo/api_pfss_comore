@@ -36,7 +36,7 @@ class Calendrier_activites_model extends CI_Model
         return array(            
             'mois'       => $calendrier_activites['mois'],
             'activite'  => $calendrier_activites['activite'],
-            'duree'  => $calendrier_activites['duree'],      
+            'numero'  => $calendrier_activites['numero'],      
             'id_pac'    => $calendrier_activites['id_pac']
         );
     }
@@ -55,7 +55,7 @@ class Calendrier_activites_model extends CI_Model
         return array(
             'mois'       => $calendrier_activites['mois'],
             'activite'  => $calendrier_activites['activite'],
-            'duree'  => $calendrier_activites['duree'],      
+            'numero'  => $calendrier_activites['numero'],      
             'id_pac'    => $calendrier_activites['id_pac']
         );
     }
@@ -91,6 +91,8 @@ class Calendrier_activites_model extends CI_Model
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where('id_pac',$id_pac)
+                        ->order_by('activite')
+                        ->order_by('numero')
                         ->get()
                         ->result();
         if($result)

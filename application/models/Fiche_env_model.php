@@ -51,7 +51,7 @@ class Fiche_env_model extends CI_Model
             'date_visa_rt'=> $fiche_env['date_visa_rt'],     
             'date_visa_ugp'=> $fiche_env['date_visa_ugp'],     
             'date_visa_be'=> $fiche_env['date_visa_be'],
-            'id_sous_projet' => $fiche_env['id_sous_projet']
+            'id_sous_projet_localisation' => $fiche_env['id_sous_projet_localisation']
         );
     }
 
@@ -84,7 +84,7 @@ class Fiche_env_model extends CI_Model
             'date_visa_rt'=> $fiche_env['date_visa_rt'],     
             'date_visa_ugp'=> $fiche_env['date_visa_ugp'],     
             'date_visa_be'=> $fiche_env['date_visa_be'],
-            'id_sous_projet' => $fiche_env['id_sous_projet'] 
+            'id_sous_projet_localisation' => $fiche_env['id_sous_projet_localisation'] 
         );
     }
 
@@ -116,7 +116,7 @@ class Fiche_env_model extends CI_Model
     }
     
 
-    public function getfiche_envbysousprojet($id_sous_projet)
+    public function getfiche_envbysousprojet_localisation($id_sous_projet_localisation)
     {
         $result =  $this->db->select("
         id as id,      
@@ -131,10 +131,10 @@ class Fiche_env_model extends CI_Model
         DATE_FORMAT(date_visa_rt, '%d/%m/%Y') as date_visa_rt,     
         DATE_FORMAT(date_visa_ugp, '%d/%m/%Y') as date_visa_ugp,     
         DATE_FORMAT(date_visa_be, '%d/%m/%Y') as date_visa_be,
-        id_sous_projet as id_sous_projet")
+        id_sous_projet_localisation as id_sous_projet_localisation")
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
-                        ->order_by('id_sous_projet')
+                        ->where('id_sous_projet_localisation',$id_sous_projet_localisation)
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)

@@ -37,7 +37,7 @@ class Sous_projet_planning_model extends CI_Model
             'code'    =>      $sous_projet_planning['code'],
             'phase_activite' =>      $sous_projet_planning['phase_activite'],
             'numero_phase'    =>      $sous_projet_planning['numero_phase'],
-            'id_sous_projet' =>      $sous_projet_planning['id_sous_projet']                      
+            'id_sous_projet_localisation' =>      $sous_projet_planning['id_sous_projet_localisation']                      
         );
     }
 
@@ -57,7 +57,7 @@ class Sous_projet_planning_model extends CI_Model
             'code'    =>      $sous_projet_planning['code'],
             'phase_activite' =>      $sous_projet_planning['phase_activite'],
             'numero_phase'    =>      $sous_projet_planning['numero_phase'],
-            'id_sous_projet' =>      $sous_projet_planning['id_sous_projet'] 
+            'id_sous_projet_localisation' =>      $sous_projet_planning['id_sous_projet_localisation'] 
         );
     }
 
@@ -88,11 +88,11 @@ class Sous_projet_planning_model extends CI_Model
         }                 
     }
 
-    public function getsous_projet_planningbysousprojet($id_sous_projet)
+    public function getsous_projet_planningbysousprojet_localisation($id_sous_projet_localisation)
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
+                        ->where('id_sous_projet_localisation',$id_sous_projet_localisation)
                         ->order_by('code')
                         ->get()
                         ->result();
