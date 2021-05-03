@@ -28,7 +28,8 @@ class Communaute extends REST_Controller {
                 } else
                     $data = array();
             
-        } elseif ($menu=="getcommunautebycommune") {
+        } 
+        /*elseif ($menu=="getcommunautebycommune") {
                
             $communaute = $this->CommunauteManager->getcommunautebycommune($id_commune);
                 if ($communaute) {
@@ -40,7 +41,7 @@ class Communaute extends REST_Controller {
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
                         $data[$key]['libelle'] = $value->libelle;
-                        $data[$key]['nbr_personne'] = $value->nbr_personne;
+                       $data[$key]['nbr_population'] = $value->nbr_population;
                         $data[$key]['representant'] = $value->representant;
                         $data[$key]['telephone'] = $value->telephone;
                         $data[$key]['statut'] = $value->statut;
@@ -64,7 +65,7 @@ class Communaute extends REST_Controller {
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
                         $data[$key]['libelle'] = $value->libelle;
-                        $data[$key]['nbr_personne'] = $value->nbr_personne;
+                        $data[$key]['nbr_population'] = $value->nbr_population;
                         $data[$key]['representant'] = $value->representant;
                         $data[$key]['telephone'] = $value->telephone;
                         $data[$key]['statut'] = $value->statut;
@@ -89,7 +90,7 @@ class Communaute extends REST_Controller {
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
                         $data[$key]['libelle'] = $value->libelle;
-                        $data[$key]['nbr_personne'] = $value->nbr_personne;
+                        $data[$key]['nbr_population'] = $value->nbr_population;
                         $data[$key]['representant'] = $value->representant;
                         $data[$key]['telephone'] = $value->telephone;
                         $data[$key]['statut'] = $value->statut;
@@ -113,7 +114,7 @@ class Communaute extends REST_Controller {
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
                         $data[$key]['libelle'] = $value->libelle;
-                        $data[$key]['nbr_personne'] = $value->nbr_personne;
+                        $data[$key]['nbr_population'] = $value->nbr_population;
                         $data[$key]['representant'] = $value->representant;
                         $data[$key]['telephone'] = $value->telephone;
                         $data[$key]['statut'] = $value->statut;
@@ -125,7 +126,8 @@ class Communaute extends REST_Controller {
                 } else
                     $data = array();
             
-        } elseif ($id) {
+        } */
+        elseif ($id) {
                
                 $data = $this->CommunauteManager->findById($id);
                 /*$data['id'] = $communaute->id;
@@ -142,10 +144,10 @@ class Communaute extends REST_Controller {
                         $data[$key]['id'] = $value->id;
                         $data[$key]['code'] = $value->code;
                         $data[$key]['libelle'] = $value->libelle;
-                        $data[$key]['nbr_personne'] = $value->nbr_personne;
-                        $data[$key]['representant'] = $value->representant;
-                        $data[$key]['telephone'] = $value->telephone;
-                        $data[$key]['statut'] = $value->statut;
+                        $data[$key]['nbr_population'] = $value->nbr_population;
+                        //$data[$key]['representant'] = $value->representant;
+                        //$data[$key]['telephone'] = $value->telephone;
+                        //$data[$key]['statut'] = $value->statut;
                         $data[$key]['zip'] = $zip;
                         $data[$key]['commune'] = $commune;
                         
@@ -178,10 +180,10 @@ class Communaute extends REST_Controller {
                 $data = array(
                     'code' => $this->post('code'),
                     'libelle' => $this->post('libelle'),
-                    'nbr_personne' => $this->post('nbr_personne'),
-                    'representant' => $this->post('representant'),
-                    'telephone' => $this->post('telephone'),
-                    'statut' => $this->post('statut'),
+                    'nbr_population' => $this->post('nbr_population'),
+                    //'representant' => $this->post('representant'),
+                    //'telephone' => $this->post('telephone'),
+                    //'statut' => $this->post('statut'),
                     'id_zip' => $this->post('id_zip'),
                     'id_commune' => $this->post('id_commune')
                 );               
@@ -209,15 +211,15 @@ class Communaute extends REST_Controller {
             }
             else
             {
-                if ($maj_statu==0)
-                {   
+               /* if ($maj_statu==0)
+                {*/   
                     $data = array(
                         'code' => $this->post('code'),
                         'libelle' => $this->post('libelle'),
-                        'nbr_personne' => $this->post('nbr_personne'),
-                        'representant' => $this->post('representant'),
-                        'telephone' => $this->post('telephone'),
-                        'statut' => $this->post('statut'),
+                        'nbr_population' => $this->post('nbr_population'),
+                        //'representant' => $this->post('representant'),
+                        //'telephone' => $this->post('telephone'),
+                        //'statut' => $this->post('statut'),
                         'id_zip' => $this->post('id_zip'),
                         'id_commune' => $this->post('id_commune')
                     );
@@ -242,7 +244,7 @@ class Communaute extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_BAD_REQUEST);
                     }
-                }
+               /* }
                 else
                 {
                     $data = array(
@@ -268,7 +270,7 @@ class Communaute extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_OK);
                     }
-                }
+                }*/
                 
                 
             }

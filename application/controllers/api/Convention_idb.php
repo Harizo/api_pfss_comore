@@ -15,10 +15,10 @@ class Convention_idb extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getconvention_idbbysousprojet") {
+        $id_sous_projet_localisation = $this->get('id_sous_projet_localisation');
+        if ($menu=="getconvention_idbbysousprojet_localisation") {
                
-            $convention_idb = $this->Convention_idbManager->getconvention_idbbysousprojet($id_sous_projet);
+            $convention_idb = $this->Convention_idbManager->getconvention_idbbysousprojet_localisation($id_sous_projet_localisation);
                 if ($convention_idb) {
                     $data = $convention_idb;
                     /*foreach ($convention_idb as $key => $value) {
@@ -75,7 +75,7 @@ class Convention_idb extends REST_Controller {
                     'nom_signataire' => $this->post('nom_signataire'),
                     'date_signature' => $this->post('date_signature'),
                     'litige_conclusion' => $this->post('litige_conclusion'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                 );               
                 if (!$data) {
                     $this->response([
@@ -110,7 +110,7 @@ class Convention_idb extends REST_Controller {
                         'nom_signataire' => $this->post('nom_signataire'),
                         'date_signature' => $this->post('date_signature'),
                         'litige_conclusion' => $this->post('litige_conclusion'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );
                     if (!$data) {
                         $this->response([
@@ -143,7 +143,7 @@ class Convention_idb extends REST_Controller {
                         'nom_signataire' => $this->post('nom_signataire'),
                         'date_signature' => $this->post('date_signature'),
                         'litige_conclusion' => $this->post('litige_conclusion'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );              
                     if (!$data || !$id) {
                         $this->response([

@@ -40,7 +40,7 @@ class Convention_mod_model extends CI_Model
             'nom_signataire' => $convention_mod['nom_signataire'],
             'date_signature' => $convention_mod['date_signature'],
             'date_prevu_recep' => $convention_mod['date_prevu_recep'],
-            'id_sous_projet' =>      $convention_mod['id_sous_projet']                      
+            'id_sous_projet_localisation' =>      $convention_mod['id_sous_projet_localisation']                      
         );
     }
 
@@ -62,7 +62,7 @@ class Convention_mod_model extends CI_Model
             'nom_signataire' => $convention_mod['nom_signataire'],
             'date_signature' => $convention_mod['date_signature'],
             'date_prevu_recep' => $convention_mod['date_prevu_recep'],
-            'id_sous_projet' =>      $convention_mod['id_sous_projet'] 
+            'id_sous_projet_localisation' =>      $convention_mod['id_sous_projet_localisation'] 
         );
     }
 
@@ -82,7 +82,7 @@ class Convention_mod_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('id_sous_projet')
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)
@@ -94,12 +94,12 @@ class Convention_mod_model extends CI_Model
     }
     
 
-    public function getconvention_modbysousprojet($id_sous_projet)
+    public function getconvention_modbysousprojet_localisation($id_sous_projet_localisation)
     {
         $result =  $this->db->select("*")
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
-                        ->order_by('id_sous_projet')
+                        ->where('id_sous_projet_localisation',$id_sous_projet_localisation)
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)

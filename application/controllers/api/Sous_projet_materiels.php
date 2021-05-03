@@ -15,10 +15,10 @@ class Sous_projet_materiels extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getsous_projet_materielsbysousprojet") {
+        $id_sous_projet_localisation = $this->get('id_sous_projet_localisation');
+        if ($menu=="getsous_projet_materielsbysousprojet_localisation") {
                
-            $sous_projet_materiels = $this->Sous_projet_materielsManager->getsous_projet_materielsbysousprojet($id_sous_projet);
+            $sous_projet_materiels = $this->Sous_projet_materielsManager->getsous_projet_materielsbysousprojet_localisation($id_sous_projet_localisation);
                 if ($sous_projet_materiels) {
                     $data = $sous_projet_materiels;
                     /*foreach ($sous_projet_materiels as $key => $value) {
@@ -74,7 +74,7 @@ class Sous_projet_materiels extends REST_Controller {
                     'quantite' => $this->post('quantite'),
                     'prix_unitaire' => $this->post('prix_unitaire'),
                     'prix_total' => $this->post('prix_total'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                 );               
                 if (!$data) {
                     $this->response([
@@ -108,7 +108,7 @@ class Sous_projet_materiels extends REST_Controller {
                         'quantite' => $this->post('quantite'),
                         'prix_unitaire' => $this->post('prix_unitaire'),
                         'prix_total' => $this->post('prix_total'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );
                     if (!$data) {
                         $this->response([
@@ -140,7 +140,7 @@ class Sous_projet_materiels extends REST_Controller {
                         'quantite' => $this->post('quantite'),
                         'prix_unitaire' => $this->post('prix_unitaire'),
                         'prix_total' => $this->post('prix_total'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );              
                     if (!$data || !$id) {
                         $this->response([

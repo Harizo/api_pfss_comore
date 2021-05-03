@@ -15,10 +15,10 @@ class Sauvegarde_env extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=="getsauvegarde_envbysousprojet") {
+        $id_sous_projet_localisation = $this->get('id_sous_projet_localisation');
+        if ($menu=="getsauvegarde_envbysousprojet_localisation") {
                
-            $sauvegarde_env = $this->Sauvegarde_envManager->getsauvegarde_envbysousprojet($id_sous_projet);
+            $sauvegarde_env = $this->Sauvegarde_envManager->getsauvegarde_envbysousprojet_localisation($id_sous_projet_localisation);
                 if ($sauvegarde_env) {
                     $data = $sauvegarde_env;
                     /*foreach ($sauvegarde_env as $key => $value) {
@@ -74,7 +74,7 @@ class Sauvegarde_env extends REST_Controller {
                     'resultats' => $this->post('resultats'),
                     'methodologie' => $this->post('methodologie'),
                     'mesures_environnement' => $this->post('mesures_environnement'),
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                 );               
                 if (!$data) {
                     $this->response([
@@ -108,7 +108,7 @@ class Sauvegarde_env extends REST_Controller {
                         'resultats' => $this->post('resultats'),
                         'methodologie' => $this->post('methodologie'),
                         'mesures_environnement' => $this->post('mesures_environnement'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );
                     if (!$data) {
                         $this->response([
@@ -140,7 +140,7 @@ class Sauvegarde_env extends REST_Controller {
                         'resultats' => $this->post('resultats'),
                         'methodologie' => $this->post('methodologie'),
                         'mesures_environnement' => $this->post('mesures_environnement'),
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet_localisation' => $this->post('id_sous_projet_localisation')
                     );              
                     if (!$data || !$id) {
                         $this->response([

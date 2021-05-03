@@ -48,7 +48,7 @@ class Filtration_env_model extends CI_Model
             'environnement_naturel' => $filtration_env['environnement_naturel'],
             'date_visa_rt_ibd' => $filtration_env['date_visa_rt_ibd'],
             'date_visa_res' => $filtration_env['date_visa_res'],
-            'id_sous_projet' =>      $filtration_env['id_sous_projet']                      
+            'id_sous_projet_localisation' =>      $filtration_env['id_sous_projet_localisation']                      
         );
     }
 
@@ -78,7 +78,7 @@ class Filtration_env_model extends CI_Model
             'environnement_naturel' => $filtration_env['environnement_naturel'],
             'date_visa_rt_ibd' => $filtration_env['date_visa_rt_ibd'],
             'date_visa_res' => $filtration_env['date_visa_res'],
-            'id_sous_projet' =>      $filtration_env['id_sous_projet'] 
+            'id_sous_projet_localisation' =>      $filtration_env['id_sous_projet_localisation'] 
         );
     }
 
@@ -98,7 +98,7 @@ class Filtration_env_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('id_sous_projet')
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)
@@ -110,7 +110,7 @@ class Filtration_env_model extends CI_Model
     }
     
 
-    public function getfiltration_envbysousprojet($id_sous_projet)
+    public function getfiltration_envbysousprojet_localisation($id_sous_projet_localisation)
     {
         $result =  $this->db->select("
         id as id,
@@ -121,10 +121,10 @@ class Filtration_env_model extends CI_Model
         environnement_naturel as environnement_naturel,
         DATE_FORMAT(date_visa_rt_ibd, '%d/%m/%Y') as date_visa_rt_ibd,
         date_visa_res as date_visa_res,
-        id_sous_projet as id_sous_projet")
+        id_sous_projet_localisation as id_sous_projet_localisation")
                         ->from($this->table)
-                        ->where('id_sous_projet',$id_sous_projet)
-                        ->order_by('id_sous_projet')
+                        ->where('id_sous_projet_localisation',$id_sous_projet_localisation)
+                        ->order_by('id_sous_projet_localisation')
                         ->get()
                         ->result();
         if($result)

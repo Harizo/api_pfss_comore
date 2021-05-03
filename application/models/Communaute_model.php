@@ -49,10 +49,10 @@ class Communaute_model extends CI_Model
         return array(
             'code'    =>      $communaute['code'],
             'libelle' =>      $communaute['libelle'],
-            'nbr_personne' => $communaute['nbr_personne'],
-            'representant' => $communaute['representant'],
-            'telephone' => $communaute['telephone'],
-            'statut' => $communaute['statut'],
+            'nbr_population' => $communaute['nbr_population'],
+            //'representant' => $communaute['representant'],
+            //'telephone' => $communaute['telephone'],
+            //'statut' => $communaute['statut'],
             'id_zip' =>      $communaute['id_zip'],
             'id_commune' =>      $communaute['id_commune']                      
         );
@@ -92,7 +92,7 @@ class Communaute_model extends CI_Model
         }                 
     }
 
-    public function getcommunautebeneficiaire()
+    /*public function getcommunautebeneficiaire()
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
@@ -137,7 +137,7 @@ class Communaute_model extends CI_Model
         }else{
             return null;
         }                 
-    }
+    }*/
 
     public function getcommunautebycommune($id_commune)
     {
