@@ -149,5 +149,10 @@ class Plainte_model extends CI_Model {
 		$query = $this->db->query($requete);
         return $query->result();                 
     }
+	public function NombrePlainteParVillage($village_id) {
+		$requete="select (ifnull(count(*),0) + 1) as nombre from see_plainte where village_id=".$village_id;
+		$query = $this->db->query($requete);
+		return $query->result();						
+	}
 }
 ?>

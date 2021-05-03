@@ -16,12 +16,15 @@ class Plainte extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
 		$cle_etrangere= $this->get('cle_etrangere');
+		$nombre_plainte= $this->get('nombre_plainte');
 		$data = array();
 		if ($id) {
 			$tmp = $this->PlainteManager->findById($id);
 			if($tmp) {
 				$data=$tmp;
 			}
+		} else if($cle_etrangere && $nombre_plainte) {
+			$data=$this->PlainteManager->NombrePlainteParVillage($cle_etrangere);
 		} else if($cle_etrangere) {
 			$data=$this->PlainteManager->findByVillage($cle_etrangere);
 		} else {		
