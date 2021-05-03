@@ -16,7 +16,7 @@ class Contrat_ugp_agex extends REST_Controller {
         $id = $this->get('id');
         $get_mdp_en_retard = $this->get('get_mdp_en_retard');
         $get_all = $this->get('get_all');
-
+        $data =array();
 		
         
 
