@@ -27,9 +27,9 @@ class Mdp_indicateur_model extends CI_Model {
     {
         return array
         (
-            'id_mdp' => $mdp_indicateur['id_mdp'],
+            'id_mdp_description_activite' => $mdp_indicateur['id_mdp_description_activite'],
             'categorie_travailleur'       => $mdp_indicateur['categorie_travailleur'],
-            'numero_semaine'       => $mdp_indicateur['numero_semaine'],
+        //    'numero_semaine'       => $mdp_indicateur['numero_semaine'],
             'nombre'       => $mdp_indicateur['nombre'],
             'lieu'       => $mdp_indicateur['lieu']
         );
@@ -58,10 +58,10 @@ class Mdp_indicateur_model extends CI_Model {
             return null;
         }                 
     }
-    public function findByMdp($id_mdp)  {
+    public function findByMdp($id_mdp_description_activite)  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("id_mdp", $id_mdp)
+                        ->where("id_mdp_description_activite", $id_mdp_description_activite)
                         ->order_by('id', 'asc')
                         ->get()
                         ->result();

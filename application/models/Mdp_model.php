@@ -65,10 +65,11 @@ class Mdp_model extends CI_Model {
             return null;
         }                 
     }
-    public function findAll()  {
+    public function findAll($type)  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('id', 'asc')
+                        ->where("type", $type)
+                        ->order_by('intitule_micro_projet', 'asc')
                         ->get()
                         ->result();
         if($result) {

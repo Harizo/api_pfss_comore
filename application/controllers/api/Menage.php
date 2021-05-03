@@ -20,28 +20,40 @@ class Menage extends REST_Controller {
         $statut = $this->get('statut');
         $id_sous_projet = $this->get('id_sous_projet');
         $beneficiaire = $this->get('beneficiaire');
+        $tous = $this->get('tous');
 
         $max_id = $this->get('max_id');
 		$data=array();
-        if ($max_id == 1) {
+		if($cle_etrangere && $tous && $id_sous_projet) {
+			 $data = $this->menageManager->findAllByVillageAndSousProjet($cle_etrangere,$id_sous_projet);
+		} else if ($max_id == 1) {
             $data = $this->menageManager->find_max_id();
-        } else if ($cle_etrangere && $statut && $id_sous_projet && $beneficiaire) {
+        } else if ($cle_etrangere && $statut && $statut=="PRESELECTIONNE" && $id_sous_projet && $beneficiaire) {
+        }  else if ($cle_etrangere && $statut && $id_sous_projet && $beneficiaire) {
 			$data = $this->menageManager->findAllByVillageAndBeneficiaireStatutAndSousProjet($cle_etrangere,$statut,$id_sous_projet);
         } else if ($cle_etrangere && $statut && $id_sous_projet) {
-			$data = $this->menageManager->findAllByVillageAndStatutAndSousProjet($cle_etrangere,$statut,$id_sous_projet);
+			if($statut=="PRESELECTIONNE") {
+				$data = $this->menageManager->findAllByVillageAndPreselectionnneStatutAndSousProjet($cle_etrangere,$statut,$id_sous_projet);
+				$ss=3;				
+			} else {
+				$data = $this->menageManager->findAllByVillageAndStatutAndSousProjet($cle_etrangere,$statut,$id_sous_projet);
+				$ss=5;
+			}	
         }else if ($cle_etrangere && $statut) {
 			$data = $this->menageManager->findAllByVillageAndStatut($cle_etrangere,$statut);
         } else if($cle_etrangere) {
-			$data = $this->menageManager->findAllByVillage($cle_etrangere);		
+			$data = $this->menageManager->findAllByVillage($cle_etrangere);	
 		} else if ($id) {                 
 			$data = $this->menageManager->findById($id);
 		} else {
 			$data = $this->menageManager->findAll();
+			$ss=8;
 		}  
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
                 'response' => $data,
+                'ss' => $ss,
                 'message' => 'Get data success',
             ], REST_Controller::HTTP_OK);
         } else {

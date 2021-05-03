@@ -111,5 +111,29 @@ class Contrat_ugp_agex_model extends CI_Model {
             return null;
         }                 
     }
+
+    public function get_mdp_en_retard()
+    {
+
+
+        $now_date = date("Y-m-d") ;
+
+       // $array = array('date_prevu_fin_contrat >=' => $now_date, 'date_prevu_fin_contrat <=' => $now_date);
+
+        $sql = 
+        "
+            select 
+                
+                cua.numero_contrat,
+                cua.date_prevu_fin_contrat
+            FROM 
+                contrat_ugp_agex as cua
+            WHERE 
+                cua.date_prevu_fin_contrat < '".$now_date."'
+                and cua.status_contrat = 'En cours'
+                
+        ";
+        return $this->db->query($sql)->result(); 
+    }
 }
 ?>

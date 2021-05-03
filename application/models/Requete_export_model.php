@@ -9,8 +9,31 @@ class Requete_export_model extends CI_Model
     {
 		$requete="select m.inapte,m.NumeroEnregistrement,m.NumeroEnregistrement as menage,m.nomchefmenage,mp.id,mp.id_menage,mp.id_sous_projet,"
 				."m.NomTravailleur as nomTravailleur,m.SexeTravailleur,m.NomTravailleurSuppliant as nomTravailleurSuppliant,"
-				."m.SexeTravailleurSuppliant"
+				."m.SexeTravailleurSuppliant,m.milieu,"
+				."m.identifiant_menage,m.datedenaissancetravailleur,m.numerocintravailleur,m.numerocarteelectoraletravailleur,"
+				."m.datedenaissancesuppliant,m.numerocinsuppliant,m.numerocarteelectoralesuppliant,m.Addresse,m.SexeChefMenage"
 				." from menage_beneficiaire as mp"
+				." left outer join menage as m on m.id=mp.id_menage"
+				." left outer join see_village as v on v.id=m.village_id"
+                ." where mp.id_sous_projet=".$id_sous_projet
+				." and v.id=".$village_id." and m.statut='BENEFICIAIRE'";	
+				$result = $this->db->query($requete)->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                  
+    }
+    public function Etat_recepteur($id_sous_projet,$village_id)
+    {
+		$requete="select m.inapte,m.NumeroEnregistrement,m.NumeroEnregistrement as menage,m.nomchefmenage,mp.id,mp.id_menage,mp.id_sous_projet,"
+				."m.NomTravailleur as NomTravailleur,m.SexeTravailleur,m.NomTravailleurSuppliant as NomTravailleurSuppliant,"
+				."m.SexeTravailleurSuppliant,m.milieu,"
+				."m.identifiant_menage,DATE_FORMAT(m.datedenaissancetravailleur,'%d/%m/%Y') as datedenaissancetravailleur,m.numerocintravailleur,m.numerocarteelectoraletravailleur,"
+				."DATE_FORMAT(m.datedenaissancesuppliant,'%d/%m/%Y') as datedenaissancesuppliant,m.numerocinsuppliant,m.numerocarteelectoralesuppliant,m.Addresse,m.SexeChefMenage,"
+				."m.agetravailleur,m.agesuppliant,m.NumeroCIN,m.NumeroCarteElectorale"
+				." from menage_beneficiaire as mp" 
 				." left outer join menage as m on m.id=mp.id_menage"
 				." left outer join see_village as v on v.id=m.village_id"
                 ." where mp.id_sous_projet=".$id_sous_projet
@@ -121,6 +144,28 @@ class Requete_export_model extends CI_Model
 				." where fp.village_id=".$village_id.$requetefiltre
 				." order by i.ile,r.region,c.commune,z.zone,v.village,act.detail,ph.phase,fp.datepaiement";	
 				$result = $this->db->query($requete)->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                  
+		
+	}
+	public function Nombre_travailleur_par_sexe($id_sous_projet,$village_id) {
+		$requete="select m.village_id,mb.id_sous_projet,"
+				." (select ifnull(count(m1.id),0) from menage_beneficiaire as m1 where m1.id_sous_projet=mb.id_sous_projet group by m1.id_sous_projet, mb.id_sous_projet) as nombre_menage_beneficiaire,"
+				." (select ifnull(count(m1.SexeChefMenage),0) from menage as m1 where m1.SexeChefMenage='H' group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_chefmenage_homme ,"
+				." (select ifnull(count(m1.SexeChefMenage),0) from menage as m1 where m1.SexeChefMenage='F'  group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_chefmenage_femme ,"
+				." (select ifnull(count(m1.SexeTravailleur),0) from menage as m1 where m1.SexeTravailleur='H'  group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_travailleur_homme,"
+				." (select ifnull(count(m1.SexeTravailleur),0)  from menage as m1 where m1.SexeTravailleur='F' group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_travailleur_femme,"
+				." (select ifnull(count(m1.SexeTravailleurSuppliant),0) from menage as m1 where m1.SexeTravailleurSuppliant='H' group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_suppleant_homme,"
+				." (select ifnull(count(m1.SexeTravailleurSuppliant),0) from menage as m1 where m1.SexeTravailleurSuppliant='F' group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_suppleant_femme"
+				." from menage as m"
+				." left join menage_beneficiaire as mb on mb.id_menage=m.id"
+				." where mb.id_sous_projet=".$id_sous_projet." and m.village_id=".$village_id
+				." group by m.village_id,mb.id_sous_projet";
+		$result = $this->db->query($requete)->result();
         if($result)
         {
             return $result;
