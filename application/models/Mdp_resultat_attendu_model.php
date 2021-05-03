@@ -28,7 +28,7 @@ class Mdp_resultat_attendu_model extends CI_Model
     {
         return array
         (
-            'id_mdp' => $mdp_resultat_attendu['id_mdp'],
+            'id_mdp_description_activite' => $mdp_resultat_attendu['id_mdp_description_activite'],
             'description'       => $mdp_resultat_attendu['description'],
             'unite'       => $mdp_resultat_attendu['unite'],
             'prevu'       => $mdp_resultat_attendu['prevu'],
@@ -60,10 +60,10 @@ class Mdp_resultat_attendu_model extends CI_Model
             return null;
         }                 
     }
-    public function findByMdp($id_mdp)  {
+    public function findByMdp($id_mdp_description_activite)  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("id_mdp", $id_mdp)
+                        ->where("id_mdp_description_activite", $id_mdp_description_activite)
                         ->order_by('id', 'asc')
                         ->get()
                         ->result();

@@ -48,11 +48,33 @@ CREATE TABLE IF NOT EXISTS `avenant_agep` (
   CONSTRAINT `FK_avenant_agep_contrat_agep` FOREIGN KEY (`id_contrat_agep`) REFERENCES `contrat_agep` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1 ROW_FORMAT=COMPACT;
 
--- Listage des données de la table pfss_db.avenant_agep : ~0 rows (environ)
+-- Listage des données de la table pfss_db.avenant_agep : ~1 rows (environ)
 /*!40000 ALTER TABLE `avenant_agep` DISABLE KEYS */;
 INSERT INTO `avenant_agep` (`id`, `id_contrat_agep`, `numero_avenant`, `objet_avenant`, `montant_avenant`, `modalite_avenant`, `date_prevu_fin`, `noms_signataires`, `date_signature`, `statu`) VALUES
 	(7, 2, 'avenant 1', 'objet', 2000, 'modalite', '2021-05-11', 'noms des', '2021-05-04', 'EN COURS');
 /*!40000 ALTER TABLE `avenant_agep` ENABLE KEYS */;
+
+-- Listage de la structure de la table pfss_db. calendrier_activites
+DROP TABLE IF EXISTS `calendrier_activites`;
+CREATE TABLE IF NOT EXISTS `calendrier_activites` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `activite` varchar(100) DEFAULT NULL,
+  `numero` int(11) DEFAULT NULL,
+  `mois` varchar(50) DEFAULT NULL,
+  `id_pac` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_calendrier_activites_pac` (`id_pac`),
+  CONSTRAINT `FK_calendrier_activites_pac` FOREIGN KEY (`id_pac`) REFERENCES `pac` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+
+-- Listage des données de la table pfss_db.calendrier_activites : ~4 rows (environ)
+/*!40000 ALTER TABLE `calendrier_activites` DISABLE KEYS */;
+INSERT INTO `calendrier_activites` (`id`, `activite`, `numero`, `mois`, `id_pac`) VALUES
+	(2, 'activite1', 1, 'Janvier', 1),
+	(3, 'activite1', 2, 'Fevrier', 1),
+	(4, 'activite2', 1, 'Mars', 1),
+	(5, 'activite1', 3, 'Mars', 1);
+/*!40000 ALTER TABLE `calendrier_activites` ENABLE KEYS */;
 
 -- Listage de la structure de la table pfss_db. communaute
 DROP TABLE IF EXISTS `communaute`;
@@ -87,6 +109,7 @@ CREATE TABLE IF NOT EXISTS `contrat_agep` (
   `numero_contrat` varchar(50) DEFAULT NULL,
   `objet_contrat` varchar(100) DEFAULT NULL,
   `montant_contrat` double DEFAULT NULL,
+  `montant_a_effectue_prevu` double DEFAULT NULL,
   `modalite_contrat` varchar(100) DEFAULT NULL,
   `date_prevu_fin` date DEFAULT NULL,
   `noms_signataires` varchar(100) DEFAULT NULL,
@@ -97,16 +120,16 @@ CREATE TABLE IF NOT EXISTS `contrat_agep` (
   KEY `FK__sous_projet` (`id_sous_projet`),
   CONSTRAINT `FK__see_agent` FOREIGN KEY (`id_agep`) REFERENCES `see_agent` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK__sous_projet` FOREIGN KEY (`id_sous_projet`) REFERENCES `sous_projet` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
 
 -- Listage des données de la table pfss_db.contrat_agep : ~5 rows (environ)
 /*!40000 ALTER TABLE `contrat_agep` DISABLE KEYS */;
-INSERT INTO `contrat_agep` (`id`, `id_agep`, `id_sous_projet`, `numero_contrat`, `objet_contrat`, `montant_contrat`, `modalite_contrat`, `date_prevu_fin`, `noms_signataires`, `date_signature`, `statu`) VALUES
-	(2, 19, 1, '2020/12/456/RAD/FDZ', 'objet', 123456, 'modalite du', '2021-04-03', 'noms', '2021-04-02', 'EN COURS'),
-	(3, 19, 1, '2020/12/456/RAD/FDZ', 'objet2', 100000, 'modalite du contrat', '2021-05-12', 'noms des', '2021-05-02', 'RESILIE'),
-	(4, 19, 2, '2020/12/456/RAD/FDZARSE', 'objet', 100, 'modalite du contrat', '2021-05-06', 'noms des', '2021-05-01', 'EN COURS'),
-	(5, 19, 4, '2020/12/456/RAD/FDZTMNCCOVID', 'objet', 200, 'modalite du contrat', '2021-05-06', 'noms des', '2021-05-05', 'EN COURS'),
-	(6, 19, 3, '2020/12/456/RAD/FDZIDB', 'objet', 1000, 'modalite du contrat', '2021-05-12', 'noms des', '2021-05-11', 'EN COURS');
+INSERT INTO `contrat_agep` (`id`, `id_agep`, `id_sous_projet`, `numero_contrat`, `objet_contrat`, `montant_contrat`, `montant_a_effectue_prevu`, `modalite_contrat`, `date_prevu_fin`, `noms_signataires`, `date_signature`, `statu`) VALUES
+	(2, 19, 1, '2020/12/456/RAD/FDZ', 'objet', 123456, 75000, 'modalite du', '2021-04-03', 'noms', '2021-04-02', 'EN COURS'),
+	(3, 19, 1, '2020/12/456/RAD/FDZ', 'objet2', 100000, 75000, 'modalite du contrat', '2021-05-12', 'noms des', '2021-05-02', 'RESILIE'),
+	(4, 19, 2, '2020/12/456/RAD/FDZARSE', 'objet', 100, 315000, 'modalite du contrat', '2021-05-06', 'noms des', '2021-05-01', 'EN COURS'),
+	(5, 19, 4, '2020/12/456/RAD/FDZTMNCCOVID', 'objet', 200, 105000, 'modalite du contrat', '2021-05-06', 'noms des', '2021-05-05', 'EN COURS'),
+	(6, 19, 3, '2020/12/456/RAD/FDZIDB', 'objet', 1000, 315000, 'modalite du contrat', '2021-05-12', 'noms des', '2021-05-11', 'EN COURS');
 /*!40000 ALTER TABLE `contrat_agep` ENABLE KEYS */;
 
 -- Listage de la structure de la table pfss_db. convention_entretien
@@ -184,7 +207,6 @@ CREATE TABLE IF NOT EXISTS `etat_paiement_agep` (
   `id_contrat_agep` int(11) DEFAULT NULL,
   `tranche` int(11) DEFAULT NULL,
   `pourcentage` float DEFAULT NULL,
-  `montant_total_prevu` double DEFAULT NULL,
   `montant_percu` double DEFAULT NULL,
   `date_paiement` date DEFAULT NULL,
   `moyen_transfert` varchar(50) DEFAULT NULL,
@@ -207,15 +229,18 @@ CREATE TABLE IF NOT EXISTS `etat_paiement_agep` (
   CONSTRAINT `FK_etat_paiement_agep_see_ile` FOREIGN KEY (`id_ile`) REFERENCES `see_ile` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_etat_paiement_agep_see_region` FOREIGN KEY (`id_region`) REFERENCES `see_region` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_etat_paiement_agep_see_village` FOREIGN KEY (`id_village`) REFERENCES `see_village` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
--- Listage des données de la table pfss_db.etat_paiement_agep : ~4 rows (environ)
+-- Listage des données de la table pfss_db.etat_paiement_agep : ~7 rows (environ)
 /*!40000 ALTER TABLE `etat_paiement_agep` DISABLE KEYS */;
-INSERT INTO `etat_paiement_agep` (`id`, `numero_ordre_paiement`, `activite_concerne`, `id_menage`, `id_contrat_agep`, `tranche`, `pourcentage`, `montant_total_prevu`, `montant_percu`, `date_paiement`, `moyen_transfert`, `situation_paiement`, `id_ile`, `id_region`, `id_commune`, `id_village`, `id_communaute`) VALUES
-	(3, '1', 'ARSE', 381, 4, 1, 10, 315000, 31500, '2021-05-01', 'moyen', 'situation', 4, 13, 38, 37, NULL),
-	(4, '1', 'ACT', 38, 2, 1, 50, 75000, 37500, '2021-05-01', 'moyen', 'situation', 4, 13, 38, 40, NULL),
-	(5, '1', 'TMNC-COVID-19', 395, 5, 1, 0, 315000, 105000, '2021-05-01', 'moyen', 'situation', 4, 13, 38, 40, NULL),
-	(6, '1', 'IDB', 395, 6, 1, 10, 315000, 31500, '2021-05-01', 'moyen', 'situ', 1, 4, 8, NULL, 2);
+INSERT INTO `etat_paiement_agep` (`id`, `numero_ordre_paiement`, `activite_concerne`, `id_menage`, `id_contrat_agep`, `tranche`, `pourcentage`, `montant_percu`, `date_paiement`, `moyen_transfert`, `situation_paiement`, `id_ile`, `id_region`, `id_commune`, `id_village`, `id_communaute`) VALUES
+	(3, '1', 'ARSE', 381, 4, 1, 10, 31500, '2021-05-01', 'moyen', 'situation', 4, 13, 38, 37, NULL),
+	(4, '1', 'ACT', 38, 2, 1, 50, 37500, '2021-05-01', 'moyen', 'situation', 4, 13, 38, 40, NULL),
+	(5, '1', 'TMNC-COVID-19', 395, 5, 1, 0, 105000, '2021-05-01', 'moyen', 'situation', 4, 13, 38, 40, NULL),
+	(6, '1', 'IDB', 395, 6, 1, 10, 31500, '2021-05-01', 'moyen', 'situ', 1, 4, 8, NULL, 2),
+	(8, '2', 'ARSE', 418, 4, 2, 70, 220500, '2021-05-02', 'moyen', 'situation', 4, 13, 38, 37, NULL),
+	(9, '2', 'TMNC-COVID-19', 395, 5, 2, 0, 35000, '2021-05-05', 'moyen', 'situation', 4, 13, 38, 40, NULL),
+	(10, '2', 'ACT', 30, 2, 2, 50, 37500, '2021-04-22', 'moyen', 'situation', 4, 13, 38, 40, NULL);
 /*!40000 ALTER TABLE `etat_paiement_agep` ENABLE KEYS */;
 
 -- Listage de la structure de la table pfss_db. etude_env

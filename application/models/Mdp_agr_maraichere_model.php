@@ -27,10 +27,10 @@ class Mdp_agr_maraichere_model extends CI_Model {
     {
         return array
         (
-            'id_mdp' => $mdp_agr_maraichere['id_mdp'],
-            'type'       => $mdp_agr_maraichere['type'],
+            'id_mdp_description_activite' => $mdp_agr_maraichere['id_mdp_description_activite'],
+            'designation'       => $mdp_agr_maraichere['designation'],
             'localite'       => $mdp_agr_maraichere['localite'],
-            'activite'       => $mdp_agr_maraichere['activite'],
+            'prix_unitaire'       => $mdp_agr_maraichere['prix_unitaire'],
             'unite'       => $mdp_agr_maraichere['unite'],
             'quantite'       => $mdp_agr_maraichere['quantite']
         );
@@ -59,10 +59,10 @@ class Mdp_agr_maraichere_model extends CI_Model {
             return null;
         }                 
     }
-    public function findByMdp($id_mdp)  {
+    public function findByMdp($id_mdp_description_activite)  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("id_mdp", $id_mdp)
+                        ->where("id_mdp_description_activite", $id_mdp_description_activite)
                         ->order_by('id', 'asc')
                         ->get()
                         ->result();
