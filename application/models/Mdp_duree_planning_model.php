@@ -29,9 +29,11 @@ class Mdp_duree_planning_model extends CI_Model {
         (
             'id_mdp' => $mdp_duree_planning['id_mdp'],
             'designation_activite'       => $mdp_duree_planning['designation_activite'],
-            'numero_semaine'       => $mdp_duree_planning['numero_semaine'],
-            'numero_jour'       => $mdp_duree_planning['numero_jour'],
-            'valeur'       => $mdp_duree_planning['valeur']
+            'numero_semaine_deb'       => $mdp_duree_planning['numero_semaine_deb'],
+            'numero_jour_deb'       => $mdp_duree_planning['numero_jour_deb'],
+            
+            'numero_semaine_fin'       => $mdp_duree_planning['numero_semaine_fin'],
+            'numero_jour_fin'       => $mdp_duree_planning['numero_jour_fin']
         );
     }
 

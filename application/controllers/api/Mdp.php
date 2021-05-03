@@ -13,6 +13,7 @@ class Mdp extends REST_Controller {
 
     public function index_get() {
         $id = $this->get('id');
+        $type = $this->get('type');
 		$data = array();
         
 
@@ -22,12 +23,13 @@ class Mdp extends REST_Controller {
 			if($tmp) 
             {
 				$data=$tmp;
-                $taiza='taoid';
+                
 			}
 		} 
-        else 
+
+        if($type)
         {			
-			$tmp = $this->mdpMng->findAll();
+			$tmp = $this->mdpMng->findAll($type);
 			if ($tmp) 
             {
 				$data=$tmp;

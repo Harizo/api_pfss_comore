@@ -12,13 +12,13 @@ class Mdp_agr_maraichere extends REST_Controller {
     }
 
     public function index_get() {
-        $id_mdp = $this->get('id_mdp');
+        $id_mdp_description_activite = $this->get('id_mdp_description_activite');
 		$data = array();
         
 
-		if ($id_mdp) 
+		if ($id_mdp_description_activite) 
         {
-			$tmp = $this->pvrmsMng->findByMdp($id_mdp);
+			$tmp = $this->pvrmsMng->findByMdp($id_mdp_description_activite);
 			if($tmp) 
             {
 				$data=$tmp;
@@ -49,10 +49,12 @@ class Mdp_agr_maraichere extends REST_Controller {
 
 		$data = array(
 		
-            'id_mdp' => $this->post('id_mdp'),
-            'type'       => $this->post('type'),
+            'id_mdp_description_activite' => $this->post('id_mdp_description_activite'),
+         
+
+            'designation'       => $this->post('designation'),
             'localite'       => $this->post('localite'),
-            'activite'       => $this->post('activite'),
+            'prix_unitaire'       => $this->post('prix_unitaire'),
             'unite'       => $this->post('unite'),
             'quantite'       => $this->post('quantite')
 		);       

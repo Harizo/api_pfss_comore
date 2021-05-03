@@ -51,9 +51,10 @@ class Mdp_duree_planning extends REST_Controller {
 		
             'id_mdp' => $this->post('id_mdp'),
             'designation_activite'       => $this->post('designation_activite'),
-            'numero_semaine'       => $this->post('numero_semaine'),
-            'numero_jour'       => $this->post('numero_jour'),
-            'valeur'       => $this->post('valeur')
+            'numero_semaine_deb'       => $this->post('numero_semaine_deb'),
+            'numero_jour_deb'       => $this->post('numero_jour_deb'),
+            'numero_semaine_fin'       => $this->post('numero_semaine_fin'),
+            'numero_jour_fin'       => $this->post('numero_jour_fin')
         
 		);       
 

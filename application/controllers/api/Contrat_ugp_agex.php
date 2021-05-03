@@ -11,9 +11,13 @@ class Contrat_ugp_agex extends REST_Controller {
         $this->load->model('contrat_ugp_agex_model', 'cuaMng');
     }
 
-    public function index_get() {
+    public function index_get() 
+    {
         $id = $this->get('id');
-		$data = array();
+        $get_mdp_en_retard = $this->get('get_mdp_en_retard');
+        $get_all = $this->get('get_all');
+
+		
         
 
 		if ($id) 
@@ -25,7 +29,19 @@ class Contrat_ugp_agex extends REST_Controller {
                 $taiza='taoid';
 			}
 		} 
-        else 
+
+        if($get_mdp_en_retard) 
+        {           
+            $tmp = $this->cuaMng->get_mdp_en_retard();
+            if ($tmp) 
+            {
+                $data=$tmp;
+          
+
+            }
+        }
+
+        if($get_all) 
         {			
 			$tmp = $this->cuaMng->findAll();
 			if ($tmp) 
@@ -35,7 +51,9 @@ class Contrat_ugp_agex extends REST_Controller {
 
 			}
 		}
-        if (count($data)>0) {
+
+        if ($data) 
+        {
             $this->response([
                 'status' => TRUE,
                 'response' => $data,

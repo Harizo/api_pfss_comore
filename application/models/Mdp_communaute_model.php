@@ -28,7 +28,8 @@ class Mdp_communaute_model extends CI_Model {
         return array
         (
             'id_mdp' => $mdp_communaute['id_mdp'],
-            'id_communaute'       => $mdp_communaute['id_communaute']
+            'id_communaute'       => $mdp_communaute['id_communaute'],
+            'nbr_beneficiaire'       => $mdp_communaute['nbr_beneficiaire']
         );
     }
 
@@ -66,6 +67,7 @@ class Mdp_communaute_model extends CI_Model {
                 mdpc.id_mdp as id_mdp,
 
                 mdpc.id_communaute as id_communaute,
+                mdpc.nbr_beneficiaire as nbr_beneficiaire,
 
                 c.code as code_communaute,
                 c.libelle as libelle_communaute,
