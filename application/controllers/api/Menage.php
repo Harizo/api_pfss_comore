@@ -34,10 +34,8 @@ class Menage extends REST_Controller {
         } else if ($cle_etrangere && $statut && $id_sous_projet) {
 			if($statut=="PRESELECTIONNE") {
 				$data = $this->menageManager->findAllByVillageAndPreselectionnneStatutAndSousProjet($cle_etrangere,$statut,$id_sous_projet);
-				$ss=3;				
 			} else {
 				$data = $this->menageManager->findAllByVillageAndStatutAndSousProjet($cle_etrangere,$statut,$id_sous_projet);
-				$ss=5;
 			}	
         }else if ($cle_etrangere && $statut) {
 			$data = $this->menageManager->findAllByVillageAndStatut($cle_etrangere,$statut);
@@ -47,18 +45,16 @@ class Menage extends REST_Controller {
 			$data = $this->menageManager->findById($id);
 		} else {
 			$data = $this->menageManager->findAll();
-			$ss=8;
 		}  
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
                 'response' => $data,
-                'ss' => $ss,
                 'message' => 'Get data success',
             ], REST_Controller::HTTP_OK);
         } else {
             $this->response([
-                'status' => FALSE,
+                'status' => TRUE,
                 'response' => array(),
                 'message' => 'No data were found'
             ], REST_Controller::HTTP_OK);
