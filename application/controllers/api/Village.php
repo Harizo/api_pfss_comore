@@ -12,6 +12,7 @@ class Village extends REST_Controller {
         $this->load->model('village_model', 'villageManager');
         $this->load->model('commune_model', 'CommuneManager');
         $this->load->model('programme_model', 'ProgrammeManager');
+        $this->load->model('zip_model', 'ZipManager');
     }
 
     public function index_get()
@@ -34,9 +35,14 @@ class Village extends REST_Controller {
             $tmp = $this->villageManager->findAllByCommune($cle_etrangere);
             if($tmp){
                 foreach ($tmp as $key => $value) {
+                 
+                $zip = $this->ZipManager->findById($value->id_zip);   
                 $data[$key]['id'] = $value->id;
                 $data[$key]['Code'] = $value->Code;
                 $data[$key]['Village'] = $value->Village;
+                $data[$key]['commune_id'] = $value->commune_id;
+                $data[$key]['vague'] = $value->vague;
+                $data[$key]['zip'] = $zip;
                 };
             }else
                     $data = array();
@@ -100,7 +106,9 @@ class Village extends REST_Controller {
                     'Code' => $this->post('Code'),
                     'Village' => $this->post('Village'),
                     'commune_id' => $this->post('commune_id'),
-                    'programme_id' => $this->post('programme_id')
+                    'programme_id' => $this->post('programme_id'),
+                    'id_zip' => $this->post('id_zip'),
+                    'vague' => $this->post('vague')
                 );               
                 if (!$data) {
                     $this->response([
@@ -128,7 +136,9 @@ class Village extends REST_Controller {
                     'Code' => $this->post('Code'),
                     'Village' => $this->post('Village'),
                     'commune_id' => $this->post('commune_id'),
-                    'programme_id' => $this->post('programme_id')
+                    'programme_id' => $this->post('programme_id'),
+                    'id_zip' => $this->post('id_zip'),
+                    'vague' => $this->post('vague')
                 );              
                 if (!$data || !$id) {
                     $this->response([
