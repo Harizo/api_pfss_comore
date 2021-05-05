@@ -37,7 +37,9 @@ class Village_model extends CI_Model
             'Code'          =>  $village['Code'],
             'Village'       =>  $village['Village'],
             'commune_id'    =>  $village['commune_id'],
-            'programme_id'  =>  $village['programme_id']                       
+            'programme_id'  =>  $village['programme_id'],
+            'id_zip'    =>  $village['id_zip'],
+            'vague'  =>  $village['vague']                        
         );
     }
 
