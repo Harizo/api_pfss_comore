@@ -5319,7 +5319,7 @@ class Requete_export extends REST_Controller {
 			$date_edition = date("d-m-Y");	
 		if($sans_menage=$sans_menage==0) {
 			$Filename ="";
-			$Filename ="fiche recepteut "."village " .$village_tmp.".xlsx";
+			$Filename ="fiche recepteur "."village " .$village_tmp.".xlsx";
 			//Check if the directory already exists.
 			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 			$objWriter->save($directoryName.$Filename);

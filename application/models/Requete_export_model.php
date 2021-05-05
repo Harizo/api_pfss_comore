@@ -155,12 +155,12 @@ class Requete_export_model extends CI_Model
 	public function Nombre_travailleur_par_sexe($id_sous_projet,$village_id) {
 		$requete="select m.village_id,mb.id_sous_projet,"
 				." (select ifnull(count(m1.id),0) from menage_beneficiaire as m1 where m1.id_sous_projet=mb.id_sous_projet group by m1.id_sous_projet, mb.id_sous_projet) as nombre_menage_beneficiaire,"
-				." (select ifnull(count(m1.SexeChefMenage),0) from menage as m1 where m1.SexeChefMenage='H' group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_chefmenage_homme ,"
-				." (select ifnull(count(m1.SexeChefMenage),0) from menage as m1 where m1.SexeChefMenage='F'  group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_chefmenage_femme ,"
-				." (select ifnull(count(m1.SexeTravailleur),0) from menage as m1 where m1.SexeTravailleur='H'  group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_travailleur_homme,"
-				." (select ifnull(count(m1.SexeTravailleur),0)  from menage as m1 where m1.SexeTravailleur='F' group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_travailleur_femme,"
-				." (select ifnull(count(m1.SexeTravailleurSuppliant),0) from menage as m1 where m1.SexeTravailleurSuppliant='H' group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_suppleant_homme,"
-				." (select ifnull(count(m1.SexeTravailleurSuppliant),0) from menage as m1 where m1.SexeTravailleurSuppliant='F' group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_suppleant_femme"
+				." (select ifnull(count(m1.SexeChefMenage),0) from menage as m1 where m1.SexeChefMenage='H'  and m1.village_id=m.village_id group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_chefmenage_homme ,"
+				." (select ifnull(count(m1.SexeChefMenage),0) from menage as m1 where m1.SexeChefMenage='F'  and m1.village_id=m.village_id group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_chefmenage_femme ,"
+				." (select ifnull(count(m1.SexeTravailleur),0) from menage as m1 where m1.SexeTravailleur='H'  and m1.village_id=m.village_id group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_travailleur_homme,"
+				." (select ifnull(count(m1.SexeTravailleur),0)  from menage as m1 where m1.SexeTravailleur='F'  and m1.village_id=m.village_id group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_travailleur_femme,"
+				." (select ifnull(count(m1.SexeTravailleurSuppliant),0) from menage as m1 where m1.SexeTravailleurSuppliant='H'  and m1.village_id=m.village_id group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_suppleant_homme,"
+				." (select ifnull(count(m1.SexeTravailleurSuppliant),0) from menage as m1 where m1.SexeTravailleurSuppliant='F'  and m1.village_id=m.village_id group by m1.village_id,m.village_id,mb.id_sous_projet) as nombre_suppleant_femme"
 				." from menage as m"
 				." left join menage_beneficiaire as mb on mb.id_menage=m.id"
 				." where mb.id_sous_projet=".$id_sous_projet." and m.village_id=".$village_id
