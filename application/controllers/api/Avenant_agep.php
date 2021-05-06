@@ -72,6 +72,8 @@ class Avenant_agep extends REST_Controller {
             'date_signature'     => $this->post('date_signature'),
             'date_prevu_fin'    => $this->post('date_prevu_fin'),
             'noms_signataires'   => $this->post('noms_signataires'),
+            'type_avenant'   => $this->post('type_avenant'),
+            'observation'   => $this->post('observation'),
             'statu'             => $this->post('statu')
 		);       
 

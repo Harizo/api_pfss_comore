@@ -37,7 +37,7 @@ class Infrastructure_model extends CI_Model
             'code'                      =>      $infrastructure['code'],
             'libelle'                   =>      $infrastructure['libelle'],
             'id_type_infrastructure'    =>      $infrastructure['id_type_infrastructure'] ,
-            'id_communaute'             =>      $infrastructure['id_communaute'] ,
+            'id_village'             =>      $infrastructure['id_village'] ,
             'statu'                     =>      $infrastructure['statu']                      
         );
     }
@@ -58,7 +58,7 @@ class Infrastructure_model extends CI_Model
             'code'                      =>      $infrastructure['code'],
             'libelle'                   =>      $infrastructure['libelle'],
             'id_type_infrastructure'    =>      $infrastructure['id_type_infrastructure'] ,
-            'id_communaute'             =>      $infrastructure['id_communaute'] ,
+            'id_village'             =>      $infrastructure['id_village'] ,
             'statu'                     =>      $infrastructure['statu']
         );
     }
@@ -106,11 +106,11 @@ class Infrastructure_model extends CI_Model
         }                 
     }
 
-    public function getinfrastructurebycommunauteandchoisi($id_communaute)
+    public function getinfrastructurebyvillageandchoisi($id_village)
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where('id_communaute',$id_communaute)
+                        ->where('id_village',$id_village)
                         ->where('statu','CHOISI')
                         ->order_by('code')
                         ->get()
@@ -123,11 +123,11 @@ class Infrastructure_model extends CI_Model
         }                 
     }
 
-    public function getinfrastructurebycommunauteandeligible($id_communaute)
+    public function getinfrastructurebyvillageandeligible($id_village)
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where('id_communaute',$id_communaute)
+                        ->where('id_village',$id_village)
                         ->where('statu','ELIGIBLE')
                         ->order_by('code')
                         ->get()
