@@ -163,6 +163,22 @@ class Importation_menage_model extends CI_Model
 			return "OK";
 		}
 	}
+    public function MiseajourHistoriqueStatut($etat_statut,$liste_menage_id) {
+		// M.A.J 3 champs ou colonnes table menage : inscrit,preselecionne,beneficiaire
+		// il se peut qu'un ménage passe directement au statut de bénéficiaire sans passer par insrit et preselecionne
+		$this->db->trans_begin();
+		$this->table="menage";
+		$requete = "update " .$this->table ." set ".$etat_statut."=1 where id in ".$liste_menage_id;
+		$query= $this->db->query($requete);		
+			
+		if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+			return "NON";
+        } else {
+            $this->db->trans_commit();
+			return "OK";
+		}
+	}
 	public function selectionMenage_Par_Identifiant($identifiant_menage) {
 		$this->table="menage";
 		$requete="select id,village_id,DateInscription from ".$this->table ." where identifiant_menage='".$identifiant_menage."'";
@@ -181,5 +197,10 @@ class Importation_menage_model extends CI_Model
 		$query = $this->db->query($requete);
         return $query->result();
 	}	
+	public function selectionzipparcode($code) {
+		$requete="select id,libelle,code from zip where code='".$code."'";
+		$query = $this->db->query($requete);
+        return $query->result();				
+	}
 	
 } ?>

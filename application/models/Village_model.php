@@ -30,7 +30,26 @@ class Village_model extends CI_Model
             return null;
         }                      
     }
+    public function update_zip_vague($id, $village)
+    {
+        $this->db->set($this->_set_zip_vague($village))
+                            ->where('id', (int) $id)
+                            ->update($this->table);
+        if($this->db->affected_rows() === 1)
+        {
+            return true;
+        }else{
+            return null;
+        }                      
+    }
 
+    public function _set_zip_vague($village)
+    {
+        return array(
+            'id_zip'    =>  $village['id_zip'],
+            'vague'  =>  $village['vague']                        
+        );
+    }
     public function _set($village)
     {
         return array(
