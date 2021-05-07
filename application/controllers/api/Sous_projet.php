@@ -36,6 +36,7 @@ class Sous_projet extends REST_Controller {
                     $data[$key]['description']= $value->description;
                     $data[$key]['objectif']= $value->objectif;
                     $data[$key]['duree']= $value->duree;
+                    $data[$key]['montant']= $value->montant;
                     /*$data[$key]['presentantion_communaute']= $value->presentantion_communaute;
                     $data[$key]['ref_dgsc']= $value->ref_dgsc;
                     $data[$key]['nbr_menage_participant']= $value->nbr_menage_participant;
@@ -99,6 +100,7 @@ class Sous_projet extends REST_Controller {
                 'description' => $this->post('description') ,
                 'objectif' => $this->post('objectif') ,
                 'duree' => $this->post('duree') ,
+                'montant' => $this->post('montant') ,
                 /*'description_activite' => $this->post('description_activite') ,
                 'presentantion_communaute' => $this->post('presentantion_communaute') ,
                 'ref_dgsc' => $this->post('ref_dgsc') ,
@@ -121,6 +123,7 @@ class Sous_projet extends REST_Controller {
                 'description' => $this->post('description') ,
                 'objectif' => $this->post('objectif') ,
                 'duree' => $this->post('duree') ,
+                'montant' => $this->post('montant') ,
                 /*'description_activite' => $this->post('description_activite') ,
                 'presentantion_communaute' => $this->post('presentantion_communaute') ,
                 'ref_dgsc' => $this->post('ref_dgsc') ,

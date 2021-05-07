@@ -17,10 +17,10 @@ class Infrastructure extends REST_Controller {
         $id = $this->get('id');
         $menu = $this->get('menu');
         $id_type_infrastructure = $this->get('id_type_infrastructure');
-        $id_communaute = $this->get('id_communaute');
-        if ($menu=="getinfrastructurebycommunauteandchoisi") {
+        $id_village = $this->get('id_village');
+        if ($menu=="getinfrastructurebyvillageandchoisi") {
                
-            $infrastructure = $this->InfrastructureManager->getinfrastructurebycommunauteandchoisi($id_communaute);
+            $infrastructure = $this->InfrastructureManager->getinfrastructurebyvillageandchoisi($id_village);
                 if ($infrastructure) {
                     //$data = $infrastructure;
                     foreach ($infrastructure as $key => $value)
@@ -30,7 +30,7 @@ class Infrastructure extends REST_Controller {
                         $data[$key]['code'] = $value->code;
                         $data[$key]['libelle'] = $value->libelle;
                         $data[$key]['statu'] = $value->statu;
-                        $data[$key]['id_communaute'] = $value->id_communaute;
+                        $data[$key]['id_village'] = $value->id_village;
                         $data[$key]['type_infrastructure'] = $type_infrastructure;
                         
                     };
@@ -38,9 +38,9 @@ class Infrastructure extends REST_Controller {
                 } else
                     $data = array();
             
-        } elseif ($menu=="getinfrastructurebycommunauteandeligible") {
+        } elseif ($menu=="getinfrastructurebyvillageandeligible") {
                
-            $infrastructure = $this->InfrastructureManager->getinfrastructurebycommunauteandeligible($id_communaute);
+            $infrastructure = $this->InfrastructureManager->getinfrastructurebyvillageandeligible($id_village);
                 if ($infrastructure) {
                     //$data = $infrastructure;
                     foreach ($infrastructure as $key => $value)
@@ -50,7 +50,7 @@ class Infrastructure extends REST_Controller {
                         $data[$key]['code'] = $value->code;
                         $data[$key]['libelle'] = $value->libelle;
                         $data[$key]['statu'] = $value->statu;
-                        $data[$key]['id_communaute'] = $value->id_communaute;
+                        $data[$key]['id_village'] = $value->id_village;
                         $data[$key]['type_infrastructure'] = $type_infrastructure;
                         
                     };
@@ -119,7 +119,7 @@ class Infrastructure extends REST_Controller {
                     'code' => $this->post('code'),
                     'libelle' => $this->post('libelle'),
                     'id_type_infrastructure' => $this->post('id_type_infrastructure'),
-                    'id_communaute' => $this->post('id_communaute'),
+                    'id_village' => $this->post('id_village'),
                     'statu' => $this->post('statu')
                 );               
                 if (!$data) {
@@ -152,7 +152,7 @@ class Infrastructure extends REST_Controller {
                         'code' => $this->post('code'),
                         'libelle' => $this->post('libelle'),
                         'id_type_infrastructure' => $this->post('id_type_infrastructure'),
-                        'id_communaute' => $this->post('id_communaute'),
+                        'id_village' => $this->post('id_village'),
                         'statu' => $this->post('statu')
                     );
                     if (!$data) {
@@ -183,7 +183,7 @@ class Infrastructure extends REST_Controller {
                         'code' => $this->post('code'),
                         'libelle' => $this->post('libelle'),
                         'id_type_infrastructure' => $this->post('id_type_infrastructure'),
-                        'id_communaute' => $this->post('id_communaute'),
+                        'id_village' => $this->post('id_village'),
                         'statu' => $this->post('statu')
                     );              
                     if (!$data || !$id) {

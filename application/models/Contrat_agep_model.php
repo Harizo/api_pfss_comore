@@ -97,6 +97,21 @@ class Contrat_agep_model extends CI_Model {
         }                 
     }
     
+    public function getallcontrat_alert()  {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where("statu",'EN COURS')                        
+                        ->where("DATEDIFF(date_prevu_fin,now())<=",5)
+                        ->order_by('id', 'asc')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+    
     public function countAllById_sous_projet_encours($id_sous_projet)  {
         $result =  $this->db->select('COUNT(*) as nbr_contrat')
                         ->from($this->table)
