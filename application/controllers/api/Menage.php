@@ -134,6 +134,27 @@ class Menage extends REST_Controller {
 			'photo' => $this->post('photo'),
 			'phototravailleur' => $this->post('phototravailleur'),
 			'phototravailleursuppliant' => $this->post('phototravailleursuppliant'),
+			'inscrit' => $this->post('inscrit'),
+			'preselectionne' => $this->post('preselectionne'),
+			'beneficiaire' => $this->post('beneficiaire'),
+			'nombre_personne_plus_soixantedixans_enquete' => $this->post('nombre_personne_plus_soixantedixans_enquete'),
+			'nombre_enfant_moins_six_ans_enquete'  => $this->post('nombre_enfant_moins_six_ans_enquete'),
+			'nombre_enfant_scolarise_enquete' => $this->post('nombre_enfant_scolarise_enquete'),
+			'nombre_enfant_moins_quinze_ans_enquete' => $this->post('nombre_enfant_moins_quinze_ans_enquete'),
+			'nombre_enfant_non_scolarise_enquete' => $this->post('nombre_enfant_non_scolarise_enquete'),
+			'nombre_personne_handicape_enquetenombre_personne_handicape_enquete' => $this->post('nombre_personne_handicape_enquetenombre_personne_handicape_enquete'),
+			'nombre_adulte_travail_enquete' => $this->post('nombre_adulte_travail_enquete'),
+			'nombre_membre_a_etranger_enquete' => $this->post('nombre_membre_a_etranger_enquete'),
+			'maison_non_dure_enquete' => $this->post('maison_non_dure_enquete'),
+			'acces_electricite_enquete' => $this->post('acces_electricite_enquete'),
+			'acces_eau_robinet_enquete' => $this->post('acces_eau_robinet_enquete'),
+			'logement_endommage_enquete' => $this->post('logement_endommage_enquete'),
+			'niveau_degat_logement_enquete' => $this->post('niveau_degat_logement_enquete'),
+			'rehabilitation_enquete' => $this->post('rehabilitation_enquete'),
+			'beneficiaire_autre_programme_enquete' => $this->post('beneficiaire_autre_programme_enquete'),
+			'membre_fonctionnaire_enquete' => $this->post('membre_fonctionnaire_enquete'),
+			'possede_frigo_enquete' => $this->post('possede_frigo_enquete'),
+			'antenne_parabolique_enquete' => $this->post('antenne_parabolique_enquete'),
 		);   
         if ($supprimer == 0) {
             if ($id == 0) {
@@ -171,6 +192,9 @@ class Menage extends REST_Controller {
 					$data = array(
 						'statut' => $this->post('statut'),
 						'identifiant_menage' => $this->post('identifiant_menage'),
+						'inscrit' => $this->post('inscrit'),
+						'preselectionne' => $this->post('preselectionne'),
+						'beneficiaire' => $this->post('beneficiaire'),
 						);
 					$update = $this->menageManager->update_statut($id, $data);	
 					if($this->post('statut')=='BENEFICIAIRE') {

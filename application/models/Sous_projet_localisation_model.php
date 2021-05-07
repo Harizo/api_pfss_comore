@@ -47,7 +47,7 @@ class Sous_projet_localisation_model extends CI_Model
             'id_region' => $sous_projet_localisation['id_region'],
             'id_commune' => $sous_projet_localisation['id_commune'],
             'id_village' => $sous_projet_localisation['id_village'],
-            'id_communaute' => $sous_projet_localisation['id_communaute'],
+            //'id_communaute' => $sous_projet_localisation['id_communaute'],
             'id_sous_projet'  => $sous_projet_localisation['id_sous_projet'],
         );
     }
@@ -64,7 +64,7 @@ class Sous_projet_localisation_model extends CI_Model
             'id_region' => $sous_projet_localisation['id_region'],
             'id_commune' => $sous_projet_localisation['id_commune'],
             'id_village' => $sous_projet_localisation['id_village'],
-            'id_communaute' => $sous_projet_localisation['id_communaute'],
+            //'id_communaute' => $sous_projet_localisation['id_communaute'],
             'id_sous_projet'  => $sous_projet_localisation['id_sous_projet'],
         );
     }

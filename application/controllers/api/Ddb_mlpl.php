@@ -2,7 +2,7 @@
 
 /*Les CRUD des tables : raison_visite_domicile,resolution_visite_domicile,theme_sensibilisation,
 projet_groupe,probleme_rencontres,resolution_ml_pl
- sont gérer par cette controller et sont model*/
+ sont gérées par ce controller et son model correspondant*/
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -41,20 +41,6 @@ class Ddb_mlpl extends REST_Controller {
 					$data["liste_choix"] =$tmp;
 				} 
 				$data["tab_reponse"]=$tab_reponse;
-				/*if (count($data)>0) {
-					$this->response([
-						'status' => TRUE,
-						'response' => $data,
-						'message' => 'Get data success',
-					], REST_Controller::HTTP_OK);
-				} 
-				else {
-					$this->response([
-						'status' => TRUE,
-						'response' => array(),
-						'message' => 'No data were found'
-					], REST_Controller::HTTP_OK);
-				}*/
 			} else {
 				if ($tmp) {
 					$data=$tmp;

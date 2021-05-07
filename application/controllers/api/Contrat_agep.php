@@ -18,7 +18,33 @@ class Contrat_agep extends REST_Controller {
 		$data = array();
         $menu = $this->get('menu');
         $id_sous_projet = $this->get('id_sous_projet');
-		if ($menu=='getcontrat_agepBysousprojet') 
+		if ($menu=='getallcontrat_alert') 
+        {
+			$tmp = $this->Contrat_agepManager->getallcontrat_alert();
+			if ($tmp) 
+            {  
+				foreach ($tmp as $key => $value)
+                {   
+                    $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
+                    $agep = $this->Agence_pManager->findById($value->id_agep);
+                    $data[$key]['id']                 = $value->id;
+                    $data[$key]['numero_contrat']     = $value->numero_contrat;
+                    $data[$key]['agep']               = $agep;
+                    $data[$key]['sous_projet']        = $sous_projet;
+                    //$data[$key]['nbr_jour_restant']      = $value->nbr_jour_restant;
+                    //$data[$key]['objet_contrat']      = $value->objet_contrat;
+                    $data[$key]['montant_contrat']    = $value->montant_contrat;
+                    $data[$key]['montant_a_effectue_prevu']    = $value->montant_a_effectue_prevu;
+                    //$data[$key]['modalite_contrat']   = $value->modalite_contrat;
+                    //$data[$key]['date_signature']     = $value->date_signature;
+                    $data[$key]['date_prevu_fin']     = $value->date_prevu_fin;
+                    //$data[$key]['noms_signataires']   = $value->noms_signataires;
+                    //$data[$key]['id_sous_projet']        = $id_sous_projet;
+                    //$data[$key]['statu']             = $value->statu;
+                }
+			}
+		} 
+        elseif ($menu=='getcontrat_agepBysousprojet') 
         {
 			$tmp = $this->Contrat_agepManager->getcontrat_agepBysousprojet($id_sous_projet);
 			if ($tmp) 

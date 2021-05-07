@@ -1,45 +1,29 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
-
+//harizo
+// afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Avenant_agep extends REST_Controller {
+class Theme_formation_detail extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('avenant_agep_model', 'Avenat_agepManager');
+		$this->load->model('theme_formation_detail_model', 'ThemeformationdetailManager');
     }
-
     public function index_get() {
         $id = $this->get('id');
 		$data = array();
-        $menu = $this->get('menu');
-        $id_contrat_agep = $this->get('id_contrat_agep');
-		if ($menu=='getavenant_agepBycontrat') 
-        {
-			$tmp = $this->Avenat_agepManager->getavenant_agepBycontrat($id_contrat_agep);
-			if ($tmp) 
-            { 
-				$data=$tmp;
-			}
-		} 
-        elseif ($id) 
-        {
-			$tmp = $this->Avenat_agepManager->findById($id);
-			if($tmp) 
-            {
-				$data=$tmp;
-			}
-		} 
-        else 
-        {			
-			$tmp = $this->Avenat_agepManager->findAll();
-			if ($tmp) 
-            {  
-				$data=$tmp;
-			}
-		}
+		$cle_etrangere=$this->get('cle_etrangere');
+        if ($cle_etrangere) {
+			$data = $this->ThemeformationdetailManager->findByIdParent($cle_etrangere);
+		} else if ($id) {
+			// Selection par id
+            $data = $this->ThemeformationdetailManager->findById($id);
+        } else {
+			// Selection de tous les enregitrements de la table
+			$data = $this->ThemeformationdetailManager->findAll();	
+        }
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
@@ -54,29 +38,14 @@ class Avenant_agep extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
-
-    public function index_post() 
-    {
+    public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
-        $etat_download = $this->post('etat_download') ;
-
 		$data = array(
-			
-            'numero_avenant'     => $this->post('numero_avenant'),
-            //'id_agep'            => $this->post('id_agep'),
-            'id_contrat_agep'     => $this->post('id_contrat_agep'),
-            'objet_avenant'      => $this->post('objet_avenant'),
-            'montant_avenant'      => $this->post('montant_avenant'),
-            'modalite_avenant'   => $this->post('modalite_avenant'),
-            'date_signature'     => $this->post('date_signature'),
-            'date_prevu_fin'    => $this->post('date_prevu_fin'),
-            'noms_signataires'   => $this->post('noms_signataires'),
-            'type_avenant'   => $this->post('type_avenant'),
-            'observation'   => $this->post('observation'),
-            'statu'             => $this->post('statu')
-		);       
-
+			'id'                 => $this->post('id'),
+			'id_theme_formation' => $this->post('id_theme_formation'),
+			'description'        => $this->post('description'),
+		);
         if ($supprimer == 0) {
             if ($id == 0) {
                 if (!$data) {
@@ -86,7 +55,8 @@ class Avenant_agep extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->Avenat_agepManager->add($data);              
+				// Ajout d'un enregitrement
+                $dataId = $this->ThemeformationdetailManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -100,10 +70,7 @@ class Avenant_agep extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-            } 
-            else 
-            {
-                
+            } else {
                 if (!$data || !$id) {
                     $this->response([
                         'status' => FALSE,
@@ -111,52 +78,47 @@ class Avenant_agep extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->Avenat_agepManager->update($id, $data);              
-                if(!is_null($update)){
+				// Mise à jour d'un enregitrement
+                $update = $this->ThemeformationdetailManager->update($id, $data);
+                if(!is_null($update)) {
                     $this->response([
-                        'status' => TRUE, 
+                        'status' => TRUE,
                         'response' => 1,
                         'message' => 'Update data success'
                             ], REST_Controller::HTTP_OK);
-                } else {
+                } else  {
                     $this->response([
-                        'status' => FALSE,
+                        'status' => TRUE,
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_OK);
                 }
-                
             }
-        } 
-        else 
-        {
-            if (!$id) 
-            {
-                $this->response([
-                'status' => FALSE,
+        } else  {
+            if (!$id) {
+            $this->response([
+                'status' => TRUE,
                 'response' => 0,
                 'message' => 'No request found'
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
-
-            $delete = $this->Avenat_agepManager->delete($id);   
-
-            if (!is_null($delete)) 
-            {
+			// Suppression d'un enregitrement
+            $delete = $this->ThemeformationdetailManager->delete($id);
+            if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,
                     'response' => 1,
                     'message' => "Delete data success"
                         ], REST_Controller::HTTP_OK);
-            }
-            else 
-            {
+            } else {
                 $this->response([
-                    'status' => FALSE,
+                    'status' => TRUE,
                     'response' => 0,
                     'message' => 'No request found'
-                        ], REST_Controller::HTTP_OK);
+                        ], REST_Controller::HTTP_BAD_REQUEST);
             }
-        }   
+        }
     }
-}
+} 
+/* End of file controllername.php */
+/* Location: ./application/controllers/controllername.php */
 ?>

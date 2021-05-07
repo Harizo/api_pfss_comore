@@ -14,14 +14,18 @@ class Zip extends REST_Controller {
 
     public function index_get() {
         $id = $this->get('id');
-            if ($id) {
+        $cle_etrangere = $this->get('cle_etrangere');
+            if ($id)
+            {
                
                 $data = $this->ZipManager->findById($id);
                 /*$data['id'] = $zip->id;
                 $data['code'] = $zip->code;
                 $data['libelle'] = $zip->libelle;*/
                 
-            } else {
+            }
+            else
+            {
                 $zip = $this->ZipManager->findAll();
                 if ($zip) {
                     $data = $zip;

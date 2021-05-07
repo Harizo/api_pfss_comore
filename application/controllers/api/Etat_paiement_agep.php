@@ -10,7 +10,8 @@ class Etat_paiement_agep extends REST_Controller {
         $this->load->model('region_model', 'RegionManager');
         $this->load->model('commune_model', 'CommuneManager');
         $this->load->model('village_model', 'VillageManager');
-        $this->load->model('communaute_model', 'CommunauteManager');
+        $this->load->model('zip_model', 'ZipManager');
+        //$this->load->model('communaute_model', 'CommunauteManager');
     }
     public function index_get() {
         $id = $this->get('id');
@@ -29,8 +30,9 @@ class Etat_paiement_agep extends REST_Controller {
                     $ile= $this->IleManager->findById($value->id_ile);
                     $region= $this->RegionManager->findById($value->id_region);
                     $commune= $this->CommuneManager->findById($value->id_commune);
-                    $communaute= $this->CommunauteManager->findById($value->id_communaute);
+                    //$communaute= $this->CommunauteManager->findById($value->id_communaute);
                     $village= $this->VillageManager->findById($value->id_village);
+                    $zip= $this->ZipManager->findById($village->id_zip);
                     $data[$key]['id'] = $value->id;
                     $data[$key]['numero_ordre_paiement'] = $value->numero_ordre_paiement;
                     $data[$key]['activite_concerne'] = $value->activite_concerne;
@@ -47,7 +49,8 @@ class Etat_paiement_agep extends REST_Controller {
                     $data[$key]['commune']= $commune;
                     $data[$key]['commune']= $commune;
                     $data[$key]['village']= $village;
-                    $data[$key]['communaute']= $communaute;
+                    $data[$key]['zip']= $zip;
+                    //$data[$key]['communaute']= $communaute;
                 }               
             }
         } 
@@ -81,7 +84,25 @@ class Etat_paiement_agep extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
         $id_sous_projet = $this->post('id_sous_projet') ;
-        if ($this->post('activite_concerne')=='IDB')
+        $data = array(
+            'numero_ordre_paiement'=> $this->post('numero_ordre_paiement'),
+            'activite_concerne'=> $this->post('activite_concerne'),
+            'id_menage'=> $this->post('id_menage'),
+            'id_contrat_agep'=> $this->post('id_contrat_agep'),
+            'tranche'=> $this->post('tranche'),
+            'pourcentage'=> $this->post('pourcentage'),
+            //'montant_total_prevu'=> $this->post('montant_total_prevu'),
+            'montant_percu'=> $this->post('montant_percu'),
+            'date_paiement'=> $this->post('date_paiement'),
+            'moyen_transfert'=> $this->post('moyen_transfert'),
+            'situation_paiement'=> $this->post('situation_paiement'),
+            'id_ile' => $this->post('id_ile') ,
+            'id_region' => $this->post('id_region') ,
+            'id_commune' => $this->post('id_commune') ,
+            'id_village' => $this->post('id_village') ,
+            //'id_communaute' => null 
+        );
+        /*if ($this->post('activite_concerne')=='IDB')
         {
             $data = array(
                 'numero_ordre_paiement'=> $this->post('numero_ordre_paiement'),
@@ -99,7 +120,7 @@ class Etat_paiement_agep extends REST_Controller {
                 'id_region' => $this->post('id_region') ,
                 'id_commune' => $this->post('id_commune') ,
                 'id_village' => null ,
-                'id_communaute' => $this->post('id_communaute') 
+                //'id_communaute' => $this->post('id_communaute') 
             );
         }
         else
@@ -120,9 +141,9 @@ class Etat_paiement_agep extends REST_Controller {
                 'id_region' => $this->post('id_region') ,
                 'id_commune' => $this->post('id_commune') ,
                 'id_village' => $this->post('id_village') ,
-                'id_communaute' => null 
+                //'id_communaute' => null 
             );
-        }
+        }*/
 		               
         if ($supprimer == 0) {
             if ($id == 0) {

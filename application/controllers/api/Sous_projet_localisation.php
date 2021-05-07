@@ -12,7 +12,8 @@ class Sous_projet_localisation extends REST_Controller {
         $this->load->model('region_model', 'RegionManager');
         $this->load->model('commune_model', 'CommuneManager');
         $this->load->model('village_model', 'VillageManager');
-        $this->load->model('communaute_model', 'CommunauteManager');
+        //$this->load->model('communaute_model', 'CommunauteManager');
+        $this->load->model('zip_model', 'ZipManager');
     }
     public function index_get() {
         $id = $this->get('id');
@@ -30,8 +31,9 @@ class Sous_projet_localisation extends REST_Controller {
                     $ile= $this->IleManager->findById($value->id_ile);
                     $region= $this->RegionManager->findById($value->id_region);
                     $commune= $this->CommuneManager->findById($value->id_commune);
-                    $communaute= $this->CommunauteManager->findById($value->id_communaute);
+                    //$communaute= $this->CommunauteManager->findById($value->id_communaute);
                     $village= $this->VillageManager->findById($value->id_village);
+                    $zip= $this->ZipManager->findById($village->id_zip);
                     $data[$key]['id'] = $value->id;
                     $data[$key]['presentantion_communaute']= $value->presentantion_communaute;
                     $data[$key]['ref_dgsc']= $value->ref_dgsc;
@@ -44,7 +46,7 @@ class Sous_projet_localisation extends REST_Controller {
                     $data[$key]['commune']= $commune;
                     $data[$key]['commune']= $commune;
                     $data[$key]['village']= $village;
-                    $data[$key]['communaute']= $communaute;
+                    $data[$key]['zip']= $zip;
                 }
 			}
 		}
@@ -90,7 +92,20 @@ class Sous_projet_localisation extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
         $etat_download = $this->post('etat_download') ; 
         $type= $this->post('type');
-        if ($type=="ACT" || $type=="ARSE" || $type=="COVID-19")
+        $data = array(
+            'presentantion_communaute' => $this->post('presentantion_communaute') ,
+            'ref_dgsc' => $this->post('ref_dgsc') ,
+            'nbr_menage_beneficiaire' => $this->post('nbr_menage_beneficiaire') ,
+            'nbr_menage_participant' => $this->post('nbr_menage_participant') ,
+            'nbr_menage_nonparticipant' => $this->post('nbr_menage_nonparticipant') ,
+            'population_total' => $this->post('population_total') ,
+            'id_ile' => $this->post('id_ile') ,
+            'id_region' => $this->post('id_region') ,
+            'id_commune' => $this->post('id_commune') ,
+            'id_village' => $this->post('id_village') ,
+            'id_sous_projet' => $this->post('id_sous_projet'),
+        );
+       /* if ($type=="ACT" || $type=="ARSE" || $type=="COVID-19")
         {
             $data = array(
                 'presentantion_communaute' => $this->post('presentantion_communaute') ,
@@ -123,7 +138,7 @@ class Sous_projet_localisation extends REST_Controller {
                 'id_communaute' => $this->post('id_communaute') ,
                 'id_sous_projet' => $this->post('id_sous_projet'),
             ); 
-        }	
+        }	*/
 		              
         if ($supprimer == 0) {
             if ($id == 0) {

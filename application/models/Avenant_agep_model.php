@@ -36,6 +36,8 @@ class Avenant_agep_model extends CI_Model {
             'date_signature'    => $avenant_agep['date_signature'],
             'date_prevu_fin'    => $avenant_agep['date_prevu_fin'],
             'noms_signataires'  => $avenant_agep['noms_signataires'],
+            'type_avenant'  => $avenant_agep['type_avenant'],
+            'observation'  => $avenant_agep['observation'],
             'statu'             => $avenant_agep['statu']
         );
     }
