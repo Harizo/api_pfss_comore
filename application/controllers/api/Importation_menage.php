@@ -13,6 +13,8 @@ class Importation_menage extends REST_Controller {
         $this->load->model('individu_model', 'IndividuManager');
         $this->load->model('requete_import_model', 'RequeteimportManager');
         $this->load->model('importation_menage_model', 'ImportationmenageManager');
+        $this->load->model('village_model', 'VillageManager');
+        $this->load->model('zip_model', 'ZipManager');
     }
 
     public function index_get() 
@@ -24,20 +26,30 @@ class Importation_menage extends REST_Controller {
 		$nomfichier = $this->get('nomfichier'); 
 		$id_sous_projet=$this->get('id_sous_projet'); 
 		$controle=$this->get('controle'); 
+		$vague=$this->get('vague'); 
 		if($controle) {
-			// id_sous_projet=2 : ARSE et 4 : COVID
-			if(intval($id_sous_projet)==2 || intval($id_sous_projet)==4) {
-				$retour=$this->controler_menage_arse_covid($chemin,$nomfichier);
+			if($vague) {
+				$retour=$this->controler_vague_zip();		
 			} else {
-				$retour=$this->controler_menage_act($chemin,$nomfichier);				
+				// id_sous_projet=2 : ARSE et 4 : COVID
+				if(intval($id_sous_projet)==2 || intval($id_sous_projet)==4) {
+					$retour=$this->controler_menage_arse_covid($chemin,$nomfichier);
+				} else {
+					$retour=$this->controler_menage_act($chemin,$nomfichier);				
+				}	
 			}	
 		} else {
-			// IMPORTATION vers BDD apprè controle
-			// id_sous_projet=2 : ARSE et 4 : COVID
-			if(intval($id_sous_projet)==2 || intval($id_sous_projet)==4) {
-				$retour=$this->importer_menage_arse_covid($chemin,$nomfichier);
+			if($vague) {
+				// Mise à jour vague et zip à partir fichier excel
+				$retour=$this->importer_vague_zip();
 			} else {
-				$retour=$this->importer_menage_act($chemin,$nomfichier);
+				// IMPORTATION vers BDD apprè controle
+				// id_sous_projet=2 : ARSE et 4 : COVID
+				if(intval($id_sous_projet)==2 || intval($id_sous_projet)==4) {
+					$retour=$this->importer_menage_arse_covid($chemin,$nomfichier);
+				} else {
+					$retour=$this->importer_menage_act($chemin,$nomfichier);
+				}	
 			}	
 		}	
     }
@@ -1353,7 +1365,10 @@ class Importation_menage extends REST_Controller {
 					$nom_conjoint=str_replace($search,$replace,$nom_conjoint);
 					$activite_chef_menage=str_replace($search,$replace,$activite_chef_menage);
 					$activite_conjoint=str_replace($search,$replace,$activite_conjoint);
-					
+					// Ajout 3 champs historique de passage statut INSCRIT,PRESELECTIONNE,BENEFICIAIRE
+					$inscrit=1;
+					$preselectionne=0;
+					$beneficiaire=0;					
 					$array_retour[] =$data;
 					$requete .="('INSCRIT','";
 					$requete .= $village_id."','";					
@@ -1404,6 +1419,9 @@ class Importation_menage extends REST_Controller {
 					$requete .= $quartier."','";					
 					$requete .= $agechefdemenage."','";					
 					$requete .= $age_conjoint."','";					
+					$requete .= $inscrit."','";					
+					$requete .= $preselectionne."','";					
+					$requete .= $beneficiaire."','";					
 					$requete .= $id_sous_projet."'),";
 				$numeroligne = $numeroligne + 1;
 			}		
@@ -1441,7 +1459,7 @@ class Importation_menage extends REST_Controller {
 			// INSERTION DANS TABLE MENAGE
 			$ou = strrpos($requete,",");
 			$requete = substr($requete,0,$ou);
-			$requete = "insert into menage(statut ,village_id,point_inscription,NumeroEnregistrement,DateInscription,milieu,zip,Addresse,nomchefmenage,SexeChefMenage,chef_frequente_ecole,niveau_instruction_chef,chef_menage_travail,activite_chef_menage,NumeroCIN,NumeroCarteElectorale,telephone_chef_menage,nom_conjoint,sexe_conjoint,conjoint_frequente_ecole,niveau_instruction_conjoint,conjoint_travail,activite_conjoint,nin_conjoint,carte_electorale_conjoint,telephone_conjoint,taille_menage,nombre_personne_plus_soixantedixans,nombre_enfant_moins_quinze_ans,nombre_enfant_non_scolarise,nombre_personne_handicape,nombre_adulte_travail,nombre_membre_a_etranger,maison_non_dure,acces_electricite,acces_eau_robinet,logement_endommage,niveau_degat_logement,rehabilitation,beneficiaire_autre_programme,membre_fonctionnaire,antenne_parabolique,possede_frigo,identifiant_menage,score_obtenu,rang_obtenu,quartier,agechefdemenage,age_conjoint,id_sous_projet) values ".$requete;
+			$requete = "insert into menage(statut ,village_id,point_inscription,NumeroEnregistrement,DateInscription,milieu,zip,Addresse,nomchefmenage,SexeChefMenage,chef_frequente_ecole,niveau_instruction_chef,chef_menage_travail,activite_chef_menage,NumeroCIN,NumeroCarteElectorale,telephone_chef_menage,nom_conjoint,sexe_conjoint,conjoint_frequente_ecole,niveau_instruction_conjoint,conjoint_travail,activite_conjoint,nin_conjoint,carte_electorale_conjoint,telephone_conjoint,taille_menage,nombre_personne_plus_soixantedixans,nombre_enfant_moins_quinze_ans,nombre_enfant_non_scolarise,nombre_personne_handicape,nombre_adulte_travail,nombre_membre_a_etranger,maison_non_dure,acces_electricite,acces_eau_robinet,logement_endommage,niveau_degat_logement,rehabilitation,beneficiaire_autre_programme,membre_fonctionnaire,antenne_parabolique,possede_frigo,identifiant_menage,score_obtenu,rang_obtenu,quartier,agechefdemenage,age_conjoint,inscrit,preselectionne,beneficiaire,id_sous_projet) values ".$requete;
 			$count_update = $this->RequeteimportManager->Execution_requete($requete);
 			
 			//////////////////////////////////////////////////////////////////////////////////////
@@ -1516,7 +1534,8 @@ class Importation_menage extends REST_Controller {
 			$ou = strrpos($liste_menage_id,",");
 			$liste_menage_id = substr($liste_menage_id,0,$ou);
 			$liste_menage_id = $liste_menage_id.")";
-			$ret = $this->ImportationmenageManager->MiseajourStatut("PRESELECTIONNE",$liste_menage_id);
+			$ret1 = $this->ImportationmenageManager->MiseajourStatut("PRESELECTIONNE",$liste_menage_id);
+			$ret2 = $this->ImportationmenageManager->MiseajourHistoriqueStatut("preselectionne",$liste_menage_id);
 			//////////////////////////////////////////////////////////////////////////////////////
 			// FIN LECTURE FEUILLE 2 : PRESELECTIONNE
 			//////////////////////////////////////////////////////////////////////////////////////
@@ -1597,7 +1616,8 @@ class Importation_menage extends REST_Controller {
 			$ou = strrpos($liste_menage_id,",");
 			$liste_menage_id = substr($liste_menage_id,0,$ou);
 			$liste_menage_id = $liste_menage_id.")";
-			$ret = $this->ImportationmenageManager->MiseajourStatut("BENEFICIAIRE",$liste_menage_id);
+			$ret1 = $this->ImportationmenageManager->MiseajourStatut("BENEFICIAIRE",$liste_menage_id);
+			$ret2 = $this->ImportationmenageManager->MiseajourHistoriqueStatut("beneficiaire",$liste_menage_id);
 			// ET INSERTION DANS MENAGE BENEFICIAIRE
 			$ou = strrpos($requete,",");
 			$requete = substr($requete,0,$ou);
@@ -2544,6 +2564,9 @@ class Importation_menage extends REST_Controller {
 				// DEBUT INSERTION BDD
 					// Remplacer le caractère simple cote par espace : provoque erreur lors de l'insertion
 					$nomchefmenage=str_replace($search,$replace,$nomchefmenage);
+					$inscrit=1;
+					$preselectionne=1;
+					$beneficiaire=0;					
 					$requete .="('PRESELECTIONNE','";
 					$requete .= $village_id."','";					
 					$requete .= $milieu."','";					
@@ -2556,6 +2579,9 @@ class Importation_menage extends REST_Controller {
 					$requete .= $identifiant_menage."','";					
 					$requete .= $score_obtenu."','";					
 					$requete .= $rang_obtenu."','";					
+					$requete .= $inscrit."','";					
+					$requete .= $preselectionne."','";					
+					$requete .= $beneficiaire."','";					
 					$requete .= $id_sous_projet."'),";
 				$numeroligne = $numeroligne + 1;
 			}		
@@ -2590,7 +2616,7 @@ class Importation_menage extends REST_Controller {
 			// INSERTION DANS TABLE MENAGE
 			$ou = strrpos($requete,",");
 			$requete = substr($requete,0,$ou);
-			$requete = "insert into menage(statut ,village_id,milieu,zip,Addresse,nomchefmenage,NumeroCIN,NumeroCarteElectorale,telephone_chef_menage,identifiant_menage,score_obtenu,rang_obtenu,id_sous_projet) values ".$requete;
+			$requete = "insert into menage(statut ,village_id,milieu,zip,Addresse,nomchefmenage,NumeroCIN,NumeroCarteElectorale,telephone_chef_menage,identifiant_menage,score_obtenu,rang_obtenu,inscrit,preselectionne,beneficiaire,id_sous_projet) values ".$requete;
 			$count_update = $this->RequeteimportManager->Execution_requete($requete);
 			
 			//////////////////////////////////////////////////////////////////////////////////////
@@ -2670,6 +2696,7 @@ class Importation_menage extends REST_Controller {
 			$liste_menage_id = substr($liste_menage_id,0,$ou);
 			$liste_menage_id = $liste_menage_id.")";
 			$ret = $this->ImportationmenageManager->MiseajourStatut("BENEFICIAIRE",$liste_menage_id);
+			$ret = $this->ImportationmenageManager->MiseajourHistoriqueStatut("beneficiaire",$liste_menage_id);
 			// INSERTION DANS MENAGE BENEFICIAIRE
 			$ou = strrpos($requete,",");
 			$requete = substr($requete,0,$ou);
@@ -2704,9 +2731,561 @@ class Importation_menage extends REST_Controller {
 			'message' => 'Get file success',
 		], REST_Controller::HTTP_OK);		  
 	}	
-	
-	
-	
+	public function controler_vague_zip() {	
+        require_once 'Classes/PHPExcel.php';
+        require_once 'Classes/PHPExcel/IOFactory.php';
+        set_time_limit(0);
+        ini_set ('memory_limit', '2048M');
+		$nomfichier="vague_zip.xlsx";
+		$chemin="vague/";
+		$search= array('é','ô','Ô','î','Î','è','ê','à','ö','ç','&','°',"'");
+		$replace=array('e','o','o','i','i','e','e','a','o','c','_','_','');
+		$directoryName = dirname(__FILE__) . "/../../../../".$chemin;
+		if(!is_dir($directoryName)) {
+			mkdir($directoryName, 0777,true);
+		}
+		$nomfichier="vague_zip.xlsx";
+		$lien_vers_mon_document_excel = dirname(__FILE__) . "/../../../../".$chemin . $nomfichier;
+		$array_data = array();
+		if(strpos($lien_vers_mon_document_excel,"xlsx") >0) {
+			// pour mise à jour après : G4 = id_fiche_presence <=> déjà importé => à ignorer
+			$objet_read_write = PHPExcel_IOFactory::createReader('Excel2007');
+			$excel = $objet_read_write->load($lien_vers_mon_document_excel);			 
+			$sheet = $excel->getSheet(0);
+			// pour lecture début - fin seulement
+			$XLSXDocument = new PHPExcel_Reader_Excel2007();
+		} else {
+			$objet_read_write = PHPExcel_IOFactory::createReader('Excel5');
+			$excel = $objet_read_write->load($lien_vers_mon_document_excel);			 
+			$sheet = $excel->getSheet(0);
+			$XLSXDocument = new PHPExcel_Reader_Excel5();
+		}
+		$Excel = $XLSXDocument->load($lien_vers_mon_document_excel);
+		// get all the row of my file
+		$rowIterator = $Excel->getActiveSheet(0)->getRowIterator();
+		$numeroligne=0;
+		// DEBUT A CONTROLER
+		$erreur_sous_projet=0;
+		$erreur_nom_ile=0;
+		$erreur_nom_prefecture=0;
+		$erreur_nom_commune=0;
+		$erreur_nom_village=0;
+		$erreur_zip=0;
+		$erreur_vague=0;
+		// FIN A CONTROLER
+		$nombre_erreur=0;
+		$deja_importe="";
+		$requete =" ";		
+		$nombre_insere=0;
+		$array_insere=array();
+		$depart_ligne_lecture=2;
+		$nom_ile="";
+		$nom_prefecture="";
+		$nom_commune="";
+		$nom_village="";
+		foreach($rowIterator as $row) {
+			 $ligne = $row->getRowIndex ();
+			 // Lecture a partir de la ligne 2
+			if($ligne >=$depart_ligne_lecture) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 $a_inserer =0;
+				foreach ($cellIterator as $cell) {
+					if('A' == $cell->getColumn()) {
+							$ile =$cell->getValue();
+					} else if('B' == $cell->getColumn()) {
+						$prefecture = $cell->getValue();
+					} else if('C' == $cell->getColumn()) {
+						$commune = $cell->getValue();
+					} else if('D' == $cell->getColumn()) {
+						$village = $cell->getValue();
+					} else if('E' == $cell->getColumn()) {
+						$zip = $cell->getValue();
+					} else if('F' == $cell->getColumn()) {
+						$vague = $cell->getValue();
+					}
+				}
+				// Controle info erronnée
+				$ile=ltrim(rtrim($ile));
+				$prefecture=ltrim(rtrim($prefecture));
+				$commune=ltrim(rtrim($commune));
+				$village=ltrim(rtrim($village));
+				if($zip=="") {
+					$sheet->getStyle("E".$ligne)->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$erreur_zip=$erreur_zip + 1;	
+					$nombre_erreur = $nombre_erreur + 1; 
+				} else {
+					$retour=$this->ImportationmenageManager->selectionzipparcode($zip);
+					if($retour) {
+						foreach($retour as $k=>$v) {
+							$id_zip =$v->id;
+						}
+						$sheet->setCellValue("H".$ligne, $id_zip);
+					} else {
+						$sheet->getStyle("E".$ligne)->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => 'FF0000'),
+									 'endcolor'   => array('argb' => 'FF0000')
+								 )
+						 );	
+						$erreur_zip=$erreur_zip + 1;	
+						$nombre_erreur = $nombre_erreur + 1; 						
+					}
+				}
+				if($vague=="") {
+					$sheet->getStyle("F".$ligne)->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );		
+					$nombre_erreur = $nombre_erreur + 1;	
+					$erreur_vague = $erreur_vague + 1;	
+				}
+				$ile_id=null;
+				$region_id=null;
+				$commune_id=null;
+				$village_id = null;
+				$code_village = "";
+				$code_commune='';
+				$reg=array();
+				$place_espace = strpos($ile," ");
+				$place_apostrophe = strpos($ile,"'");
+				$ile=strtolower($ile);
+				if($ile >'') {
+					if($place_espace >0) {
+						$region_temporaire1 = substr ( $ile , 0 ,($place_espace - 1));
+						$region_temporaire2 = substr ( $ile , ($place_espace + 1));
+						$region_temporaire1 =ltrim(rtrim($region_temporaire1));
+						$region_temporaire2 =ltrim(rtrim($region_temporaire2));
+						$reg = $this->ImportationmenageManager->selectionile_avec_espace($region_temporaire1,$region_temporaire2);
+					} else if($place_apostrophe >0) {
+						$region_temporaire1 = substr ( $ile , 0 ,($place_apostrophe - 1));
+						$region_temporaire2 = substr ( $ile , ($place_apostrophe + 1));
+						$region_temporaire1 =ltrim(rtrim($region_temporaire1));
+						$region_temporaire2 =ltrim(rtrim($region_temporaire2));
+					} else {	
+						$reg = $this->ImportationmenageManager->selectionile($ile);
+					}	
+					if(count($reg) >0) {
+						foreach($reg as $indice=>$v) {
+							$ile_id = $v->id;
+							$code_ile=$v->code;
+							$nom_ile=$v->ile;
+						} 	
+						$sheet->setCellValue("J".$ligne, $ile_id);	
+					} else {
+						// Pas de ile : marquer tous les découpages administratif 
+						$sheet->getStyle("A".$ligne)->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => 'FF0000'),
+									 'endcolor'   => array('argb' => 'FF0000')
+								 )
+						 );	
+						$sheet->getStyle("B".$ligne)->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => 'FF0000'),
+									 'endcolor'   => array('argb' => 'FF0000')
+								 )
+						 );	
+						$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => 'FF0000'),
+									 'endcolor'   => array('argb' => 'FF0000')
+								 )
+						 );	
+						$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => 'FF0000'),
+									 'endcolor'   => array('argb' => 'FF0000')
+								 )
+						 );	
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_nom_ile = $erreur_nom_ile + 1;	
+					}	
+					if(intval($ile_id) >0) {
+						if($prefecture >'') {
+							$prefecture=strtolower($prefecture);
+							$region_ok = true;
+							$place_espace = strpos($prefecture," ");
+							$place_apostrophe = strpos($prefecture,"'"); 	
+							if($place_espace >0) {
+								$prefecture_temporaire1 = substr ( $prefecture , 0 ,($place_espace - 1));
+								$prefecture_temporaire2 = substr ( $prefecture , ($place_espace + 1));
+								$prefecture_temporaire1 =ltrim(rtrim($prefecture_temporaire1));
+								$prefecture_temporaire2 =ltrim(rtrim($prefecture_temporaire2));
+								$dis = $this->ImportationmenageManager->selectionprefecture_avec_espace($prefecture_temporaire1,$prefecture_temporaire2,$ile_id);
+							} else if($place_apostrophe >0) {
+								$prefecture_temporaire1 = substr ( $prefecture , 0 ,($place_apostrophe - 1));
+								$prefecture_temporaire2 = substr ( $prefecture , ($place_apostrophe + 1));
+								$prefecture_temporaire1 =ltrim(rtrim($prefecture_temporaire1));
+								$prefecture_temporaire2 =ltrim(rtrim($prefecture_temporaire2));
+								$dis = $this->ImportationmenageManager->selectionprefecture_avec_espace($prefecture_temporaire1,$prefecture_temporaire2,$ile_id);
+							} else {
+								$dis = $this->ImportationmenageManager->selectionileprefecture($prefecture,$ile_id);
+							}	
+							if(count($dis) >0) {
+								foreach($dis as $indice=>$v) {
+									$region_id = $v->id;
+									$codeprefecture= $v->code;
+									$nom_prefecture= $v->region;
+								}
+								$sheet->setCellValue("K".$ligne, $region_id);
+							} else {
+								// Pas de prefecture : marquer prefecture,commune,village 
+								$sheet->getStyle("B".$ligne)->getFill()->applyFromArray(
+										 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+											 'startcolor' => array('rgb' => 'FF0000'),
+											 'endcolor'   => array('argb' => 'FF0000')
+										 )
+								 );	
+								$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
+										 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+											 'startcolor' => array('rgb' => 'FF0000'),
+											 'endcolor'   => array('argb' => 'FF0000')
+										 )
+								 );	
+								$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
+										 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+											 'startcolor' => array('rgb' => 'FF0000'),
+											 'endcolor'   => array('argb' => 'FF0000')
+										 )
+								 );	
+								$nombre_erreur = $nombre_erreur + 1;	
+								$erreur_nom_prefecture = $erreur_nom_prefecture + 1;	
+							}
+							if(intval($region_id) >0) {
+								if($commune >'') {
+									$commune=strtolower($commune);
+									if($commune=='pimba' || $commune=='itsahidi' || $commune=='domba') {
+										if($commune=='itsahidi') {
+											$commune_id ='18';
+										}
+										if($commune=='domba') {
+											$commune_id ='19';
+										}
+										if($commune=='pimba') {
+											$commune_id ='20';
+										}
+									} else {
+										$district_ok = true;
+										$place_espace = strpos($commune," ");
+										$place_apostrophe = strpos($commune,"'");
+										if($place_espace >0) {
+											$commune_temporaire1 = substr ( $commune , 0 ,($place_espace - 1));
+											$commune_temporaire2 = substr ( $commune , ($place_espace + 1));
+											$commune_temporaire1 =ltrim(rtrim($commune_temporaire1));
+											$commune_temporaire2 =ltrim(rtrim($commune_temporaire2));
+											$comm = $this->ImportationmenageManager->selectioncommune_avec_espace($commune_temporaire1,$commune_temporaire2,$region_id);
+										} else if($place_apostrophe >0) {
+											$commune_temporaire1 = substr ( $commune , 0 ,($place_apostrophe - 1));
+											$commune_temporaire2 = substr ( $commune , ($place_apostrophe + 1));
+											$commune_temporaire1 =ltrim(rtrim($commune_temporaire1));
+											$commune_temporaire2 =ltrim(rtrim($commune_temporaire2));
+											$comm = $this->ImportationmenageManager->selectioncommune_avec_espace($commune_temporaire1,$commune_temporaire2,$region_id);
+										} else {
+											$comm = $this->ImportationmenageManager->selectioncommune($commune,$region_id);
+										}	
+										if(count($comm) >0) {
+											foreach($comm as $indice=>$v) {
+												$commune_id = $v->id;
+												$code_commune = $v->code;
+												$nom_commune = $v->commune;
+											}
+											$sheet->setCellValue("L".$ligne, $commune_id);
+										} else {
+											// Pas de commune : marquer commune,village 
+											$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
+													 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+														 'startcolor' => array('rgb' => 'FF0000'),
+														 'endcolor'   => array('argb' => 'FF0000')
+													 )
+											 );	
+											$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
+													 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+														 'startcolor' => array('rgb' => 'FF0000'),
+														 'endcolor'   => array('argb' => 'FF0000')
+													 )
+											 );	
+											$nombre_erreur = $nombre_erreur + 1;
+											$erreur_nom_commune = $erreur_nom_commune + 1;	
+										}	
+									}	
+									if(intval($commune_id) >0) {
+										if($village >'') {
+											$place_espace = strpos($village," ");
+											$place_apostrophe = strpos($village,"'");
+											if($place_espace >0) {
+												$village_temporaire1 = substr ( $village , 0 ,($place_espace - 1));
+												$village_temporaire2 = substr ( $village , ($place_espace + 1));
+												$village_temporaire1 =ltrim(rtrim($village_temporaire1));
+												$village_temporaire2 =ltrim(rtrim($village_temporaire2));
+												$fkt = $this->ImportationmenageManager->selectionvillage_avec_espace($village_temporaire1,$village_temporaire2,$commune_id);
+											} else if($place_apostrophe >0){
+												$village_temporaire1 = substr ( $village , 0 ,($place_apostrophe - 1));
+												$village_temporaire2 = substr ( $village , ($place_apostrophe + 1));
+												$village_temporaire1 =ltrim(rtrim($village_temporaire1));
+												$village_temporaire2 =ltrim(rtrim($village_temporaire2));
+												$fkt = $this->ImportationmenageManager->selectionvillage_avec_espace($village_temporaire1,$village_temporaire2,$commune_id);
+											} else {
+												$fkt = $this->ImportationmenageManager->selectionvillage($village,$commune_id);
+											}	
+											if(count($fkt) >0) {
+												foreach($fkt as $indice=>$v) {
+													// A utliser ultérieurement lors de la deuxième vérification : village_id
+													$village_id = $v->id;
+													$code_village = $v->code;
+													$nom_village = $v->village;
+												}
+												$sheet->setCellValue("G".$ligne, $village_id);
+											} else {													
+												// Pas de village : marquer village 
+												$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
+														 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+															 'startcolor' => array('rgb' => 'FF0000'),
+															 'endcolor'   => array('argb' => 'FF0000')
+														 )
+												 );	
+												$nombre_erreur = $nombre_erreur + 1;
+												$erreur_nom_village = $erreur_nom_village + 1;	
+											}												
+										} else {
+											// Pas de village : marquer village 
+											$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
+													 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+														 'startcolor' => array('rgb' => 'FF0000'),
+														 'endcolor'   => array('argb' => 'FF0000')
+													 )
+											 );	
+											$nombre_erreur = $nombre_erreur + 1;
+											$erreur_nom_village = $erreur_nom_village + 1;	
+										}
+									} 
+								} else {										
+									// Pas de commune : marquer commune,village 
+									$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
+											 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+												 'startcolor' => array('rgb' => 'FF0000'),
+												 'endcolor'   => array('argb' => 'FF0000')
+											 )
+									 );	
+									$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
+											 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+												 'startcolor' => array('rgb' => 'FF0000'),
+												 'endcolor'   => array('argb' => 'FF0000')
+											 )
+									 );	
+									$nombre_erreur = $nombre_erreur + 1;
+									$erreur_nom_commune = $erreur_nom_commune + 1;	
+								}		
+							}
+						} else {
+							// Pas de prefecture : marquer prefecture,commune,village 
+							$sheet->getStyle("B".$ligne)->getFill()->applyFromArray(
+									 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+										 'startcolor' => array('rgb' => 'FF0000'),
+										 'endcolor'   => array('argb' => 'FF0000')
+									 )
+							 );	
+
+							 $sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
+									 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+										 'startcolor' => array('rgb' => 'FF0000'),
+										 'endcolor'   => array('argb' => 'FF0000')
+									 )
+							 );	
+							$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
+									 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+										 'startcolor' => array('rgb' => 'FF0000'),
+										 'endcolor'   => array('argb' => 'FF0000')
+									 )
+							 );	
+							$nombre_erreur = $nombre_erreur + 1;
+							$erreur_nom_prefecture = $erreur_nom_prefecture + 1;	
+						}		
+					}
+				} else {
+					// Pas de région : marquer tous les découpages administratif 
+					$sheet->getStyle("A".$ligne)->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$sheet->getStyle("B".$ligne)->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$sheet->getStyle("C".$ligne)->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_nom_ile = $erreur_nom_ile + 1;	
+				}
+				$numeroligne = $numeroligne + 1;
+			}		
+		}	
+		$val_ret = array();
+		$val_ret["erreur_zip"] = $erreur_zip;
+		$val_ret["erreur_nom_ile"] = $erreur_nom_ile;
+		$val_ret["erreur_nom_prefecture"] = $erreur_nom_prefecture;
+		$val_ret["erreur_nom_commune"] = $erreur_nom_commune;
+		$val_ret["erreur_nom_village"] = $erreur_nom_village;
+		$val_ret["erreur_vague"] = $erreur_vague;
+		if($nombre_erreur==0) {
+			$status=TRUE;
+			$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+			$objWriter->save(dirname(__FILE__) . "/../../../../" .$chemin. $nomfichier);
+			unset($objet_read_write,$excel,$Excel);				
+		} else {
+			$status=FALSE;
+			$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+			$objWriter->save(dirname(__FILE__) . "/../../../../" .$chemin. $nomfichier);
+			unset($objet_read_write,$excel,$Excel);				
+		}
+		$this->response([
+			'status' => $status,
+			'retour'  => $val_ret,
+			'message' => 'Get file success',
+		], REST_Controller::HTTP_OK);			  
+	}		
+	public function importer_vague_zip() {	
+        require_once 'Classes/PHPExcel.php';
+        require_once 'Classes/PHPExcel/IOFactory.php';
+        set_time_limit(0);
+        ini_set ('memory_limit', '2048M');
+		$nomfichier="vague_zip.xlsx";
+		$chemin="vague/";
+		$search= array('é','ô','Ô','î','Î','è','ê','à','ö','ç','&','°',"'");
+		$replace=array('e','o','o','i','i','e','e','a','o','c','_','_','');
+		$directoryName = dirname(__FILE__) . "/../../../../".$chemin;
+		if(!is_dir($directoryName)) {
+			mkdir($directoryName, 0777,true);
+		}
+		$nomfichier="vague_zip.xlsx";
+		$lien_vers_mon_document_excel = dirname(__FILE__) . "/../../../../".$chemin . $nomfichier;
+		$array_data = array();
+		if(strpos($lien_vers_mon_document_excel,"xlsx") >0) {
+			// pour mise à jour après : G4 = id_fiche_presence <=> déjà importé => à ignorer
+			$objet_read_write = PHPExcel_IOFactory::createReader('Excel2007');
+			$excel = $objet_read_write->load($lien_vers_mon_document_excel);			 
+			$sheet = $excel->getSheet(0);
+			// pour lecture début - fin seulement
+			$XLSXDocument = new PHPExcel_Reader_Excel2007();
+		} else {
+			$objet_read_write = PHPExcel_IOFactory::createReader('Excel5');
+			$excel = $objet_read_write->load($lien_vers_mon_document_excel);			 
+			$sheet = $excel->getSheet(0);
+			$XLSXDocument = new PHPExcel_Reader_Excel5();
+		}
+		$Excel = $XLSXDocument->load($lien_vers_mon_document_excel);
+		// get all the row of my file
+		$rowIterator = $Excel->getActiveSheet(0)->getRowIterator();
+		$numeroligne=0;
+		// DEBUT A CONTROLER
+		$erreur_sous_projet=0;
+		$erreur_nom_ile=0;
+		$erreur_nom_prefecture=0;
+		$erreur_nom_commune=0;
+		$erreur_nom_village=0;
+		$erreur_zip=0;
+		$erreur_vague=0;
+		// FIN A CONTROLER
+		$nombre_erreur=0;
+		$deja_importe="";
+		$requete =" ";		
+		$nombre_insere=0;
+		$array_insere=array();
+		$depart_ligne_lecture=2;
+		$nom_ile="";
+		$nom_prefecture="";
+		$nom_commune="";
+		$nom_village="";
+		$nombre_maj=0;
+		foreach($rowIterator as $row) {
+			 $ligne = $row->getRowIndex ();
+			 // Lecture a partir de la ligne 2
+			if($ligne >=$depart_ligne_lecture) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 $a_inserer =0;
+				 $id_zip=null;
+				foreach ($cellIterator as $cell) {
+					if('A' == $cell->getColumn()) {
+							$ile =$cell->getValue();
+					} else if('B' == $cell->getColumn()) {
+						$prefecture = $cell->getValue();
+					} else if('C' == $cell->getColumn()) {
+						$commune = $cell->getValue();
+					} else if('D' == $cell->getColumn()) {
+						$village = $cell->getValue();
+					} else if('E' == $cell->getColumn()) {
+						$zip = $cell->getValue();
+					} else if('F' == $cell->getColumn()) {
+						$vague = $cell->getValue();
+					} else if('G' == $cell->getColumn()) {
+						$village_id = $cell->getValue();
+					} else if('H' == $cell->getColumn()) {
+						$id_zip = $cell->getValue();
+					}
+				}
+				if(intval($village_id) >0 && intval($id_zip) >0) {
+					$data = array(
+						'id_zip' => $id_zip,
+						'vague' => $vague,
+					);
+					$ret =$this->VillageManager->update_zip_vague($village_id, $data);
+					if($ret) {
+						$nombre_maj = $nombre_maj + 1;
+						$sheet->setCellValue("I".$ligne, "OK");
+					}
+				}
+			}		
+		}	
+		$val_ret = array();
+		$val_ret["erreur_zip"] = $erreur_zip;
+		$val_ret["erreur_nom_ile"] = $erreur_nom_ile;
+		$val_ret["erreur_nom_prefecture"] = $erreur_nom_prefecture;
+		$val_ret["erreur_nom_commune"] = $erreur_nom_commune;
+		$val_ret["erreur_nom_village"] = $erreur_nom_village;
+		$val_ret["erreur_vague"] = $erreur_vague;
+		if($nombre_erreur==0) {
+			$status=TRUE;
+			$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+			$objWriter->save(dirname(__FILE__) . "/../../../../" .$chemin. $nomfichier);
+			unset($objet_read_write,$excel,$Excel);				
+		} else {
+			$status=FALSE;
+			$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+			$objWriter->save(dirname(__FILE__) . "/../../../../" .$chemin. $nomfichier);
+			unset($objet_read_write,$excel,$Excel);				
+		}
+		$this->response([
+			'status' => $status,
+			'retour'  => $val_ret,
+			'message' => 'Get file success',
+		], REST_Controller::HTTP_OK);			  
+	}		
 } 
 /* End of file controllername.php */
 /* Location: ./application/controllers/controllername.php */

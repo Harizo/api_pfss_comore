@@ -91,5 +91,14 @@ class Zip_model extends CI_Model
         }
         return null;
     }
+    public function findByCode($code)
+    {
+        $this->db->where("code", $code);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
 
 }

@@ -135,6 +135,27 @@ class Menage_model extends CI_Model
 			'quartier' => $menage['quartier'],			
 			'milieu' => $menage['milieu'],			
 			'zip' => $menage['zip'],			
+			'inscrit' => $menage['inscrit'],			
+			'preselectionne' => $menage['preselectionne'],			
+			'beneficiaire' => $menage['beneficiaire'],			
+			'nombre_personne_plus_soixantedixans_enquete' => $menage['nombre_personne_plus_soixantedixans_enquete'],
+			'nombre_enfant_moins_six_ans_enquete' =>  $menage['nombre_enfant_moins_six_ans_enquete'],
+			'nombre_enfant_scolarise_enquete' => $menage['nombre_enfant_scolarise_enquete'],
+			'nombre_enfant_moins_quinze_ans_enquete' => $menage['nombre_enfant_moins_quinze_ans_enquete'],
+			'nombre_enfant_non_scolarise_enquete' => $menage['nombre_enfant_non_scolarise_enquete'],
+			'nombre_personne_handicape_enquetenombre_personne_handicape_enquete' => $menage['nombre_personne_handicape_enquetenombre_personne_handicape_enquete'],
+			'nombre_adulte_travail_enquete' => $menage['nombre_adulte_travail_enquete'],
+			'nombre_membre_a_etranger_enquete' => $menage['nombre_membre_a_etranger_enquete'],
+			'maison_non_dure_enquete' => $menage['maison_non_dure_enquete'],
+			'acces_electricite_enquete' => $menage['acces_electricite_enquete'],
+			'acces_eau_robinet_enquete' => $menage['acces_eau_robinet_enquete'],
+			'logement_endommage_enquete' => $menage['logement_endommage_enquete'],
+			'niveau_degat_logement_enquete' => $menage['niveau_degat_logement_enquete'],
+			'rehabilitation_enquete' => $menage['rehabilitation_enquete'],
+			'beneficiaire_autre_programme_enquete' => $menage['beneficiaire_autre_programme_enquete'],
+			'membre_fonctionnaire_enquete' => $menage['membre_fonctionnaire_enquete'],
+			'possede_frigo_enquete' => $menage['possede_frigo_enquete'],
+			'antenne_parabolique_enquete' => $menage['antenne_parabolique_enquete'],
         );
     }
     public function _set_reponse($menage)
@@ -161,6 +182,24 @@ class Menage_model extends CI_Model
 			'possede_frigo' => $menage['possede_frigo'],
 			'score_obtenu' => $menage['score_obtenu'],
 			'rang_obtenu' => $menage['rang_obtenu'],			
+			'nombre_personne_plus_soixantedixans_enquete' => $menage['nombre_personne_plus_soixantedixans_enquete'],
+			'nombre_enfant_moins_six_ans_enquete'  => $menage['nombre_enfant_moins_six_ans_enquete'],
+			'nombre_enfant_scolarise_enquete' => $menage['nombre_enfant_scolarise_enquete'],
+			'nombre_enfant_moins_quinze_ans_enquete' => $menage['nombre_enfant_moins_quinze_ans_enquete'],
+			'nombre_enfant_non_scolarise_enquete' => $menage['nombre_enfant_non_scolarise_enquete'],
+			'nombre_personne_handicape_enquetenombre_personne_handicape_enquete' => $menage['nombre_personne_handicape_enquetenombre_personne_handicape_enquete'],
+			'nombre_adulte_travail_enquete' => $menage['nombre_adulte_travail_enquete'],
+			'nombre_membre_a_etranger_enquete' => $menage['nombre_membre_a_etranger_enquete'],
+			'maison_non_dure_enquete' => $menage['maison_non_dure_enquete'],
+			'acces_electricite_enquete' => $menage['acces_electricite_enquete'],
+			'acces_eau_robinet_enquete' => $menage['acces_eau_robinet_enquete'],
+			'logement_endommage_enquete' => $menage['logement_endommage_enquete'],
+			'niveau_degat_logement_enquete' => $menage['niveau_degat_logement_enquete'],
+			'rehabilitation_enquete' => $menage['rehabilitation_enquete'],
+			'beneficiaire_autre_programme_enquete' => $menage['beneficiaire_autre_programme_enquete'],
+			'membre_fonctionnaire_enquete' => $menage['membre_fonctionnaire_enquete'],
+			'possede_frigo_enquete' => $menage['possede_frigo_enquete'],
+			'antenne_parabolique_enquete' => $menage['antenne_parabolique_enquete'],
         );
     }
     public function _set_statut($menage)
@@ -168,6 +207,9 @@ class Menage_model extends CI_Model
         return array(
 			'statut'             => $menage['statut'],
 			'identifiant_menage' => $menage['identifiant_menage'],
+			'inscrit'            => $menage['inscrit'],
+			'preselectionne'     => $menage['preselectionne'],
+			'beneficiaire'       => $menage['beneficiaire'],
         );
     }
     public function _set_photo($menage)
