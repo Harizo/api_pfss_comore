@@ -300,7 +300,7 @@
                 <table cellspacing="0" cellpadding="0" width="100%"  style="background-color:#f7f7f7">
                     <tr>
                         <td width="100%" height="80" valign="top" style="text-align: center; vertical-align:middle;">
-                            <h1>Ministère de la Santé, de la Solidarité, de la Protection Sociale et de la Promotion du Genre</h1> <br> 
+                            <!-- <h1>Ministère de la Santé, de la Solidarité, de la Protection Sociale et de la Promotion du Genre</h1> <br>  -->
                             <h2>Projet de Filet Sociaux de Sécurité</h2>
                         </td>
                     </tr>
