@@ -83,8 +83,32 @@ class Contrat_agep_model extends CI_Model {
             return null;
         }                 
     }
-    public function getcontrat_agepBysousprojet($id_sous_projet)  {
+    /*public function getcontrat_agepBysousprojet($id_sous_projet)  {
         $result =  $this->db->select('*,DATEDIFF(date_prevu_fin,now()) as nbr_jour_restant')
+                        ->from($this->table)
+                        ->where("id_sous_projet", $id_sous_projet)
+                        ->order_by('id', 'asc')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }*/
+    
+    public function getcontrat_agepBysousprojet($id_sous_projet)  {
+        $result =  $this->db->select('contrat_agep.*,contrat_agep.id as id_contrat ,DATEDIFF(date_prevu_fin,now()) as nbr_jour_restant,
+                                    (select avenant1.id from avenant_agep as avenant1
+                                            where avenant1.id_contrat_agep=id_contrat
+                                                    and avenant1.date_prevu_fin =(select MAX(avenant2.date_prevu_fin) from avenant_agep as avenant2 where avenant2.id_contrat_agep=id_contrat) 
+                                    ) as id_avenant_presence,
+                                    (select avenant3.id from avenant_agep as avenant3
+                                            where avenant3.id_contrat_agep=id_contrat 
+                                                    and avenant3.statu="EN COURS"
+                                                    and DATEDIFF(avenant3.date_prevu_fin,now())<=5
+                                                    and avenant3.date_prevu_fin =(select MAX(avenant4.date_prevu_fin) from avenant_agep as avenant4 where avenant4.id_contrat_agep=id_contrat ) 
+                                    ) as id_avenant_retard')
                         ->from($this->table)
                         ->where("id_sous_projet", $id_sous_projet)
                         ->order_by('id', 'asc')
@@ -98,7 +122,17 @@ class Contrat_agep_model extends CI_Model {
     }
     
     public function getallcontrat_alert()  {
-        $result =  $this->db->select('*')
+        $result =  $this->db->select('contrat_agep.*,contrat_agep.id as id_contrat ,DATEDIFF(date_prevu_fin,now()) as nbr_jour_restant,
+                                        (select avenant1.id from avenant_agep as avenant1
+                                                where avenant1.id_contrat_agep=id_contrat
+                                                        and avenant1.date_prevu_fin =(select MAX(avenant2.date_prevu_fin) from avenant_agep as avenant2 where avenant2.id_contrat_agep=id_contrat) 
+                                        ) as id_avenant_presence,
+                                        (select avenant3.id from avenant_agep as avenant3
+                                                where avenant3.id_contrat_agep=id_contrat 
+                                                        and avenant3.statu="EN COURS"
+                                                        and DATEDIFF(avenant3.date_prevu_fin,now())<=5
+                                                        and avenant3.date_prevu_fin =(select MAX(avenant4.date_prevu_fin) from avenant_agep as avenant4 where avenant4.id_contrat_agep=id_contrat ) 
+                                        ) as id_avenant_retard')
                         ->from($this->table)
                         ->where("statu",'EN COURS')                        
                         ->where("DATEDIFF(date_prevu_fin,now())<=",5)
@@ -111,6 +145,7 @@ class Contrat_agep_model extends CI_Model {
             return null;
         }                 
     }
+    
     
     public function countAllById_sous_projet_encours($id_sous_projet)  {
         $result =  $this->db->select('COUNT(*) as nbr_contrat')
@@ -127,8 +162,37 @@ class Contrat_agep_model extends CI_Model {
             return null;
         }                 
     }
-    /*public function getcontrat_agepBysousprojet($id_sous_projet)  {
-        $requete= "select *,DATEDIFF(now(),DATE(date_signature)) as diff, now() as no from contrat_agep where id_sous_projet='".$id_sous_projet."'";
+   /* public function countAllById_sous_projet_encours_avenant($id_sous_projet)  {
+        $result =  $this->db->select("contrat_agep.id as id_contrat, select avenant_agep.id from avenant_agep where id_contrat_agep=id_contrat")
+                        ->from($this->table)
+                        ->where("id_sous_projet", $id_sous_projet)
+                        ->where("statu",'EN COURS')                        
+                        ->where("DATEDIFF(date_prevu_fin,now())<=",5)
+                        ->order_by('id', 'asc')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }*/
+    public function countAllById_sous_projet_encours_avenant($id_sous_projet)
+    {
+        $requete= "select contrat_agep.*,contrat_agep.id as id_contrat ,
+                        (select avenant1.id from avenant_agep as avenant1
+                                where avenant1.id_contrat_agep=id_contrat
+                                        and avenant1.date_prevu_fin =(select MAX(avenant2.date_prevu_fin) from avenant_agep as avenant2 where avenant2.id_contrat_agep=id_contrat) 
+                        ) as id_avenant_presence,
+                        (select avenant3.id from avenant_agep as avenant3
+                                where avenant3.id_contrat_agep=id_contrat
+                                        and avenant3.statu='EN COURS'
+                                        and DATEDIFF(avenant3.date_prevu_fin,now())<=5
+                                        and avenant3.date_prevu_fin =(select MAX(avenant4.date_prevu_fin) from avenant_agep as avenant4 where avenant4.id_contrat_agep=id_contrat ) 
+                        ) as id_avenant_retard
+                    from contrat_agep where id_sous_projet='".$id_sous_projet."' 
+                        and DATEDIFF(date_prevu_fin,now())<=5 
+                        and statu='EN COURS'" ;
 		$query = $this->db->query($requete);
         $result= $query->result();				
         if($result) {
@@ -136,6 +200,6 @@ class Contrat_agep_model extends CI_Model {
         }else{
             return array();
         }                 
-    }*/
+    }
 }
 ?>
