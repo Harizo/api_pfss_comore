@@ -75,7 +75,8 @@ class Requete_export extends REST_Controller {
 				if($vill) {
 					$village = $vill->Village;
 					$villageois = $vill->Village;
-					$zone_id = $vill->zone_id;
+					$zone_id = $vill->id_zip;
+					$id_zip = $vill->id_zip;
 					if(intval($zone_id) >0) {
 						$zip = $this->ZipManager->findById($zone_id);
 						if($zip) {							
@@ -148,11 +149,12 @@ class Requete_export extends REST_Controller {
 				$village_id=$id_village;
 				$apiUrlbase= $this->get('apiUrlbase');
 				$micro = $this->SousprojetManager->findById($id_sous_projet);
+				$z=$this->VillageManager->findById($village_id);
 				$microprojet = $micro->description;
 				$menages=$this->MenageManager->findAllByVillageAndStatutAndSousProjet($village_id,"BENEFICIAIRE",$id_sous_projet);
 				// Solution Provisoire : id_sous_projet ARSE =2 les autres carte bénéficiaire par défaut
 				if(intval($id_sous_projet)==2) {
-					$this->exportcartebeneficiaireARSE($apiUrlbase,$menages,$nom_ile,$region,$commune,$village,$zone_id,$zip,$code_zip,$microprojet,$ile_id,$region_id,$commune_id,$village_id);
+					$this->exportcartebeneficiaireARSE($apiUrlbase,$menages,$nom_ile,$region,$commune,$village,$zone_id,$zip,$code_zip,$microprojet,$ile_id,$region_id,$commune_id,$village_id,$id_zip);
 				} else {
 					$this->exportcartebeneficiaire($apiUrlbase,$menages,$nom_ile,$region,$commune,$village,$zone_id,$zip,$code_zip,$microprojet,$ile_id,$region_id,$commune_id,$village_id);
 				}	
@@ -2652,6 +2654,7 @@ class Requete_export extends REST_Controller {
 			foreach ($menages as $ii => $d) {
 				if(intval($d->inapte)==0) {
 					$menage=$d->NumeroEnregistrement;
+					$identifiant_menage=$d->identifiant_menage;
 					$nomchefmenage=$d->nomchefmenage;
 					$Addresse=$d->Addresse;
 					$SexeChefMenage=$d->SexeChefMenage;
@@ -2747,13 +2750,15 @@ class Requete_export extends REST_Controller {
 						$i=$i+1;
 						$objPHPExcel->getActiveSheet()->mergeCells('B'.$i.':J'.$i);
 						$objPHPExcel->getActiveSheet()->mergeCells('Q'.$i.':AB'.$i);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "N° D'INSCRIPTION DU MENAGE");
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "N° D'INSCRIPTION DU MENAGE:");
 						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('Q'.$i, "(doit être le même que celui du cahier d'enregistrement)");
 						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setName('calibri')->setSize(11);
 						$objPHPExcel->getActiveSheet()->getStyle('Q'.$i)->getFont()->setName('calibri')->setSize(8);
 						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setBold(true);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, $menage);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("K" . $i,isset($menage) ? $menage : "", PHPExcel_Cell_DataType::TYPE_STRING);			
+						// $objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, $menage);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("K" . $i,isset($identifiant_menage) ? $identifiant_menage : "", PHPExcel_Cell_DataType::TYPE_STRING);			
 						$i=$i + 1;
 						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Adresse");
 						$styleArray = array(
@@ -3190,6 +3195,7 @@ class Requete_export extends REST_Controller {
 			foreach ($menages as $ii => $d)	{
 				if(intval($d->inapte)>0) {
 					$menage=$d->NumeroEnregistrement;
+					$identifiant_menage=$d->identifiant_menage;
 					$nomchefmenage=$d->nomchefmenage;
 					$Addresse=$d->Addresse;
 					$SexeChefMenage=$d->SexeChefMenage;
@@ -3286,14 +3292,17 @@ class Requete_export extends REST_Controller {
 						$objPHPExcel->getActiveSheet()->getStyle('A'.$i)->getFont()->setBold(true);
 						$i=$i+1;
 						$objPHPExcel->getActiveSheet()->mergeCells('B'.$i.':J'.$i);
+						$objPHPExcel->getActiveSheet()->mergeCells('K'.$i.':P'.$i);
 						$objPHPExcel->getActiveSheet()->mergeCells('Q'.$i.':AB'.$i);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "N° D'INSCRIPTION DU MENAGE");
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "N° D'INSCRIPTION DU MENAGE:");
 						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('Q'.$i, "(doit être le même que celui du cahier d'enregistrement)");
 						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setName('calibri')->setSize(11);
 						$objPHPExcel->getActiveSheet()->getStyle('Q'.$i)->getFont()->setName('calibri')->setSize(8);
 						$objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getFont()->setBold(true);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, $menage);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("K" . $i,isset($menage) ? $menage : "", PHPExcel_Cell_DataType::TYPE_STRING);			
+						// $objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'.$i, $menage);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setName('calibri')->setSize(11);
+						$objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getFont()->setBold(true);
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("K" . $i,isset($identifiant_menage) ? $identifiant_menage : "", PHPExcel_Cell_DataType::TYPE_STRING);			
 						$i=$i + 1;
 						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'.$i, "Adresse");
 						$styleArray = array(
@@ -3683,7 +3692,7 @@ class Requete_export extends REST_Controller {
 	}	
 	// 'style' => PHPExcel_Style_Border::BORDER_DASHDOT,
 
-	public function exportcartebeneficiaireARSE($apiUrlbase,$menages,$ile,$region,$commune,$village,$zone_id,$zip,$code_zip,$microprojet,$ile_id,$region_id,$commune_id,$village_id) {	
+	public function exportcartebeneficiaireARSE($apiUrlbase,$menages,$ile,$region,$commune,$village,$zone_id,$zip,$code_zip,$microprojet,$ile_id,$region_id,$commune_id,$village_id,$id_zip) {	
         require_once 'Classes/PHPExcel.php';
         require_once 'Classes/PHPExcel/IOFactory.php';
         set_time_limit(0);
@@ -3767,8 +3776,9 @@ class Requete_export extends REST_Controller {
 			$premier=0;			
 			foreach ($menages as $ii => $d) {
 				if(intval($d->inapte)==0) {					
-					$id_menage=$d->id_menage;
+					$id_menage=$d->id;
 					$menage=$d->NumeroEnregistrement;
+					$identifiant_menage=$d->identifiant_menage;
 					$NumeroEnregistrement=$d->NumeroEnregistrement;
 					$nomchefmenage=$d->nomchefmenage;
 					$Addresse=$d->Addresse;
@@ -3791,7 +3801,7 @@ class Requete_export extends REST_Controller {
 					$numerocarteelectoraletravailleur=$d->numerocarteelectoraletravailleur;
 					$numerocinsuppliant=$d->numerocinsuppliant;
 					$numerocarteelectoralesuppliant=$d->numerocarteelectoralesuppliant;
-					$zip=$d->libelle;
+					$zip=$id_zip;
 					$phototravailleur=$d->phototravailleur;
 					$pos_jpg_trav =0;		
 					$pos_jpg_trav =strpos($phototravailleur,".jpg");		
@@ -3957,7 +3967,7 @@ class Requete_export extends REST_Controller {
 						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "CODE MENAGE");
 						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
 						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':N'.$i)->getFont()->setItalic(true);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,$NumeroEnregistrement, PHPExcel_Cell_DataType::TYPE_STRING);	
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,$identifiant_menage, PHPExcel_Cell_DataType::TYPE_STRING);	
 						$i=$i+1;
 						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':H'.$i);
 						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
@@ -4417,8 +4427,9 @@ class Requete_export extends REST_Controller {
 			$existe_menage_inapte=0;
 			foreach ($menages as $ii => $d)	{
 				if(intval($d->inapte)>0) {
-					$id_menage=$d->id_menage;
+					$id_menage=$d->id;
 					$menage=$d->NumeroEnregistrement;
+					$identifiant_menage=$d->identifiant_menage;
 					$NumeroEnregistrement=$d->NumeroEnregistrement;
 					$nomchefmenage=$d->nomchefmenage;
 					$Addresse=$d->Addresse;
@@ -4441,7 +4452,7 @@ class Requete_export extends REST_Controller {
 					$numerocarteelectoraletravailleur=$d->numerocarteelectoraletravailleur;
 					$numerocinsuppliant=$d->numerocinsuppliant;
 					$numerocarteelectoralesuppliant=$d->numerocarteelectoralesuppliant;
-					$zip=$d->libelle;
+					$zip=$id_zip;
 					$photo=$d->photo;
 					$pos_jpg_chef =0;		
 					$pos_jpg_chef =strpos($photo,".jpg");		
@@ -4610,7 +4621,7 @@ class Requete_export extends REST_Controller {
 						$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'.$i, "CODE MENAGE");
 						$objPHPExcel->getActiveSheet()->mergeCells('J'.$i.':N'.$i);
 						$objPHPExcel->getActiveSheet()->getStyle('J'.$i.':N'.$i)->getFont()->setItalic(true);
-						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,$NumeroEnregistrement, PHPExcel_Cell_DataType::TYPE_STRING);	
+						$objPHPExcel->setActiveSheetIndex(0)->setCellValueExplicit("J" . $i,$identifiant_menage, PHPExcel_Cell_DataType::TYPE_STRING);	
 						$i=$i+1;
 						$objPHPExcel->getActiveSheet()->mergeCells('G'.$i.':H'.$i);
 						$objPHPExcel->getActiveSheet()->getStyle('G'.$i)->getFont()->setName('calibri')->setSize(11);
