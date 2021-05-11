@@ -16,13 +16,41 @@ class Count_contrat_agep extends REST_Controller {
     {
         $id = $this->get('id');
         $id_sous_projet = $this->get('id_sous_projet');
+        $menu = $this->get('menu');
+        $id_sous_p = $this->get('id_sous_p');
         $data=array();
         if ($id_sous_projet)
         {
            $contrat_agep = $this->Contrat_agepManager->countAllById_sous_projet_encours($id_sous_projet);          
             $data = $contrat_agep;
+            
         }
-    
+        if ($menu=="andrana")
+        {
+           $contrat_agep = $this->Contrat_agepManager->countAllById_sous_projet_encours_avenant($id_sous_p);          
+           // $data = $contrat_agep;
+            if ($contrat_agep) 
+            {  $data_retard=array();
+				foreach ($contrat_agep as $key => $value)
+                {   if ($value->id_avenant_presence)
+                    {
+                        if ($value->id_avenant_retard)
+                        {
+                            $data_retard[$key]['id'] = $value->id;
+                        }
+                    }
+                    else
+                    {
+                        $data_retard[$key]['id'] = $value->id;
+                    }
+                    
+                }
+                $data=$data_retard;
+			}
+            else {
+                $data=array();
+            }
+        }
         
         if (count($data)>0) {
             $this->response([

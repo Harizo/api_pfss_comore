@@ -34,7 +34,8 @@ class Infrastructure_model extends CI_Model
     public function _set($infrastructure)
     {
         return array(
-            'code'                      =>      $infrastructure['code'],
+            'code_numero'                      =>      $infrastructure['code_numero'],
+            'code_passation'                   =>      $infrastructure['code_passation'],
             'libelle'                   =>      $infrastructure['libelle'],
             'id_type_infrastructure'    =>      $infrastructure['id_type_infrastructure'] ,
             'id_village'             =>      $infrastructure['id_village'] ,
@@ -55,7 +56,8 @@ class Infrastructure_model extends CI_Model
     {
         return array(
             'id' => $id,
-            'code'                      =>      $infrastructure['code'],
+            'code_numero'                      =>      $infrastructure['code_numero'],
+            'code_passation'                   =>      $infrastructure['code_passation'],
             'libelle'                   =>      $infrastructure['libelle'],
             'id_type_infrastructure'    =>      $infrastructure['id_type_infrastructure'] ,
             'id_village'             =>      $infrastructure['id_village'] ,
@@ -79,7 +81,7 @@ class Infrastructure_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('code')
+                        ->order_by('code_numero')
                         ->get()
                         ->result();
         if($result)
@@ -95,7 +97,7 @@ class Infrastructure_model extends CI_Model
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where('id_type_infrastructure',$id_type_infrastructure)
-                        ->order_by('code')
+                        ->order_by('code_numero')
                         ->get()
                         ->result();
         if($result)
@@ -112,7 +114,7 @@ class Infrastructure_model extends CI_Model
                         ->from($this->table)
                         ->where('id_village',$id_village)
                         ->where('statu','CHOISI')
-                        ->order_by('code')
+                        ->order_by('code_numero')
                         ->get()
                         ->result();
         if($result)
@@ -129,7 +131,7 @@ class Infrastructure_model extends CI_Model
                         ->from($this->table)
                         ->where('id_village',$id_village)
                         ->where('statu','ELIGIBLE')
-                        ->order_by('code')
+                        ->order_by('code_numero')
                         ->get()
                         ->result();
         if($result)

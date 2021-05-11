@@ -23,7 +23,8 @@ class Etat_paiement_agep extends REST_Controller {
         {
             $tmp = $this->Etat_paiement_agepManager->getetatBycontrat($id_contrat_agep);          
             if ($tmp)
-            {
+            {   $village = array();
+                $zip = array();
                 foreach ($tmp as $key => $value) 
                 {   
                     $menage = $this->MenageManager->findById($value->id_menage);
@@ -31,8 +32,15 @@ class Etat_paiement_agep extends REST_Controller {
                     $region= $this->RegionManager->findById($value->id_region);
                     $commune= $this->CommuneManager->findById($value->id_commune);
                     //$communaute= $this->CommunauteManager->findById($value->id_communaute);
-                    $village= $this->VillageManager->findById($value->id_village);
-                    $zip= $this->ZipManager->findById($village->id_zip);
+                    if ($commune)
+                    {                       
+                        $village= $this->VillageManager->findById($value->id_village);
+                        
+                    }
+                    if ($village)
+                    {                            
+                        $zip= $this->ZipManager->findById($village->id_zip);
+                    }
                     $data[$key]['id'] = $value->id;
                     $data[$key]['numero_ordre_paiement'] = $value->numero_ordre_paiement;
                     $data[$key]['activite_concerne'] = $value->activite_concerne;

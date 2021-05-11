@@ -23,25 +23,53 @@ class Contrat_agep extends REST_Controller {
 			$tmp = $this->Contrat_agepManager->getallcontrat_alert();
 			if ($tmp) 
             {  
+                $data_retard=array();
 				foreach ($tmp as $key => $value)
                 {   
-                    $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
-                    $agep = $this->Agence_pManager->findById($value->id_agep);
-                    $data[$key]['id']                 = $value->id;
-                    $data[$key]['numero_contrat']     = $value->numero_contrat;
-                    $data[$key]['agep']               = $agep;
-                    $data[$key]['sous_projet']        = $sous_projet;
-                    //$data[$key]['nbr_jour_restant']      = $value->nbr_jour_restant;
-                    //$data[$key]['objet_contrat']      = $value->objet_contrat;
-                    $data[$key]['montant_contrat']    = $value->montant_contrat;
-                    $data[$key]['montant_a_effectue_prevu']    = $value->montant_a_effectue_prevu;
-                    //$data[$key]['modalite_contrat']   = $value->modalite_contrat;
-                    //$data[$key]['date_signature']     = $value->date_signature;
-                    $data[$key]['date_prevu_fin']     = $value->date_prevu_fin;
-                    //$data[$key]['noms_signataires']   = $value->noms_signataires;
-                    //$data[$key]['id_sous_projet']        = $id_sous_projet;
-                    //$data[$key]['statu']             = $value->statu;
+                    if ($value->id_avenant_presence)
+                    {
+                        if ($value->id_avenant_retard)
+                        {
+                            $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
+                            $agep = $this->Agence_pManager->findById($value->id_agep);
+                            $data_retard[$key]['id']                 = $value->id;
+                            $data_retard[$key]['numero_contrat']     = $value->numero_contrat;
+                            $data_retard[$key]['agep']               = $agep;
+                            $data_retard[$key]['sous_projet']        = $sous_projet;
+                            //$data_retard[$key]['nbr_jour_restant']      = $value->nbr_jour_restant;
+                            //$data_retard[$key]['objet_contrat']      = $value->objet_contrat;
+                            $data_retard[$key]['montant_contrat']    = $value->montant_contrat;
+                            $data_retard[$key]['montant_a_effectue_prevu']    = $value->montant_a_effectue_prevu;
+                            //$data_retard[$key]['modalite_contrat']   = $value->modalite_contrat;
+                            //$data_retard[$key]['date_signature']     = $value->date_signature;
+                            $data_retard[$key]['date_prevu_fin']     = $value->date_prevu_fin;
+                            //$data_retard[$key]['noms_signataires']   = $value->noms_signataires;
+                            //$data_retard[$key]['id_sous_projet']        = $id_sous_projet;
+                            //$data_retard[$key]['statu']             = $value->statu;
+                        }
+                    }
+                    else
+                    {
+                        $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
+                        $agep = $this->Agence_pManager->findById($value->id_agep);
+                        $data_retard[$key]['id']                 = $value->id;
+                        $data_retard[$key]['numero_contrat']     = $value->numero_contrat;
+                        $data_retard[$key]['agep']               = $agep;
+                        $data_retard[$key]['sous_projet']        = $sous_projet;
+                        //$data_retard[$key]['nbr_jour_restant']      = $value->nbr_jour_restant;
+                        //$data_retard[$key]['objet_contrat']      = $value->objet_contrat;
+                        $data_retard[$key]['montant_contrat']    = $value->montant_contrat;
+                        $data_retard[$key]['montant_a_effectue_prevu']    = $value->montant_a_effectue_prevu;
+                        //$data_retard[$key]['modalite_contrat']   = $value->modalite_contrat;
+                        //$data_retard[$key]['date_signature']     = $value->date_signature;
+                        $data_retard[$key]['date_prevu_fin']     = $value->date_prevu_fin;
+                        //$data_retard[$key]['noms_signataires']   = $value->noms_signataires;
+                        //$data_retard[$key]['id_sous_projet']        = $id_sous_projet;
+                        //$data_retard[$key]['statu']             = $value->statu;
+                    }
+                    
                 }
+                $data=$data_retard;
 			}
 		} 
         elseif ($menu=='getcontrat_agepBysousprojet') 
@@ -51,6 +79,37 @@ class Contrat_agep extends REST_Controller {
             {   
                 foreach ($tmp as $key => $value)
                 {   
+                    if ($value->statu=='EN COURS')
+                    {
+                        if ($value->nbr_jour_restant<=5)
+                        {
+                            if ($value->id_avenant_presence)
+                            {   
+                                if ($value->id_avenant_retard)
+                                {
+                                    $data[$key]['retard'] = true;
+                                }
+                                else
+                                {
+                                    $data[$key]['retard'] = false;
+                                }
+                            }
+                            else
+                            {
+                                $data[$key]['retard'] = true;
+                            }
+                        }
+                        else
+                        {
+                            $data[$key]['retard'] = false;
+                        }
+                    }
+                    else
+                    {
+                        $data[$key]['retard'] = false;
+                    }
+                    
+
                     //$sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
                     $agep = $this->Agence_pManager->findById($value->id_agep);
                     $data[$key]['id']                 = $value->id;
