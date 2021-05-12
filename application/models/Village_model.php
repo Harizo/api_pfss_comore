@@ -134,7 +134,7 @@ public function findAllByIle($ile_id)
     }
     public function findByIdAr($id)
     {
- 		$requete="select v.Village as village,v.zone_id"
+ 		$requete="select v.Village as village,v.zone_id,v.id_zip,v.vague"
 				." from see_village as v"
                 ." where v.id=".$id;
 				$result = $this->db->query($requete)->result();

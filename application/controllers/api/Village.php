@@ -43,6 +43,7 @@ class Village extends REST_Controller {
                 $data[$key]['commune_id'] = $value->commune_id;
                 $data[$key]['vague'] = $value->vague;
                 $data[$key]['zip'] = $zip;
+                $data[$key]['id_zip'] = $value->id_zip;
                 };
             }else
                     $data = array();
