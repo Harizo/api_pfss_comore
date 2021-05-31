@@ -8,6 +8,9 @@ class Consultant_ong extends REST_Controller {
         parent::__construct();
         $this->load->model('consultant_ong_model', 'ConsultantongManager');
         $this->load->model('ile_model', 'IleManager');
+        $this->load->model('region_model', 'RegionManager');
+        $this->load->model('commune_model', 'CommuneManager');
+        $this->load->model('village_model', 'VillageManager');
     }
     public function index_get() {
         $id = $this->get('id');
@@ -26,6 +29,9 @@ class Consultant_ong extends REST_Controller {
                 foreach ($tmp as $key => $value)
                 {
                     $ile = $this->IleManager->findById($value->ile_id);
+                    $region = $this->RegionManager->findById($value->id_region);
+                    $commune = $this->CommuneManager->findById($value->id_commune);
+                    $village = $this->VillageManager->findById($value->id_village);
                     $data[$key]['id'] = $value->id;
                     $data[$key]['code'] = $value->code;
                     $data[$key]['nom_consultant']    = $value->nom_consultant;
@@ -35,6 +41,9 @@ class Consultant_ong extends REST_Controller {
                     $data[$key]['telephone_contact']    = $value->telephone_contact;
                     $data[$key]['adresse']    = $value->adresse;
                     $data[$key]['ile']    = $ile;
+                    $data[$key]['region']    = $region;
+                    $data[$key]['commune']    = $commune;
+                    $data[$key]['village']    = $village;
                 }
             }
             else
@@ -48,6 +57,9 @@ class Consultant_ong extends REST_Controller {
                 foreach ($tmp as $key => $value)
                 {
                     $ile = $this->IleManager->findById($value->ile_id);
+                    $region = $this->RegionManager->findById($value->id_region);
+                    $commune = $this->CommuneManager->findById($value->id_commune);
+                    $village = $this->VillageManager->findById($value->id_village);
                     $data[$key]['id'] = $value->id;
                     $data[$key]['code'] = $value->code;
                     $data[$key]['nom_consultant']    = $value->nom_consultant;
@@ -57,6 +69,9 @@ class Consultant_ong extends REST_Controller {
                     $data[$key]['telephone_contact']    = $value->telephone_contact;
                     $data[$key]['adresse']    = $value->adresse;
                     $data[$key]['ile']    = $ile;
+                    $data[$key]['region']    = $region;
+                    $data[$key]['commune']    = $commune;
+                    $data[$key]['village']    = $village;
                 }
             }
             else
@@ -90,6 +105,9 @@ class Consultant_ong extends REST_Controller {
 			'telephone_contact'    => $this->post('telephone_contact'),
 			'adresse'    => $this->post('adresse'),
 			'ile_id'    => $this->post('ile_id'),
+			'id_region'    => $this->post('id_region'),
+			'id_commune'    => $this->post('id_commune'),
+			'id_village'    => $this->post('id_village')
 		);               
          if ($supprimer == 0)  {
             if ($id == 0) {

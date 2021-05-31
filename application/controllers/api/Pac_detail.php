@@ -5,52 +5,45 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 // afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Pges_phases extends REST_Controller {
+class Pac_detail extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('pges_phases_model', 'Pges_phasesManager');
+        $this->load->model('pac_detail_model', 'Pac_detailManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
+        $id_pac = $this->get('id_pac');
         $menu = $this->get('menu');
-        $id_pges = $this->get('id_pges');
-        if ($menu=="getphasesbypges") {
-               
-            $pges_phases = $this->Pges_phasesManager->getphasesbypges($id_pges);
-                if ($pges_phases) {
-                    $data = $pges_phases;
-                    /*foreach ($pges_phases as $key => $value)
-                    {
-                        $ile = $this->IleManager->findById($value->calendrier_execution);
-                        $region = $this->RegionManager->findById($value->cout_estimatif);
-                        $commune = $this->CommuneManager->findById($value->id_commune);
-
-                        $data[$key]['id'] = $value->id;
-                        $data[$key]['impacts'] = $value-> impacts;      
-                        $data[$key]['mesures'] = $value-> mesures;      
-                        $data[$key]['responsable'] = $value-> responsable;
-                        $data[$key]['id_pges'] = $value->id_pges;                        
-                    };*/
+        if ($menu=="getpac_detailbypac")
+        {
+            $pac_detail = $this->Pac_detailManager->getpac_detailbypac($id_pac );
+                if ($pac_detail)
+                {
+                    $data = $pac_detail;
 
                 } else
                     $data = array();
             
-        } elseif ($id) {
+        } 
+        elseif ($id) 
+        {
                
-                $data = $this->Pges_phasesManager->findById($id);
-                /*$data['id'] = $pges_phases->id;
-                $data['code'] = $pges_phases->code;
-                $data['description'] = $pges_phases->description;*/
+                $data = $this->Pac_detailManager->findById($id);
+                /*$data['id'] = $pac_detail->id;
+                $data['code'] = $pac_detail->code;
+                $data['description'] = $pac_detail->description;*/
                 
-            } else 
+            } 
+            else 
             {
-               /* $pges_phases = $this->Pges_phasesManager->findAll();
-                if ($pges_phases) {
-                    $data = $pges_phases;
+               $pac_detail = $this->Pac_detailManager->findAll();
+                if ($pac_detail)
+                {
+                    $data = $pac_detail;
 
-                } else*/
+                } else
                     $data = array();
             }
         
@@ -75,14 +68,12 @@ class Pges_phases extends REST_Controller {
         if ($supprimer == 0) {
             if ($id == 0) {
                 $data = array(
-                    'description'=> $this->post( 'description'), 
-                    'impacts'=> $this->post( 'impacts'),      
-                    'mesures'=> $this->post( 'mesures'),      
-                    'responsable'=> $this->post( 'responsable'),
-                    'calendrier_execution'=> $this->post( 'calendrier_execution'),      
-                    'cout_estimatif'=> $this->post( 'cout_estimatif'), 
-                    'id_pges' => $this->post('id_pges'), 
-                    'phase' => $this->post('phase')
+                    'numero'       => $this->post('numero'),
+                    'besoin'       => $this->post('besoin'),
+                    'cout'  => $this->post('cout'),
+                    'duree'  => $this->post('duree'),      
+                    'id_pac'    => $this->post('id_pac'),      
+                    'calendrier_activite'    => $this->post('calendrier_activite')
                 );               
                 if (!$data) {
                     $this->response([
@@ -91,7 +82,7 @@ class Pges_phases extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->Pges_phasesManager->add($data);              
+                $dataId = $this->Pac_detailManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -111,14 +102,12 @@ class Pges_phases extends REST_Controller {
                 if ($etat_download)
                 {   
                     $data = array(
-                        'description'=> $this->post( 'description'),
-                        'impacts'=> $this->post( 'impacts'),      
-                        'mesures'=> $this->post( 'mesures'),      
-                        'responsable'=> $this->post( 'responsable'),
-                        'calendrier_execution'=> $this->post( 'calendrier_execution'),      
-                        'cout_estimatif'=> $this->post( 'cout_estimatif'), 
-                        'id_pges' => $this->post('id_pges'), 
-                        'phase' => $this->post('phase')
+                        'numero'       => $this->post('numero'),
+                        'besoin'       => $this->post('besoin'),
+                        'cout'  => $this->post('cout'),
+                        'duree'  => $this->post('duree'),      
+                        'id_pac'    => $this->post('id_pac'),      
+                        'calendrier_activite'    => $this->post('calendrier_activite')
                     );
                     if (!$data) {
                         $this->response([
@@ -127,7 +116,7 @@ class Pges_phases extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_BAD_REQUEST);
                     }
-                    $dataId = $this->Pges_phasesManager->add_down($data, $id);              
+                    $dataId = $this->Pac_detailManager->add_down($data, $id);              
                     if (!is_null($dataId)) {
                         $this->response([
                             'status' => TRUE,
@@ -145,14 +134,12 @@ class Pges_phases extends REST_Controller {
                 else
                 {
                     $data = array(
-                        'description'=> $this->post( 'description'),
-                        'impacts'=> $this->post( 'impacts'),      
-                        'mesures'=> $this->post( 'mesures'),      
-                        'responsable'=> $this->post( 'responsable'),
-                        'calendrier_execution'=> $this->post( 'calendrier_execution'),      
-                        'cout_estimatif'=> $this->post( 'cout_estimatif'),
-                        'id_pges' => $this->post('id_pges'), 
-                        'phase' => $this->post('phase')
+                        'numero'       => $this->post('numero'),
+                        'besoin'       => $this->post('besoin'),
+                        'cout'  => $this->post('cout'),
+                        'duree'  => $this->post('duree'),      
+                        'id_pac'    => $this->post('id_pac'),      
+                        'calendrier_activite'    => $this->post('calendrier_activite')
                     );              
                     if (!$data || !$id) {
                         $this->response([
@@ -161,7 +148,7 @@ class Pges_phases extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_BAD_REQUEST);
                     }
-                    $update = $this->Pges_phasesManager->update($id, $data);              
+                    $update = $this->Pac_detailManager->update($id, $data);              
                     if(!is_null($update)){
                         $this->response([
                             'status' => TRUE, 
@@ -186,7 +173,7 @@ class Pges_phases extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
-            $delete = $this->Pges_phasesManager->delete($id);          
+            $delete = $this->Pac_detailManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,

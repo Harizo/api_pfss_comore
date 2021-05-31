@@ -43,7 +43,10 @@ class Consultant_ong_model extends CI_Model {
             'fonction_contact'    =>  $cons_ong['fonction_contact'],                       
             'telephone_contact'    =>  $cons_ong['telephone_contact'],                       
             'adresse'    =>  $cons_ong['adresse'],                       
-            'ile_id'    =>  $cons_ong['ile_id'],                       
+            'ile_id'    =>  $cons_ong['ile_id'] ,                       
+            'id_region'    =>  $cons_ong['id_region'],                       
+            'id_commune'    =>  $cons_ong['id_commune'] ,                       
+            'id_village'    =>  $cons_ong['id_village']                        
         );
     }
     public function _set_down($cons_ong) {
@@ -57,6 +60,9 @@ class Consultant_ong_model extends CI_Model {
             'telephone_contact'    =>  $cons_ong['telephone_contact'],                       
             'adresse'    =>  $cons_ong['adresse'],                       
             'ile_id'    =>  $cons_ong['ile_id'],                       
+            'id_region'    =>  $cons_ong['id_region'],                       
+            'id_commune'    =>  $cons_ong['id_commune'] ,                       
+            'id_village'    =>  $cons_ong['id_village']                       
         );
     }
     public function delete($id) {

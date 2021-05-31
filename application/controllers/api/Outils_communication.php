@@ -1,47 +1,53 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
-
+//harizo
 // afaka fafana refa ts ilaina
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Tableau_recap_pac extends REST_Controller {
+class Outils_communication extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('tableau_recap_pac_model', 'Tableau_recap_pacManager');
+        $this->load->model('outils_communication_model', 'Outils_communicationManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
-        $id_pac = $this->get('id_pac');
         $menu = $this->get('menu');
-        if ($menu=="gettableau_recap_pacbypac")
-        {
-            $tableau_recap_pac = $this->Tableau_recap_pacManager->gettableau_recap_pacbypac($id_pac );
-                if ($tableau_recap_pac)
-                {
-                    $data = $tableau_recap_pac;
+        $id_formation_ml = $this->get('id_formation_ml');
+        if ($menu=="getoutils_communicationbyformation") {
+               
+            $outils_communication = $this->Outils_communicationManager->getoutils_communicationbyformation($id_formation_ml);
+                if ($outils_communication) {
+                    //$data = $outils_communication;
+                    foreach ($outils_communication as $key => $value) {
+                        $data[$key]['id'] = $value->id;
+                        $data[$key]['outils_communication'] = unserialize($value->outils_communication);
+                        $data[$key]['id_formation_ml'] = $value->id_formation_ml;
+                        
+                    };
 
                 } else
                     $data = array();
             
-        } 
-        elseif ($id) 
-        {
+        } elseif ($id) {
                
-                $data = $this->Tableau_recap_pacManager->findById($id);
-                /*$data['id'] = $tableau_recap_pac->id;
-                $data['code'] = $tableau_recap_pac->code;
-                $data['description'] = $tableau_recap_pac->description;*/
+                $data = $this->Outils_communicationManager->findById($id);
+                /*$data['id'] = $outils_communication->id;
+                $data['outils_communication'] = $outils_communication->outils_communication;
+                $data['libelle'] = $outils_communication->libelle;*/
                 
-            } 
-            else 
-            {
-               $tableau_recap_pac = $this->Tableau_recap_pacManager->findAll();
-                if ($tableau_recap_pac)
-                {
-                    $data = $tableau_recap_pac;
+            } else {
+                $outils_communication = $this->Outils_communicationManager->findAll();
+                if ($outils_communication) {
+                    $data = $outils_communication;
+                    /*foreach ($outils_communication as $key => $value) {
+                        $data[$key]['id'] = $value->id;
+                        $data[$key]['outils_communication'] = $value->outils_communication;
+                        $data[$key]['libelle'] = $value->libelle;
+                        
+                    };*/
 
                 } else
                     $data = array();
@@ -68,10 +74,8 @@ class Tableau_recap_pac extends REST_Controller {
         if ($supprimer == 0) {
             if ($id == 0) {
                 $data = array(
-                    'besoin'       => $this->post('besoin'),
-                    'cout'  => $this->post('cout'),
-                    'duree'  => $this->post('duree'),      
-                    'id_pac'    => $this->post('id_pac')
+                    'outils_communication' => serialize($this->post('outils_communication')),
+                    'id_formation_ml' => $this->post('id_formation_ml')
                 );               
                 if (!$data) {
                     $this->response([
@@ -80,7 +84,7 @@ class Tableau_recap_pac extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->Tableau_recap_pacManager->add($data);              
+                $dataId = $this->Outils_communicationManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -100,10 +104,8 @@ class Tableau_recap_pac extends REST_Controller {
                 if ($etat_download)
                 {   
                     $data = array(
-                        'besoin'       => $this->post('besoin'),
-                        'cout'  => $this->post('cout'),
-                        'duree'  => $this->post('duree'),      
-                        'id_pac'    => $this->post('id_pac')
+                        'outils_communication' => serialize($this->post('outils_communication')),
+                        'id_formation_ml' => $this->post('id_formation_ml')
                     );
                     if (!$data) {
                         $this->response([
@@ -112,7 +114,7 @@ class Tableau_recap_pac extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_BAD_REQUEST);
                     }
-                    $dataId = $this->Tableau_recap_pacManager->add_down($data, $id);              
+                    $dataId = $this->Outils_communicationManager->add_down($data, $id);              
                     if (!is_null($dataId)) {
                         $this->response([
                             'status' => TRUE,
@@ -130,10 +132,8 @@ class Tableau_recap_pac extends REST_Controller {
                 else
                 {
                     $data = array(
-                        'besoin'       => $this->post('besoin'),
-                        'cout'  => $this->post('cout'),
-                        'duree'  => $this->post('duree'),      
-                        'id_pac'    => $this->post('id_pac')
+                        'outils_communication' => serialize($this->post('outils_communication')),
+                        'id_formation_ml' => $this->post('id_formation_ml')
                     );              
                     if (!$data || !$id) {
                         $this->response([
@@ -142,7 +142,7 @@ class Tableau_recap_pac extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_BAD_REQUEST);
                     }
-                    $update = $this->Tableau_recap_pacManager->update($id, $data);              
+                    $update = $this->Outils_communicationManager->update($id, $data);              
                     if(!is_null($update)){
                         $this->response([
                             'status' => TRUE, 
@@ -167,7 +167,7 @@ class Tableau_recap_pac extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
-            $delete = $this->Tableau_recap_pacManager->delete($id);          
+            $delete = $this->Outils_communicationManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,

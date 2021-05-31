@@ -152,4 +152,34 @@ class Infrastructure_model extends CI_Model
         return null;
     }
 
+    public function findByIdwithtype($id)
+    {
+        $this->db->select("infrastructure.*,type_infrastructure.code as code_type,type_infrastructure.libelle as libelle_type")
+                ->join('type_infrastructure','type_infrastructure.id=infrastructure.id_type_infrastructure')
+                ->where("infrastructure.id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
+    
+    public function getinfrastructurebyvillageandchoisitype($id_village)
+    {
+        $result =  $this->db->select('infrastructure.*,type_infrastructure.code as code_type,type_infrastructure.libelle as libelle_type')
+                        ->from($this->table)
+                        ->join('type_infrastructure','type_infrastructure.id=infrastructure.id_type_infrastructure')
+                        ->where('id_village',$id_village)
+                        ->where('statu','CHOISI')
+                        ->order_by('code_numero')
+                        ->get()
+                        ->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+
 }

@@ -18,7 +18,28 @@ class Infrastructure extends REST_Controller {
         $menu = $this->get('menu');
         $id_type_infrastructure = $this->get('id_type_infrastructure');
         $id_village = $this->get('id_village');
-        if ($menu=="getinfrastructurebyvillageandchoisi") {
+        if ($menu=="getinfrastructurebyvillageandchoisitype") {
+               
+            $infrastructure = $this->InfrastructureManager->getinfrastructurebyvillageandchoisitype($id_village);
+                if ($infrastructure) {
+                    $data = $infrastructure;
+                    /*foreach ($infrastructure as $key => $value)
+                    {
+                        $type_infrastructure = $this->Type_infrastructureManager->findById($value->id_type_infrastructure);
+                        $data[$key]['id'] = $value->id;
+                        $data[$key]['code_numero'] = $value->code_numero;
+                        $data[$key]['code_passation'] = $value->code_passation;
+                        $data[$key]['libelle'] = $value->libelle;
+                        $data[$key]['statu'] = $value->statu;
+                        $data[$key]['id_village'] = $value->id_village;
+                        $data[$key]['type_infrastructure'] = $type_infrastructure;
+                        
+                    };*/
+
+                } else
+                    $data = array();
+            
+        } elseif ($menu=="getinfrastructurebyvillageandchoisi") {
                
             $infrastructure = $this->InfrastructureManager->getinfrastructurebyvillageandchoisi($id_village);
                 if ($infrastructure) {

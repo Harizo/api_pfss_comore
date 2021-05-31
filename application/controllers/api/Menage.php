@@ -24,7 +24,6 @@ class Menage extends REST_Controller {
         $beneficiaire = $this->get('beneficiaire');
         $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
         $tous = $this->get('tous');
-
         $max_id = $this->get('max_id');
 		$data=array();
 		if($cle_etrangere && $id_groupe_ml_pl) {
@@ -43,6 +42,10 @@ class Menage extends REST_Controller {
 		} else if($cle_etrangere && $etat_statut && $id_sous_projet) {
 			 $data = $this->menageManager->findAllByVillageAndEtatstatut($cle_etrangere,$id_sous_projet,$etat_statut);
 		} else if($cle_etrangere && $tous && $id_sous_projet) {
+		if($id_groupe_ml_pl)
+		{	
+			$data = $this->menageManager->findmenageBygroupe($id_groupe_ml_pl);
+	   } else if($cle_etrangere && $tous && $id_sous_projet) {
 			 $data = $this->menageManager->findAllByVillageAndSousProjet($cle_etrangere,$id_sous_projet);
 		} else if ($max_id == 1) {
             $data = $this->menageManager->find_max_id();

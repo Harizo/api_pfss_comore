@@ -192,7 +192,7 @@ class Contrat_agep_model extends CI_Model {
                         ) as id_avenant_retard
                     from contrat_agep where id_sous_projet='".$id_sous_projet."' 
                         and DATEDIFF(date_prevu_fin,now())<=5 
-                        and statu='EN COURS'" ;
+                        and statu='EN COURS' group by contrat_agep.id";
 		$query = $this->db->query($requete);
         $result= $query->result();				
         if($result) {

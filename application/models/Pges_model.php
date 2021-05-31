@@ -46,7 +46,10 @@ class Pges_model extends CI_Model
             'date_etablissement'=> $pges['date_etablissement'],    
             'date_visa_ugp'=> $pges['date_visa_ugp'],    
             'nom_prenom_ugp'=> $pges['nom_prenom_ugp'],   
-            'id_sous_projet' => $pges['id_sous_projet'] 
+            'id_sous_projet' => $pges['id_sous_projet'],   
+            'id_village' => $pges['id_village'],   
+            'id_infrastructure' => $pges['id_infrastructure'],   
+            'montant_total' => $pges['montant_total']  
         );
     }
 
@@ -74,7 +77,10 @@ class Pges_model extends CI_Model
             'date_etablissement'=> $pges['date_etablissement'],    
             'date_visa_ugp'=> $pges['date_visa_ugp'],    
             'nom_prenom_ugp'=> $pges['nom_prenom_ugp'],   
-            'id_sous_projet' => $pges['id_sous_projet'] 
+            'id_sous_projet' => $pges['id_sous_projet'],   
+            'id_village' => $pges['id_village'],   
+            'id_infrastructure' => $pges['id_infrastructure'],   
+            'montant_total' => $pges['montant_total'] 
         );
     }
 
@@ -130,6 +136,20 @@ class Pges_model extends CI_Model
             return $q->row();
         }
         return null;
+    }
+
+    public function getpgesBysousprojetvillage($id_sous_projet,$id_village)
+    {
+        $requete= "select pges.*
+                    from pges where pges.id_sous_projet='".$id_sous_projet."' 
+                        and pges.id_village='".$id_village."'";
+		$query = $this->db->query($requete);
+        $result= $query->result();				
+        if($result) {
+            return $result;
+        }else{
+            return array();
+        }                 
     }
 
 }

@@ -1,13 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Phaseexection_model extends CI_Model
+class Pac_detail_model extends CI_Model
 {
-    protected $table = 'see_phaseexection';
+    protected $table = 'pac_detail';
 
 
-    public function add($phaseexection)
+    public function add($pac_detail)
     {
-        $this->db->set($this->_set($phaseexection))
+        $this->db->set($this->_set($pac_detail))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
         {
@@ -18,9 +18,9 @@ class Phaseexection_model extends CI_Model
     }
 
 
-    public function update($id, $phaseexection)
+    public function update($id, $pac_detail)
     {
-        $this->db->set($this->_set($phaseexection))
+        $this->db->set($this->_set($pac_detail))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)
@@ -31,20 +31,20 @@ class Phaseexection_model extends CI_Model
         }                      
     }
 
-    public function _set($phaseexection)
+    public function _set($pac_detail)
     {
-        return array(
-            'Code' => $phaseexection['Code'],
-            'Phase' => $phaseexection['Phase'],
-            'montantalloue' => $phaseexection['montantalloue'],
-            'indemnite'     => $phaseexection['indemnite'],
-            'datedebut'     => $phaseexection['datedebut'],
-            'datefin'       => $phaseexection['datefin']                    
+        return array(            
+            'numero'       => $pac_detail['numero'],            
+            'besoin'       => $pac_detail['besoin'],
+            'cout'  => $pac_detail['cout'],
+            'duree'  => $pac_detail['duree'],      
+            'calendrier_activite'    => $pac_detail['calendrier_activite'],      
+            'id_pac'    => $pac_detail['id_pac']
         );
     }
 
-    public function add_down($phaseexection, $id)  {
-        $this->db->set($this->_set_down($phaseexection, $id))
+    public function add_down($pac_detail, $id)  {
+        $this->db->set($this->_set_down($pac_detail, $id))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -52,15 +52,15 @@ class Phaseexection_model extends CI_Model
             return null;
         }                    
     }
-    public function _set_down($phaseexection, $id)
+    public function _set_down($pac_detail, $id)
     {
-        return array(
-            'Code' => $phaseexection['Code'],
-            'Phase' => $phaseexection['Phase'],
-            'montantalloue' => $phaseexection['montantalloue'],
-            'indemnite'     => $phaseexection['indemnite'],
-            'datedebut'     => $phaseexection['datedebut'],
-            'datefin'       => $phaseexection['datefin']
+        return array(           
+            'numero'       => $pac_detail['numero'],            
+            'besoin'       => $pac_detail['besoin'],
+            'cout'  => $pac_detail['cout'],
+            'duree'  => $pac_detail['duree'],      
+            'calendrier_activite'    => $pac_detail['calendrier_activite'],     
+            'id_pac'    => $pac_detail['id_pac']
         );
     }
 
@@ -80,7 +80,21 @@ class Phaseexection_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('datedebut')
+                        ->order_by('id')
+                        ->get()
+                        ->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                 
+    } 
+    public function getpac_detailbypac($id_pac)
+    {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where('id_pac',$id_pac)
                         ->get()
                         ->result();
         if($result)

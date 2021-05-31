@@ -13,8 +13,19 @@ class Contrat_consultant_ong extends REST_Controller {
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
+        $id_sous_projet = $this->get('id_sous_projet');
+        $menu = $this->get('menu');
         $data = array() ;
-		if($id) {
+		if($menu=="getcontratbysousprojet")
+        {
+			$tmp = $this->ContratconsultantManager->getcontratbysousprojet($id_sous_projet);
+            if ($tmp)
+            {
+                $data = $tmp;
+            }
+                
+		}  
+        elseif($id) {
 			$data = $this->ContratconsultantManager->findById($id);
             if (!$data)
                 $data = array();
@@ -80,7 +91,7 @@ class Contrat_consultant_ong extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-				// Mise à jour d'un enregistrement
+				// Mise ï¿½ jour d'un enregistrement
                 $update = $this->ContratconsultantManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
