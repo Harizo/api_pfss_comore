@@ -21,10 +21,13 @@ class Menage extends REST_Controller {
         $id_sous_projet = $this->get('id_sous_projet');
         $beneficiaire = $this->get('beneficiaire');
         $tous = $this->get('tous');
-
+		$id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
         $max_id = $this->get('max_id');
 		$data=array();
-		if($cle_etrangere && $tous && $id_sous_projet) {
+		if($id_groupe_ml_pl)
+		{	
+			$data = $this->menageManager->findmenageBygroupe($id_groupe_ml_pl);
+	   } else if($cle_etrangere && $tous && $id_sous_projet) {
 			 $data = $this->menageManager->findAllByVillageAndSousProjet($cle_etrangere,$id_sous_projet);
 		} else if ($max_id == 1) {
             $data = $this->menageManager->find_max_id();

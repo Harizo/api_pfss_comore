@@ -30,22 +30,27 @@ class Count_contrat_agep extends REST_Controller {
            $contrat_agep = $this->Contrat_agepManager->countAllById_sous_projet_encours_avenant($id_sous_p);          
            // $data = $contrat_agep;
             if ($contrat_agep) 
-            {  $data_retard=array();
+            {  
+                $data_retard=array();
+                $data=array();
+                $i=0;
 				foreach ($contrat_agep as $key => $value)
-                {   if ($value->id_avenant_presence)
+                {   
+                    if ($value->id_avenant_presence)
                     {
                         if ($value->id_avenant_retard)
                         {
-                            $data_retard[$key]['id'] = $value->id;
+                            $data[$i]['id'] = $value->id;
+                            $i++;
                         }
                     }
                     else
                     {
-                        $data_retard[$key]['id'] = $value->id;
-                    }
-                    
+                        $data[$i]['id'] = $value->id;
+                        $i++;
+                    }  
                 }
-                $data=$data_retard;
+                //$data=$data_retard;
 			}
             else {
                 $data=array();

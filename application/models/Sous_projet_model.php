@@ -94,7 +94,7 @@ class Sous_projet_model extends CI_Model
 	// Récupération de tous les enregistrements de la table
     public function findAll()
     {
-		$requete='select sp.id,sp.code,sp.description as description,sp.id_par,par.intitule as plan_action_reinstallation'
+		$requete='select sp.id,sp.code,sp.description as description,sp.id_par,par.intitule as plan_action_reinstallation,sp.type'
 				.' from sous_projet as sp'
 				.' left outer join plan_action_reinstallation as par on par.id=sp.id_par'
 				.' order by sp.id	';				

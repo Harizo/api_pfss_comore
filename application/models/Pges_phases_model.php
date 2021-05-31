@@ -40,7 +40,8 @@ class Pges_phases_model extends CI_Model
             'responsable'=> $pges_phases['responsable'],
             'calendrier_execution'=> $pges_phases['calendrier_execution'],      
             'cout_estimatif'=> $pges_phases['cout_estimatif'],      
-            'id_pges'=> $pges_phases['id_pges']
+            'id_pges'=> $pges_phases['id_pges'],      
+            'phase'=> $pges_phases['phase']
         );
     }
 
@@ -62,7 +63,8 @@ class Pges_phases_model extends CI_Model
             'responsable'=> $pges_phases['responsable'],
             'calendrier_execution'=> $pges_phases['calendrier_execution'],      
             'cout_estimatif'=> $pges_phases['cout_estimatif'],      
-            'id_pges'=> $pges_phases['id_pges']
+            'id_pges'=> $pges_phases['id_pges'],      
+            'phase'=> $pges_phases['phase']
         );
     }
 

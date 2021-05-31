@@ -365,5 +365,20 @@ class Menage_model extends CI_Model
         }
         return null;
     }
+    
+    public function findmenageBygroupe($id_groupe_ml_pl)
+    {
+        $result =  $this->db->select('menage.*')
+                        ->from($this->table)
+                        ->join('liste_menage_ml_pl','liste_menage_ml_pl.menage_id=menage.id')
+                        ->where('liste_menage_ml_pl.id_groupe_ml_pl',$id_groupe_ml_pl)
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
 
 }
