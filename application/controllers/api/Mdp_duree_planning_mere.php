@@ -4,21 +4,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Mdp_duree_planning extends REST_Controller {
+class Mdp_duree_planning_mere extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('mdp_duree_planning_model', 'pvrmsMng');
+        $this->load->model('mdp_duree_planning_mere_model', 'pvrmsMng');
     }
 
     public function index_get() {
-        $id_mere = $this->get('id_mere');
+        $id_mdp = $this->get('id_mdp');
 		$data = array();
         
 
-		if ($id_mere) 
+		if ($id_mdp) 
         {
-			$tmp = $this->pvrmsMng->findByMere($id_mere);
+			$tmp = $this->pvrmsMng->findByMdp($id_mdp);
 			if($tmp) 
             {
 				$data=$tmp;
@@ -49,12 +49,8 @@ class Mdp_duree_planning extends REST_Controller {
 
 		$data = array(
 		
-            'id_mere' => $this->post('id_mere'),
-            'designation_activite'       => $this->post('designation_activite'),
-            'numero_semaine_deb'       => $this->post('numero_semaine_deb'),
-            'numero_jour_deb'       => $this->post('numero_jour_deb'),
-            'numero_semaine_fin'       => $this->post('numero_semaine_fin'),
-            'numero_jour_fin'       => $this->post('numero_jour_fin')
+            'id_mdp' => $this->post('id_mdp'),
+            'libelle'       => $this->post('libelle')
         
 		);       
 

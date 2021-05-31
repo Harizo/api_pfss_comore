@@ -29,7 +29,9 @@ class Gestion_financiere_model extends CI_Model {
         return array(
             'date'                  => $gestion_financiere['date'],
             'id_composante'         => $gestion_financiere['id_composante'],
-            'id_sous_projet'        => $gestion_financiere['id_sous_projet'],
+            'zip'                   => $gestion_financiere['zip'],
+            'vague'                 => $gestion_financiere['vague'],
+            'id_sous_rubrique'      => $gestion_financiere['id_sous_rubrique'],
             'id_village'            => $gestion_financiere['id_village'],
             'montant_engage'        => $gestion_financiere['montant_engage'],
             'montant_paye'          => $gestion_financiere['montant_paye']
@@ -74,9 +76,12 @@ class Gestion_financiere_model extends CI_Model {
                 cmp.code AS code_composante,
                 cmp.libelle AS libelle_composante,
                 
-                gf.id_sous_projet,
-                sp.code AS code_sous_projet,
+                gf.id_sous_rubrique,
+                sp.code AS code_sous_rubrique,
                 
+                gf.zip,
+                gf.vague,
+
                 gf.id_village,
                 sv.Village ,
                 
@@ -95,14 +100,14 @@ class Gestion_financiere_model extends CI_Model {
             FROM
                 gestion_financiere AS gf,
                 composante_pfss AS cmp,
-                sous_projet AS sp,
+                sous_rubrique AS sp,
                 see_village AS sv,
                 see_commune AS sc,
                 see_region AS sr,
                 see_ile AS si
             WHERE 
                 gf.id_composante = cmp.id
-                AND gf.id_sous_projet = sp.id
+                AND gf.id_sous_rubrique = sp.id
                 AND gf.id_village = sv.id
                 AND sv.commune_id = sc.id
                 AND sc.region_id = sr.id
@@ -145,6 +150,39 @@ class Gestion_financiere_model extends CI_Model {
         return $this->db->query($sql)->result(); 
     }
 
+
+
+    public function situtation_activite_global($date_debut, $date_fin)
+    {
+        $sql = 
+        '
+            select
+                sp.CODE AS Activité,
+                sp.montant AS '."'Montant prévu (KMF)'".',
+                
+                SUM(gf.montant_engage) AS '."'Cumule des engagement (KMF)'".',
+                ROUND(((SUM(gf.montant_engage) * 100)/sp.montant),2) AS '."'Taux d\'engagement (%)'".',
+                
+                SUM(gf.montant_paye) AS '."'Cumule des paiement (KMF)'".',
+                ROUND(((SUM(gf.montant_paye) * 100)/sp.montant),2) AS '."'Taux de décaissement (%)'".'
+                
+            FROM 
+                gestion_financiere AS gf,
+                see_village AS sv,
+                sous_rubrique AS sp
+            WHERE 
+                gf.id_village = sv.id
+                AND gf.id_sous_rubrique = sp.id
+                AND gf.date BETWEEN "'.$date_debut.'" AND "'.$date_fin.'"
+               
+            GROUP BY sp.id
+
+        ';
+
+
+        return $this->db->query($sql)->result(); 
+    }
+
     public function situtation_activite($date_debut, $date_fin, $id_village)
     {
         $sql = 
@@ -162,10 +200,10 @@ class Gestion_financiere_model extends CI_Model {
             FROM 
                 gestion_financiere AS gf,
                 see_village AS sv,
-                sous_projet AS sp
+                sous_rubrique AS sp
             WHERE 
                 gf.id_village = sv.id
-                AND gf.id_sous_projet = sp.id
+                AND gf.id_sous_rubrique = sp.id
                 AND gf.date BETWEEN "'.$date_debut.'" AND "'.$date_fin.'"
                 AND sv.id = '.$id_village.'
             GROUP BY sp.id

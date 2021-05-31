@@ -4,28 +4,39 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Mdp_duree_planning extends REST_Controller {
+class Sous_rubrique extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('mdp_duree_planning_model', 'pvrmsMng');
+        $this->load->model('sous_rubrique_model', 'sous_rubriqueMng');
     }
 
     public function index_get() {
-        $id_mere = $this->get('id_mere');
+        $id = $this->get('id');
+        
 		$data = array();
         
 
-		if ($id_mere) 
+		if ($id) 
         {
-			$tmp = $this->pvrmsMng->findByMere($id_mere);
+			$tmp = $this->sous_rubriqueMng->findById($id);
 			if($tmp) 
             {
 				$data=$tmp;
                 
 			}
 		} 
-        
+
+        else
+        {			
+			$tmp = $this->sous_rubriqueMng->findAll();
+			if ($tmp) 
+            {
+				$data=$tmp;
+          
+
+			}
+		}
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
@@ -49,13 +60,10 @@ class Mdp_duree_planning extends REST_Controller {
 
 		$data = array(
 		
-            'id_mere' => $this->post('id_mere'),
-            'designation_activite'       => $this->post('designation_activite'),
-            'numero_semaine_deb'       => $this->post('numero_semaine_deb'),
-            'numero_jour_deb'       => $this->post('numero_jour_deb'),
-            'numero_semaine_fin'       => $this->post('numero_semaine_fin'),
-            'numero_jour_fin'       => $this->post('numero_jour_fin')
-        
+
+            'code'                => $this->post('code'),
+            'libelle'             => $this->post('libelle'),
+            'montant'             => $this->post('montant')
 		);       
 
         if ($supprimer == 0) {
@@ -67,7 +75,7 @@ class Mdp_duree_planning extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->pvrmsMng->add($data);              
+                $dataId = $this->sous_rubriqueMng->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -92,7 +100,7 @@ class Mdp_duree_planning extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->pvrmsMng->update($id, $data);              
+                $update = $this->sous_rubriqueMng->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -119,7 +127,7 @@ class Mdp_duree_planning extends REST_Controller {
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
 
-            $delete = $this->pvrmsMng->delete($id);   
+            $delete = $this->sous_rubriqueMng->delete($id);   
 
             if (!is_null($delete)) 
             {

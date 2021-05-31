@@ -29,6 +29,11 @@ class Gestion_financiere extends REST_Controller {
                 $data = $this->GfmManager->situtation_composante($date_debut, $date_fin);
             }
 
+            if ($etat_choisis == 'situtation_activite_global') 
+            {
+                $data = $this->GfmManager->situtation_activite_global($date_debut, $date_fin);
+            }
+
             if ($etat_choisis == 'situtation_activite') 
             {
                 $data = $this->GfmManager->situtation_activite($date_debut, $date_fin, $id_village);
@@ -70,7 +75,9 @@ class Gestion_financiere extends REST_Controller {
 
             'date'                  => $this->post('date'),
             'id_composante'         => $this->post('id_composante'),
-            'id_sous_projet'        => $this->post('id_sous_projet'),
+            'zip'         => $this->post('zip'),
+            'vague'         => $this->post('vague'),
+            'id_sous_rubrique'        => $this->post('id_sous_rubrique'),
             'id_village'            => $this->post('id_village'),
             'montant_engage'        => $this->post('montant_engage'),
             'montant_paye'          => $this->post('montant_paye')
