@@ -29,6 +29,7 @@ class Menage_beneficiaire extends REST_Controller {
                 $data['id_menage'] = ($menage_programme->id_menage);
                 $data['id_sous_projet'] = ($menage_programme->id_sous_projet);                
                 $data['date_sortie'] = ($menage_programme->date_sortie);                
+                $data['motif_sortie'] = ($menage_programme->motif_sortie);                
                 $data['date_inscription'] = ($menage_programme->date_inscription);                
             }
         } else {
@@ -47,7 +48,8 @@ class Menage_beneficiaire extends REST_Controller {
                         $data[$key]['profession'] = ($value->profession);
                         $data[$key]['date_inscription'] = ($value->date_inscription);
                         $data[$key]['id_sous_projet'] = ($value->id_sous_projet);
-                        $data[$key]['date_sortie'] = ($value->date_sortie);
+                        $data[$key]['date_sortie'] = $value->date_sortie;
+                        $data[$key]['motif_sortie'] = $value->motif_sortie;
                         $data[$key]['date_inscription'] = ($value->date_inscription);
                         $data[$key]['detail_suivi_menage'] = array();
                         $data[$key]['detail_charge'] = 0;
@@ -67,6 +69,7 @@ class Menage_beneficiaire extends REST_Controller {
                         $data[$key]['NumeroEnregistrement'] = ($value->NumeroEnregistrement);
                         $data[$key]['id_sous_projet'] = ($id_sous_projet);
                         $data[$key]['date_sortie'] = ($value->date_sortie);
+                        $data[$key]['motif_sortie'] = ($value->motif_sortie);
                         $data[$key]['date_inscription'] = ($value->date_inscription);
                     }
                 }
@@ -97,11 +100,13 @@ class Menage_beneficiaire extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+        $sortie_programme = $this->post('sortie_programme') ;
 		$data = array(
 			'id_menage' => $this->post('id_menage'),
 			'id_sous_projet' => ($this->post('id_sous_projet')),
 			'date_sortie' => ($this->post('date_sortie')),
 			'date_inscription' => ($this->post('date_inscription')),
+			'motif_sortie' => ($this->post('motif_sortie')),
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {
@@ -136,7 +141,19 @@ class Menage_beneficiaire extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Mise à jour d'un enregistrement
-                $update = $this->MenagebeficiaireManager->update($id, $data);              
+				if($sortie_programme) {
+					$data = array(
+						'statut' => ('SORTI'),
+					);               
+					$updates = $this->menageManager->update_sortie($this->post('id_menage'), $data);
+					$data = array(
+						'date_sortie' => ($this->post('date_sortie')),
+						'motif_sortie' => ($this->post('motif_sortie')),
+					);               
+					$update = $this->MenagebeficiaireManager->update_sortie($this->post('id_menage'),$this->post('id_sous_projet'), $data);
+				} else {
+					$update = $this->MenagebeficiaireManager->update($id, $data);
+				}		
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 

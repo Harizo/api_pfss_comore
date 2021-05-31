@@ -50,7 +50,10 @@ class Pac_model extends CI_Model
             'id_ile'    => $pac['id_ile'],      
             'id_region'  => $pac['id_region'],
             'id_commune' => $pac['id_commune'],
-            'id_zip'     => $pac['id_zip']
+            'id_zip'     => $pac['id_zip'],
+            'id_village'     => $pac['id_village'],
+            'id_type_agr'     => $pac['id_type_agr'],
+            'libelle'     => $pac['libelle']
         );
     }
 
@@ -82,7 +85,10 @@ class Pac_model extends CI_Model
             'id_ile'    => $pac['id_ile'],      
             'id_region'  => $pac['id_region'],
             'id_commune' => $pac['id_commune'],
-            'id_zip'     => $pac['id_zip']
+            'id_zip'     => $pac['id_zip'],
+            'id_village'     => $pac['id_village'],
+            'id_type_agr'     => $pac['id_type_agr'],
+            'libelle'     => $pac['libelle']
         );
     }
 

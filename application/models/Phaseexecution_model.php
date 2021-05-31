@@ -36,10 +36,9 @@ class Phaseexecution_model extends CI_Model
         return array(
             'Code' => $phaseexecution['Code'],
             'Phase' => $phaseexecution['Phase'],
-            'montantalloue' => $phaseexecution['montantalloue'],
+            'id_sous_projet' => $phaseexecution['id_sous_projet'],
             'indemnite'     => $phaseexecution['indemnite'],
-            'datedebut'     => $phaseexecution['datedebut'],
-            'datefin'       => $phaseexecution['datefin']                    
+            'pourcentage'     => $phaseexecution['pourcentage']                   
         );
     }
 
@@ -57,10 +56,9 @@ class Phaseexecution_model extends CI_Model
         return array(
             'Code' => $phaseexecution['Code'],
             'Phase' => $phaseexecution['Phase'],
-            'montantalloue' => $phaseexecution['montantalloue'],
+            'id_sous_projet' => $phaseexecution['id_sous_projet'],
             'indemnite'     => $phaseexecution['indemnite'],
-            'datedebut'     => $phaseexecution['datedebut'],
-            'datefin'       => $phaseexecution['datefin']
+            'pourcentage'   => $phaseexecution['pourcentage']
         );
     }
 
@@ -80,7 +78,9 @@ class Phaseexecution_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->order_by('datedebut')
+                        ->order_by('id_sous_projet','asc')
+                        ->order_by('Code','asc')
+                        ->order_by('id','asc')
                         ->get()
                         ->result();
         if($result)

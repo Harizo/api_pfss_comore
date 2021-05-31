@@ -13,7 +13,9 @@ class Pac extends REST_Controller {
         $this->load->model('ile_model', 'IleManager');
         $this->load->model('region_model', 'RegionManager');
         $this->load->model('commune_model', 'CommuneManager');
+        $this->load->model('village_model', 'VillageManager');
         $this->load->model('zip_model', 'ZipManager');
+        $this->load->model('type_agr_model', 'Type_agrManager');
     }
 
     public function index_get() {
@@ -37,6 +39,8 @@ class Pac extends REST_Controller {
                         $region = $this->RegionManager->findById($value->id_region);
                         $commune = $this->CommuneManager->findById($value->id_commune);
                         $zip = $this->ZipManager->findById($value->id_zip);
+                        $village = $this->VillageManager->findById($value->id_village);
+                        $type_agr = $this->Type_agrManager->findById($value->id_type_agr);
                         $data[$key]['id']       = $value->id;
                         $data[$key]['milieu_physique']       = $value->milieu_physique;
                         $data[$key]['condition_climatique']  = $value->condition_climatique;
@@ -55,6 +59,9 @@ class Pac extends REST_Controller {
                         $data[$key]['region']   = $region;
                         $data[$key]['commune']   = $commune;
                         $data[$key]['zip']   = $zip;
+                        $data[$key]['village']   = $village;
+                        $data[$key]['type_agr']   = $type_agr;
+                        $data[$key]['libelle']       = $value->libelle;
                     }
 
                 } else
@@ -98,7 +105,10 @@ class Pac extends REST_Controller {
                     'id_ile'    => $this->post('id_ile'),      
                     'id_region'  => $this->post('id_region'),
                     'id_commune' => $this->post('id_commune'),
-                    'id_zip'     => $this->post('id_zip')
+                    'id_zip'     => $this->post('id_zip'),
+                    'id_village'     => $this->post('id_village'),
+                    'id_type_agr'     => $this->post('id_type_agr'),
+                    'libelle'     => $this->post('libelle')
                 );               
                 if (!$data) {
                     $this->response([
@@ -143,7 +153,10 @@ class Pac extends REST_Controller {
                         'id_ile'    => $this->post('id_ile'),      
                         'id_region'  => $this->post('id_region'),
                         'id_commune' => $this->post('id_commune'),
-                        'id_zip'     => $this->post('id_zip')
+                        'id_zip'     => $this->post('id_zip'),
+                        'id_village'     => $this->post('id_village'),
+                        'id_type_agr'     => $this->post('id_type_agr'),
+                        'libelle'     => $this->post('libelle')
                     );
                     if (!$data) {
                         $this->response([
@@ -186,7 +199,10 @@ class Pac extends REST_Controller {
                         'id_ile'    => $this->post('id_ile'),      
                         'id_region'  => $this->post('id_region'),
                         'id_commune' => $this->post('id_commune'),
-                        'id_zip'     => $this->post('id_zip')
+                        'id_zip'     => $this->post('id_zip'),
+                        'id_village'     => $this->post('id_village'),
+                        'id_type_agr'     => $this->post('id_type_agr'),
+                        'libelle'     => $this->post('libelle')
                     );              
                     if (!$data || !$id) {
                         $this->response([

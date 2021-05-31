@@ -66,6 +66,18 @@ class Menage_model extends CI_Model
             return null;
         }                      
     }
+    public function update_sortie($id, $menage)
+    {
+        $this->db->set($this->_set_sortie($menage))
+                            ->where('id', (int) $id)
+                            ->update($this->table);
+        if($this->db->affected_rows() === 1)
+        {
+            return true;
+        }else{
+            return null;
+        }                      
+    }
 
     public function _set($menage)
     {
@@ -125,10 +137,12 @@ class Menage_model extends CI_Model
 			'SexeTravailleur' => $menage['SexeTravailleur'],
 			'datedenaissancetravailleur' => $menage['datedenaissancetravailleur'],
 			'agetravailleur' => $menage['agetravailleur'],
+			'lien_travailleur' => $menage['lien_travailleur'],
 			'NomTravailleurSuppliant' => $menage['NomTravailleurSuppliant'],
 			'SexeTravailleurSuppliant' => $menage['SexeTravailleurSuppliant'],
 			'datedenaissancesuppliant' => $menage['datedenaissancesuppliant'],
 			'agesuppliant' => $menage['agesuppliant'],
+			'lien_suppleant' => $menage['lien_suppleant'],
 			'statut' => $menage['statut'],			
 			'inapte' => $menage['inapte'],			
 			'id_sous_projet' => $menage['id_sous_projet'],			
@@ -144,7 +158,7 @@ class Menage_model extends CI_Model
 			'nombre_enfant_scolarise_enquete' => $menage['nombre_enfant_scolarise_enquete'],
 			'nombre_enfant_moins_quinze_ans_enquete' => $menage['nombre_enfant_moins_quinze_ans_enquete'],
 			'nombre_enfant_non_scolarise_enquete' => $menage['nombre_enfant_non_scolarise_enquete'],
-			'nombre_personne_handicape_enquetenombre_personne_handicape_enquete' => $menage['nombre_personne_handicape_enquetenombre_personne_handicape_enquete'],
+			'nombre_personne_handicape_enquete' => $menage['nombre_personne_handicape_enquete'],
 			'nombre_adulte_travail_enquete' => $menage['nombre_adulte_travail_enquete'],
 			'nombre_membre_a_etranger_enquete' => $menage['nombre_membre_a_etranger_enquete'],
 			'maison_non_dure_enquete' => $menage['maison_non_dure_enquete'],
@@ -157,6 +171,7 @@ class Menage_model extends CI_Model
 			'membre_fonctionnaire_enquete' => $menage['membre_fonctionnaire_enquete'],
 			'possede_frigo_enquete' => $menage['possede_frigo_enquete'],
 			'antenne_parabolique_enquete' => $menage['antenne_parabolique_enquete'],
+			'motif_non_selection' => $menage['motif_non_selection'],
         );
     }
     public function _set_reponse($menage)
@@ -202,6 +217,7 @@ class Menage_model extends CI_Model
 			'membre_fonctionnaire_enquete' => $menage['membre_fonctionnaire_enquete'],
 			'possede_frigo_enquete' => $menage['possede_frigo_enquete'],
 			'antenne_parabolique_enquete' => $menage['antenne_parabolique_enquete'],
+			'motif_non_selection' => $menage['motif_non_selection'],
         );
     }
     public function _set_statut($menage)
@@ -220,6 +236,12 @@ class Menage_model extends CI_Model
 			'photo'                     => $menage['photo'],
 			'phototravailleur'          => $menage['phototravailleur'],
 			'phototravailleursuppliant' => $menage['phototravailleursuppliant'],
+        );
+    }
+    public function _set_sortie($menage)
+    {
+        return array(
+			'statut'                     => $menage['statut'],
         );
     }
 
@@ -328,6 +350,39 @@ class Menage_model extends CI_Model
             return null;
         }                  
     }
+    public function findAllByVillageAndEtatstatut($village_id,$id_sous_projet,$etat_statut)
+    {
+		$requete="select menage.*,lp1.description as lien_parente_travailleur,"
+				."lp2.description as lien_parente_suppleant"
+				." from menage"
+				." left join liendeparente as lp1 on lp1.id="."menage.lien_travailleur"
+				." left join liendeparente as lp2 on lp2.id="."menage.lien_suppleant"
+				." where  village_id=".$village_id
+				." and statut!='SORTI' and ".$etat_statut."=1".($id_sous_projet>0 ? " and id_sous_projet=".$id_sous_projet : "");
+		$result = $this->db->query($requete)->result();		
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                  
+    }
+    public function findAllByVillageAndMenagemlpl($village_id,$id_groupe_ml_pl)
+    {	// Liste ménage bénéficiaire par village avec statut<>SORTI et beneficiaire=1
+		// En outre il faut enlever les ménages qui ppartiennent déjà dans un autre groupe ML/PL
+		$requete="select * from menage as m where m.beneficiaire =1 and m.statut <> 'SORTI' and m.village_id =".$village_id
+				." and m.id not in "
+				." (select distinct lmplp.menage_id from liste_menage_ml_pl as lmplp"
+				." left join menage as m1 on m1.id=lmplp.menage_id "
+				." where lmplp.id_groupe_ml_pl<>".$id_groupe_ml_pl.")";
+		$result = $this->db->query($requete)->result();		
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                  
+    }
     public function findAllByVillageAndStatutAndSousProjet($village_id,$statut,$id_sous_projet)
     {
         $result =  $this->db->select('*')
@@ -364,6 +419,21 @@ class Menage_model extends CI_Model
             return $q->row();
         }
         return null;
+    }
+    
+    public function findmenageBygroupe($id_groupe_ml_pl)
+    {
+        $result =  $this->db->select('menage.*')
+                        ->from($this->table)
+                        ->join('liste_menage_ml_pl','liste_menage_ml_pl.menage_id=menage.id')
+                        ->where('liste_menage_ml_pl.id_groupe_ml_pl',$id_groupe_ml_pl)
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
     }
 
 }

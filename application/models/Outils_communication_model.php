@@ -1,13 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Tableau_recap_pac_model extends CI_Model
+class outils_communication_model extends CI_Model
 {
-    protected $table = 'tableau_recap_pac';
+    protected $table = 'outils_communication_ml';
 
 
-    public function add($tableau_recap_pac)
+    public function add($outils_communication)
     {
-        $this->db->set($this->_set($tableau_recap_pac))
+        $this->db->set($this->_set($outils_communication))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)
         {
@@ -18,9 +18,9 @@ class Tableau_recap_pac_model extends CI_Model
     }
 
 
-    public function update($id, $tableau_recap_pac)
+    public function update($id, $outils_communication)
     {
-        $this->db->set($this->_set($tableau_recap_pac))
+        $this->db->set($this->_set($outils_communication))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)
@@ -31,18 +31,16 @@ class Tableau_recap_pac_model extends CI_Model
         }                      
     }
 
-    public function _set($tableau_recap_pac)
+    public function _set($outils_communication)
     {
-        return array(            
-            'besoin'       => $tableau_recap_pac['besoin'],
-            'cout'  => $tableau_recap_pac['cout'],
-            'duree'  => $tableau_recap_pac['duree'],      
-            'id_pac'    => $tableau_recap_pac['id_pac']
+        return array(
+            'outils_communication'    =>      $outils_communication['outils_communication'],
+            'id_formation_ml' =>      $outils_communication['id_formation_ml']                      
         );
     }
 
-    public function add_down($tableau_recap_pac, $id)  {
-        $this->db->set($this->_set_down($tableau_recap_pac, $id))
+    public function add_down($outils_communication, $id)  {
+        $this->db->set($this->_set_down($outils_communication, $id))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -50,13 +48,12 @@ class Tableau_recap_pac_model extends CI_Model
             return null;
         }                    
     }
-    public function _set_down($tableau_recap_pac, $id)
+    public function _set_down($outils_communication, $id)
     {
         return array(
-            'besoin'       => $tableau_recap_pac['besoin'],
-            'cout'  => $tableau_recap_pac['cout'],
-            'duree'  => $tableau_recap_pac['duree'],      
-            'id_pac'    => $tableau_recap_pac['id_pac']
+            'id' => $id,
+            'outils_communication' => $outils_communication['outils_communication'],
+            'id_formation_ml' =>      $outils_communication['id_formation_ml'] 
         );
     }
 
@@ -76,6 +73,22 @@ class Tableau_recap_pac_model extends CI_Model
     {
         $result =  $this->db->select('*')
                         ->from($this->table)
+                        ->order_by('outils_communication')
+                        ->get()
+                        ->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+
+    public function getoutils_communicationbyformation($id_formation_ml)
+    {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where('id_formation_ml',$id_formation_ml)
                         ->order_by('id')
                         ->get()
                         ->result();
@@ -85,21 +98,17 @@ class Tableau_recap_pac_model extends CI_Model
         }else{
             return null;
         }                 
-    } 
-    public function gettableau_recap_pacbypac($id_pac)
+    }
+
+    /*public function getoutils_communicationbyformation($id)
     {
-        $result =  $this->db->select('*')
-                        ->from($this->table)
-                        ->where('id_pac',$id_pac)
-                        ->get()
-                        ->result();
-        if($result)
-        {
-            return $result;
-        }else{
-            return null;
-        }                 
-    } 
+        $this->db->where("id_formation_ml", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }*/
     public function findById($id)
     {
         $this->db->where("id", $id);

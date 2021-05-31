@@ -10,6 +10,7 @@ class Phaseexecution extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('phaseexecution_model', 'PhaseexecutionManager');
+        $this->load->model('sous_projet_model', 'Sous_projetManager');
     }
 
     public function index_get() {
@@ -24,8 +25,19 @@ class Phaseexecution extends REST_Controller {
             } else 
             {
                $phaseexecution = $this->PhaseexecutionManager->findAll();
-                if ($phaseexecution) {
-                    $data = $phaseexecution;
+                if ($phaseexecution)
+                {   
+                    foreach ($phaseexecution as $key => $value)
+                    {
+                        $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
+                        $data[$key]['id']=$value->id;
+                        $data[$key]['Code']=$value->Code;
+                        $data[$key]['Phase']=$value->Phase;
+                        $data[$key]['sous_projet']=$sous_projet;
+                        $data[$key]['indemnite']=$value->indemnite;
+                        $data[$key]['pourcentage']=$value->pourcentage;
+                    }
+                    //$data = $phaseexecution;
 
                 } else
                     $data = array();
@@ -54,10 +66,9 @@ class Phaseexecution extends REST_Controller {
                 $data = array(
                     'Code' => $this->post('Code'),
                     'Phase' => $this->post('Phase'),
-                    'montantalloue' => $this->post('montantalloue'),
+                    'id_sous_projet' => $this->post('id_sous_projet'),
                     'indemnite' => $this->post('indemnite'),
-                    'datedebut' => $this->post('datedebut'),
-                    'datefin' => $this->post('datefin')
+                    'pourcentage' => $this->post('pourcentage')
                 );               
                 if (!$data) {
                     $this->response([
@@ -88,10 +99,9 @@ class Phaseexecution extends REST_Controller {
                     $data = array(
                         'Code' => $this->post('Code'),
                         'Phase' => $this->post('Phase'),
-                        'montantalloue' => $this->post('montantalloue'),
+                        'id_sous_projet' => $this->post('id_sous_projet'),
                         'indemnite' => $this->post('indemnite'),
-                        'datedebut' => $this->post('datedebut'),
-                        'datefin' => $this->post('datefin')
+                        'pourcentage' => $this->post('pourcentage')
                     );
                     if (!$data) {
                         $this->response([
@@ -120,10 +130,9 @@ class Phaseexecution extends REST_Controller {
                     $data = array(
                         'Code' => $this->post('Code'),
                         'Phase' => $this->post('Phase'),
-                        'montantalloue' => $this->post('montantalloue'),
+                        'id_sous_projet' => $this->post('id_sous_projet'),
                         'indemnite' => $this->post('indemnite'),
-                        'datedebut' => $this->post('datedebut'),
-                        'datefin' => $this->post('datefin')
+                        'pourcentage' => $this->post('pourcentage')
                     );              
                     if (!$data || !$id) {
                         $this->response([

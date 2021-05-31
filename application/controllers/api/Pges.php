@@ -11,13 +11,53 @@ class Pges extends REST_Controller {
         parent::__construct();
         $this->load->model('pges_model', 'PgesManager');
         $this->load->model('sous_projet_model', 'Sous_projetManager');
+        $this->load->model('infrastructure_model', 'InfrastrctureManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
         $menu = $this->get('menu');
         $id_sous_projet = $this->get('id_sous_projet');
-        if ($menu=='getpgesBysousprojet') {
+        $id_village = $this->get('id_village');
+        if ($menu=='getpgesBysousprojetvillage')
+        {
+               
+            $tmp = $this->PgesManager->getpgesBysousprojetvillage($id_sous_projet,$id_village);
+            if ($tmp)
+            {
+                foreach ($tmp as $key => $value)
+                    {
+                        
+                        $infrastructure = $this->InfrastrctureManager->findByIdwithtype($value->id_infrastructure);
+                        $data[$key]['id'] = $value->id;    
+                        $data[$key]['bureau_etude'] = $value-> bureau_etude;      
+                        $data[$key]['ref_contrat'] = $value-> ref_contrat;
+                            
+                        $data[$key]['description_env'] = $value-> description_env;         
+                        $data[$key]['composante_zone_susce'] = $value-> composante_zone_susce;      
+                        $data[$key]['probleme_env'] = $value-> probleme_env;      
+                        $data[$key]['mesure_envisage'] = $value-> mesure_envisage;        
+                        $data[$key]['observation'] = $value-> observation;      
+                        $data[$key]['nom_prenom_etablissement'] = $value-> nom_prenom_etablissement;     
+                        $data[$key]['nom_prenom_validation'] = $value-> nom_prenom_validation;     
+                        $data[$key]['date_etablissement'] = $value-> date_etablissement;
+                          
+                        $data[$key]['date_visa_ugp'] = $value-> date_visa_ugp;      
+                        $data[$key]['nom_prenom_ugp'] = $value-> nom_prenom_ugp; 
+                        $data[$key]['infrastructure'] = $infrastructure;       
+                        $data[$key]['montant_total'] = $value-> montant_total;      
+                        $data[$key]['id_village'] = $value-> id_village;                       
+                    };
+                //$data=$tmp;
+            }
+            else {
+                $data=array();
+            }
+            
+            
+        } 
+        elseif ($menu=='getpgesBysousprojet')
+        {
                
             $tmp = $this->PgesManager->getpgesBysousprojet($id_sous_projet);
             if ($tmp)
@@ -61,7 +101,8 @@ class Pges extends REST_Controller {
                           
                         $data[$key]['date_visa_ugp'] = $value-> date_visa_ugp;      
                         $data[$key]['nom_prenom_ugp'] = $value-> nom_prenom_ugp; 
-                        $data[$key]['sous_projet'] = $sous_projet;                        
+                        $data[$key]['sous_projet'] = $sous_projet;     
+                        $data[$key]['montant_total'] = $value-> montant_total;                         
                     };
 
                 } else
@@ -101,7 +142,10 @@ class Pges extends REST_Controller {
                     'date_etablissement'=> $this->post( 'date_etablissement'),     
                     'date_visa_ugp'=> $this->post( 'date_visa_ugp'),      
                     'nom_prenom_ugp'=> $this->post( 'nom_prenom_ugp'), 
-                    'id_sous_projet' => $this->post('id_sous_projet')
+                    'id_sous_projet' => $this->post('id_sous_projet'), 
+                    'id_village' => $this->post('id_village'), 
+                    'id_infrastructure' => $this->post('id_infrastructure'), 
+                    'montant_total' => $this->post('montant_total')
                 );               
                 if (!$data) {
                     $this->response([
@@ -142,7 +186,10 @@ class Pges extends REST_Controller {
                         'date_etablissement'=> $this->post( 'date_etablissement'),     
                         'date_visa_ugp'=> $this->post( 'date_visa_ugp'),      
                         'nom_prenom_ugp'=> $this->post( 'nom_prenom_ugp'), 
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet' => $this->post('id_sous_projet'), 
+                        'id_village' => $this->post('id_village'), 
+                        'id_infrastructure' => $this->post('id_infrastructure'), 
+                        'montant_total' => $this->post('montant_total')
                     );
                     if (!$data) {
                         $this->response([
@@ -181,7 +228,10 @@ class Pges extends REST_Controller {
                         'date_etablissement'=> $this->post( 'date_etablissement'),     
                         'date_visa_ugp'=> $this->post( 'date_visa_ugp'),      
                         'nom_prenom_ugp'=> $this->post( 'nom_prenom_ugp'), 
-                        'id_sous_projet' => $this->post('id_sous_projet')
+                        'id_sous_projet' => $this->post('id_sous_projet'), 
+                        'id_village' => $this->post('id_village'), 
+                        'id_infrastructure' => $this->post('id_infrastructure'), 
+                        'montant_total' => $this->post('montant_total')
                     );              
                     if (!$data || !$id) {
                         $this->response([

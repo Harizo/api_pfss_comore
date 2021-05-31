@@ -58,9 +58,73 @@ class Contrat_consultant_ong_model extends CI_Model {
             return null;
         }  
    }
-    public function findById($id) {
+   public function getcontratbysousprojet($id_sous_projet) {
+        $requete="
+        select contrat.id as id,
+                contrat.id_consultant as id_consultant_ong,
+                contrat.id_sous_projet as id_sous_projet,
+                contrat.reference as reference,
+                sp.description as description_sp,
+                contrat.date_contrat as date_contrat,
+                contrat.objet as objet,
+                consultant.nom_consultant as nom_consultant
+        from contrat_consultant_ong as contrat
+            left outer join sous_projet as sp on sp.id=contrat.id_sous_projet
+            left outer join consultant_ong as consultant on consultant.id=contrat.id_consultant
+            where sp.id='".$id_sous_projet."'
+        order by contrat.id";
+       $query= $this->db->query($requete);		
+       if($query->result()) {
+           return $query->result();
+       }else{
+           return null;
+       }  
+  }
+  
+  public function findByIdArray($id)  {
+    $result =  $this->db->select('*')
+                    ->from($this->table)
+                    ->where("id", $id)
+                    ->order_by('id', 'asc')
+                    ->get()
+                    ->result();
+    if($result) {
+        return $result;
+    }else{
+        return null;
+    }                 
+}
+   public function findByIdAfaa($id_contrat) {
+        $requete="
+        select contrat.id as id,
+                contrat.id_consultant as id_consultant_ong,
+                contrat.id_sous_projet as id_sous_projet,
+                contrat.reference as reference,
+                sp.description as description_sp,
+                contrat.date_contrat as date_contrat,
+                contrat.objet as objet,
+                consultant.nom_consultant as nom_consultant
+        from contrat_consultant_ong as contrat
+            left outer join sous_projet as sp on sp.id=contrat.id_sous_projet
+            left outer join consultant_ong as consultant on consultant.id=contrat.id_consultant
+            where contrat.id='".$id_contrat."'
+        order by contrat.id";
+        return $this->db->query($requete)->result(); 
+  }
+    public function findByIdwithcle($id) {
 		// Selection par id
-        $this->db->where("id", $id);
+        $this->db->select('contrat_consultant_ong.id as id,
+                            contrat_consultant_ong.id_consultant as id_consultant_ong,
+                            contrat_consultant_ong.id_sous_projet as id_sous_projet,
+                            contrat_consultant_ong.reference as reference,
+                            sous_projet.description as description_sp,
+                            contrat_consultant_ong.date_contrat as date_contrat,
+                            contrat_consultant_ong.objet as objet,
+                            consultant_ong.nom_consultant as nom_consultant')
+                    //->from('contrat_consultant_ong')
+                    ->join("sous_projet", "sous_projet.id=contrat_consultant_ong.id_sous_projet")
+                    ->join("consultant_ong", "consultant_ong.id=contrat_consultant_ong.id_consultant")
+                    ->where("contrat_consultant_ong.id", $id);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
             return $q->row();

@@ -33,6 +33,9 @@ class Liste_mlpl_model extends CI_Model {
             'adresse'         =>  $liste_mlpl['adresse'],                       
             'contact'         =>  $liste_mlpl['contact'],                       
             'fonction'        =>  $liste_mlpl['fonction'],                       
+            'sexe'            =>  $liste_mlpl['sexe'],                       
+            'age'             =>  $liste_mlpl['age'],                       
+            'lien_de_parente' =>  $liste_mlpl['lien_de_parente'],                       
         );
     }
     public function delete($id) {
@@ -59,10 +62,12 @@ class Liste_mlpl_model extends CI_Model {
     }
     public function findAllByGroupemlpl($id_groupe_ml_pl)  {     
 		$requete="select grpm.id_groupe_ml_pl,grpm.menage_id, grpm.id,m.NumeroEnregistrement,m.nomchefmenage,m.nom_conjoint,m.Addresse,"
-		."m.nombre_enfant_non_scolarise,m.nombre_enfant_moins_six_ans,m.nombre_enfant_scolarise,"
-		."grpm.nom_prenom,grpm.adresse,grpm.contact,grpm.fonction"
+		."m.nombre_enfant_non_scolarise,m.nombre_enfant_moins_six_ans,m.nombre_enfant_scolarise,m.identifiant_menage,"
+		."grpm.nom_prenom,grpm.adresse,grpm.contact,grpm.fonction,grpm.sexe,grpm.age,grpm.lien_de_parente,"
+		."lp.description  as lienparental"
 		." from liste_ml_pl as grpm"
 		." left outer join menage as m on m.id=grpm.menage_id"
+		." left outer join liendeparente as lp on lp.id=grpm.lien_de_parente"
 		." where grpm.id_groupe_ml_pl =".$id_groupe_ml_pl
 		." order by m.NumeroEnregistrement";
 		$query= $this->db->query($requete);		

@@ -56,6 +56,14 @@ class Plainte extends REST_Controller {
 		if($tempo && intval($tempo) >0) {
 			$menage_id=$tempo;
 		}
+		$dateresolution=null;
+		if($this->post('dateresolution')) {
+			$dateresolution=$this->post('dateresolution');
+		}
+		$datemodification=null;
+		if($this->post('datemodification')) {
+			$datemodification=$this->post('datemodification');
+		}
 		$data = array(
             'menage_id'                 => $menage_id,
             'activite_id'               => $this->post('activite_id'),
@@ -72,12 +80,13 @@ class Plainte extends REST_Controller {
             'adresseplaignant'          => $this->post('adresseplaignant'),
             'responsableenregistrement' => $this->post('responsableenregistrement'),
             'mesureprise'               => $this->post('mesureprise'),
-            'dateresolution'            => $this->post('dateresolution'),
+            'dateresolution'            => $dateresolution,
             'statut'                    => $this->post('statut'),
+            'telephone'                 => $this->post('telephone'),
             'a_ete_modifie'             => $this->post('a_ete_modifie'),
             'supprime'                  => $this->post('supprime'),
             'userid'                    => $this->post('userid'),
-            'datemodification'          => $this->post('datemodification'),
+            'datemodification'          => $datemodification,
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {
