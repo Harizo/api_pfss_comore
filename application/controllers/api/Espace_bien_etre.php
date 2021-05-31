@@ -1,30 +1,25 @@
 <?php
+
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Liste_mlpl extends REST_Controller {
+class Espace_bien_etre extends REST_Controller {
+
     public function __construct() {
         parent::__construct();
-        $this->load->model('liste_mlpl_model', 'ListemlplManager');
+        $this->load->model('espace_bien_etre_model', 'EspacebienetreManager');
     }
+
     public function index_get() {
         $id = $this->get('id');
-        $cle_etrangere = $this->get('cle_etrangere');
-        $data = array() ;
-		if($id) {
-			$data = $this->ListemlplManager->findById($id);
-            if (!$data)
-                $data = array();
-		} else if ($cle_etrangere)  {
-            $data = $this->ListemlplManager->findAllByGroupemlpl($cle_etrangere);
-            if (!$data)
-                $data = array();
-        } else  {
-			$data = $this->ListemlplManager->findAll();
-            if (!$data)
-                $data = array();
-        }
+		$data = array();
+		if ($id) {
+			// Récupération par id (id=clé primaire)
+			$data = $this->EspacebienetreManager->findById($id);
+		} else {			
+			$data = $this->EspacebienetreManager->findAll();
+		}
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
@@ -33,7 +28,7 @@ class Liste_mlpl extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         } else {
             $this->response([
-                'status' => FALSE,
+                'status' => TRUE,
                 'response' => array(),
                 'message' => 'No data were found'
             ], REST_Controller::HTTP_OK);
@@ -42,23 +37,11 @@ class Liste_mlpl extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
-		$lien_de_parente=null;
-		if($this->post('lien_de_parente')) {
-			$lien_de_parente=$this->post('lien_de_parente');
-		}
-		// Affectation des valeurs des colonnes de la table
+		// Affectation description devise
 		$data = array(
-			'id_groupe_ml_pl' => $this->post('id_groupe_ml_pl'),
-			'menage_id' => $this->post('menage_id'),
-			'nom_prenom'      => $this->post('nom_prenom'),
-			'adresse'         => $this->post('adresse'),
-			'contact'         => $this->post('contact'),
-			'fonction'        => $this->post('fonction'),
-			'sexe'        => $this->post('sexe'),
-			'age'        => $this->post('age'),
-			'lien_de_parente'        => $lien_de_parente,
+			'description' => $this->post('description'),
 		);               
-         if ($supprimer == 0)  {
+        if ($supprimer == 0) {
             if ($id == 0) {
                 if (!$data) {
                     $this->response([
@@ -68,7 +51,7 @@ class Liste_mlpl extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Ajout d'un enregistrement
-                $dataId = $this->ListemlplManager->add($data);
+                $dataId = $this->EspacebienetreManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -91,11 +74,11 @@ class Liste_mlpl extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Mise à jour d'un enregistrement
-                $update = $this->ListemlplManager->update($id, $data);              
+                $update = $this->EspacebienetreManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
-                        'response' => $id,
+                        'response' => 1,
                         'message' => 'Update data success'
                             ], REST_Controller::HTTP_OK);
                 } else {
@@ -114,7 +97,7 @@ class Liste_mlpl extends REST_Controller {
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregistrement
-            $delete = $this->ListemlplManager->delete($id);          
+            $delete = $this->EspacebienetreManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,

@@ -40,6 +40,15 @@ class Liste_menage_mlpl_model extends CI_Model {
             return null;
         }  
     }
+    public function deleteByGroupemlpl($id_groupe_ml_pl) {
+		// Suppression d'un enregitrement
+        $this->db->where('id_groupe_ml_pl', (int) $id_groupe_ml_pl)->delete($this->table);
+        if($this->db->affected_rows() >= 1) {
+            return true;
+        }else{
+            return null;
+        }  
+    }
     public function findAll() {
 		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
@@ -55,7 +64,7 @@ class Liste_menage_mlpl_model extends CI_Model {
     }
     public function findAllByGroupemlpl($id_groupe_ml_pl)  {   
 		$requete="select grpm.id_groupe_ml_pl,grpm.menage_id, grpm.id,m.NumeroEnregistrement,m.nomchefmenage,m.nom_conjoint,m.Addresse,"
-		."m.nombre_enfant_non_scolarise,m.nombre_enfant_moins_six_ans,m.nombre_enfant_scolarise "
+		."m.nombre_enfant_non_scolarise,m.nombre_enfant_moins_six_ans,m.nombre_enfant_scolarise,m.identifiant_menage "
 		." from liste_menage_ml_pl as grpm"
 		." left outer join menage as m on m.id=grpm.menage_id"
 		." where grpm.id_groupe_ml_pl =".$id_groupe_ml_pl

@@ -51,6 +51,7 @@ class Plainte_model extends CI_Model {
             'mesureprise'               => $plainte['mesureprise'],
             'dateresolution'            => $plainte['dateresolution'],
             'statut'                    => $plainte['statut'],
+            'telephone'                 => $plainte['telephone'],
             'a_ete_modifie'             => $plainte['a_ete_modifie'],
             'supprime'                  => $plainte['supprime'],
             'userid'                    => $plainte['userid'],
@@ -78,6 +79,7 @@ class Plainte_model extends CI_Model {
             'mesureprise'               => $plainte['mesureprise'],
             'dateresolution'            => $plainte['dateresolution'],
             'statut'                    => $plainte['statut'],
+            'telephone'                 => $plainte['telephone'],
             'a_ete_modifie'             => $plainte['a_ete_modifie'],
             'supprime'                  => $plainte['supprime'],
             'userid'                    => $plainte['userid'],
@@ -135,7 +137,7 @@ class Plainte_model extends CI_Model {
 					."p.id,p.village_id,p.cellulederecours_id,p.typeplainte_id,p.solution_id,p.Objet,p.datedepot,p.reference,"
 					."p.nomplaignant,p.adresseplaignant,p.dateresolution,"
 					."ssp.code as code_sous_projet,ssp.description as sous_projet,"
-					."p.menage_id,m.NumeroEnregistrement,m.nomchefmenage,"
+					."p.menage_id,m.NumeroEnregistrement,m.nomchefmenage,p.telephone,"
 					."p.responsableenregistrement,p.mesureprise,p.id_sous_projet,p.statut,p.a_ete_modifie,"
 					."p.userid,p.datemodification"
 					." from see_plainte as p"

@@ -30,7 +30,6 @@ class Visite_domicile_model extends CI_Model {
             'id_groupe_ml_pl' =>  $visite_mlpl['id_groupe_ml_pl'],
             'numero'          =>  $visite_mlpl['numero'],                       
             'date_visite1'    =>  $visite_mlpl['date_visite1'],                       
-            'menage_id'       =>  $visite_mlpl['menage_id'],                       
             'objet_visite'    =>  $visite_mlpl['objet_visite'],                       
             'nom_prenom_mlpl' =>  $visite_mlpl['nom_prenom_mlpl'],                       
             'date_visite2'    =>  $visite_mlpl['date_visite2'],                       
@@ -62,19 +61,17 @@ class Visite_domicile_model extends CI_Model {
     }
     public function findAllByGroupemlpl($id_groupe_ml_pl)  {     
 		// Selection par id_groupe_ml_pl
-		$requete="select v.id_groupe_ml_pl,v.menage_id, v.id,m.NumeroEnregistrement,m.nomchefmenage,m.nom_conjoint,m.Addresse,"
-		."m.nombre_enfant_non_scolarise,m.nombre_enfant_moins_six_ans,m.nombre_enfant_scolarise, "
-		."v.numero,v.date_visite1,v.objet_visite,v.nom_prenom_mlpl,v.date_visite2,v.resultat_visite,v.recommandation"
-		." from visite_domicile as v"
-		." left outer join menage as m on m.id=v.menage_id"
-		." where v.id_groupe_ml_pl =".$id_groupe_ml_pl
-		." order by m.NumeroEnregistrement";
-		$query= $this->db->query($requete);		
-		if($query->result()) {
-			return $query->result();
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where("id_groupe_ml_pl", $id_groupe_ml_pl)
+                        ->order_by('id', 'asc')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
         }else{
             return null;
-        }  
+        }                 
     }
     public function findById($id) {
 		// Selection par id
