@@ -42,6 +42,10 @@ class Liste_mlpl extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+		$lien_de_parente=null;
+		if($this->post('lien_de_parente')) {
+			$lien_de_parente=$this->post('lien_de_parente');
+		}
 		// Affectation des valeurs des colonnes de la table
 		$data = array(
 			'id_groupe_ml_pl' => $this->post('id_groupe_ml_pl'),
@@ -50,6 +54,9 @@ class Liste_mlpl extends REST_Controller {
 			'adresse'         => $this->post('adresse'),
 			'contact'         => $this->post('contact'),
 			'fonction'        => $this->post('fonction'),
+			'sexe'        => $this->post('sexe'),
+			'age'        => $this->post('age'),
+			'lien_de_parente'        => $lien_de_parente,
 		);               
          if ($supprimer == 0)  {
             if ($id == 0) {

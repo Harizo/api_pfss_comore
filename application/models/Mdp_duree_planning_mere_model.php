@@ -1,10 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Mdp_duree_planning_model extends CI_Model {
-    protected $table = 'mdp_duree_planning';
+class Mdp_duree_planning_mere_model extends CI_Model {
+    protected $table = 'mdp_duree_planning_mere';
 
-    public function add($mdp_duree_planning)  {
-        $this->db->set($this->_set($mdp_duree_planning))
+    public function add($mdp_duree_planning_mere)  {
+        $this->db->set($this->_set($mdp_duree_planning_mere))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -13,8 +13,8 @@ class Mdp_duree_planning_model extends CI_Model {
         }                    
     }
 
-    public function update($id, $mdp_duree_planning)  {
-        $this->db->set($this->_set($mdp_duree_planning))
+    public function update($id, $mdp_duree_planning_mere)  {
+        $this->db->set($this->_set($mdp_duree_planning_mere))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -23,17 +23,12 @@ class Mdp_duree_planning_model extends CI_Model {
             return null;
         }                      
     }
-    public function _set($mdp_duree_planning) 
+    public function _set($mdp_duree_planning_mere) 
     {
         return array
         (
-            'id_mere' => $mdp_duree_planning['id_mere'],
-            'designation_activite'       => $mdp_duree_planning['designation_activite'],
-            'numero_semaine_deb'       => $mdp_duree_planning['numero_semaine_deb'],
-            'numero_jour_deb'       => $mdp_duree_planning['numero_jour_deb'],
-            
-            'numero_semaine_fin'       => $mdp_duree_planning['numero_semaine_fin'],
-            'numero_jour_fin'       => $mdp_duree_planning['numero_jour_fin']
+            'id_mdp' => $mdp_duree_planning_mere['id_mdp'],
+            'libelle'       => $mdp_duree_planning_mere['libelle']
         );
     }
 
@@ -60,10 +55,10 @@ class Mdp_duree_planning_model extends CI_Model {
             return null;
         }                 
     }
-    public function findByMere($id_mere)  {
+    public function findByMdp($id_mdp)  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("id_mere", $id_mere)
+                        ->where("id_mdp", $id_mdp)
                         ->order_by('id', 'asc')
                         ->get()
                         ->result();

@@ -11,6 +11,7 @@ class Menage extends REST_Controller {
         parent::__construct();
         $this->load->model('menage_model', 'menageManager');
         $this->load->model('menage_beneficiaire_model', 'MenageBeneficiaireManager');
+        $this->load->model('liste_menage_mlpl_model', 'ListemenagemlplManager');
     }
 
     public function index_get() {
@@ -18,14 +19,19 @@ class Menage extends REST_Controller {
 
         $cle_etrangere = $this->get('cle_etrangere');
         $statut = $this->get('statut');
+        $etat_statut = $this->get('etat_statut');
         $id_sous_projet = $this->get('id_sous_projet');
         $beneficiaire = $this->get('beneficiaire');
+        $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
         $tous = $this->get('tous');
+
 		$id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
 		$id_village = $this->get('id_village');
+
         $max_id = $this->get('max_id');
         $menu = $this->get('menu');
 		$data=array();
+
 		
 		if($id_village) 
 		{	
@@ -37,8 +43,26 @@ class Menage extends REST_Controller {
 	   } 
 	   else if($id_groupe_ml_pl) 
 		{	
+
+		if($cle_etrangere && $id_groupe_ml_pl) {
+			$data['menage'] = array();
+			$data['tab_reponse_menage_ml_pl'] = array();
+			 $retour = $this->menageManager->findAllByVillageAndMenagemlpl($cle_etrangere,$id_groupe_ml_pl);
+			 $retour1 = $this->ListemenagemlplManager->findAllByGroupemlpl($id_groupe_ml_pl);
+			 // Récupération des id pour cocher les ménages mebre du groupe ML/PL
+			 if($retour1) {
+				foreach($retour1 as $key =>$value) {
+					$data['tab_reponse_menage_ml_pl'][$key] = $value->menage_id;
+				} 
+			 }
+			 if($retour)
+				$data['menage'] = $retour;
+		} else if($cle_etrangere && $etat_statut && $id_sous_projet) {
+			 $data = $this->menageManager->findAllByVillageAndEtatstatut($cle_etrangere,$id_sous_projet,$etat_statut);
+		} else if($id_groupe_ml_pl) {	
+
 			$data = $this->menageManager->findmenageBygroupe($id_groupe_ml_pl);
-	   } else if($cle_etrangere && $tous && $id_sous_projet) {
+		} else if($cle_etrangere && $tous && $id_sous_projet) {
 			 $data = $this->menageManager->findAllByVillageAndSousProjet($cle_etrangere,$id_sous_projet);
 		} else if ($max_id == 1) {
             $data = $this->menageManager->find_max_id();
@@ -135,10 +159,12 @@ class Menage extends REST_Controller {
 			'SexeTravailleur' => $this->post('SexeTravailleur'),
 			'datedenaissancetravailleur' => $this->post('datedenaissancetravailleur'),
 			'agetravailleur' => $this->post('agetravailleur'),
+			'lien_travailleur' => $this->post('lien_travailleur'),
 			'NomTravailleurSuppliant' => $this->post('NomTravailleurSuppliant'),
 			'SexeTravailleurSuppliant' => $this->post('SexeTravailleurSuppliant'),
 			'datedenaissancesuppliant' => $this->post('datedenaissancesuppliant'),
 			'agesuppliant' => $this->post('agesuppliant'),
+			'lien_suppleant' => $this->post('lien_suppleant'),
 			'statut' => $this->post('statut'),
 			'inapte' => $this->post('inapte'),
 			'id_sous_projet' => $this->post('id_sous_projet'),
@@ -170,6 +196,7 @@ class Menage extends REST_Controller {
 			'membre_fonctionnaire_enquete' => $this->post('membre_fonctionnaire_enquete'),
 			'possede_frigo_enquete' => $this->post('possede_frigo_enquete'),
 			'antenne_parabolique_enquete' => $this->post('antenne_parabolique_enquete'),
+			'motif_non_selection' => $this->post('motif_non_selection'),
 		);   
         if ($supprimer == 0) {
             if ($id == 0) {

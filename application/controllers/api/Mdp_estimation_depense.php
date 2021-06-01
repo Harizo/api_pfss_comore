@@ -53,10 +53,7 @@ class Mdp_estimation_depense extends REST_Controller {
             'designation'       => $this->post('designation'),
             'unite'       => $this->post('unite'),
             'quantite'       => $this->post('quantite'),
-            'dziani'       => $this->post('dziani'),
-            'kiyo'       => $this->post('kiyo'),
-            'komoni'       => $this->post('komoni'),
-            'trindrini'       => $this->post('trindrini'),
+            'localite'       => $this->post('localite'),
             'prix_unitaire'       => $this->post('prix_unitaire'),
             'total'       => $this->post('total')
 		);       

@@ -31,10 +31,7 @@ class Mdp_estimation_depense_model extends CI_Model {
             'designation'       => $mdp_estimation_depense['designation'],
             'unite'       => $mdp_estimation_depense['unite'],
             'quantite'       => $mdp_estimation_depense['quantite'],
-            'dziani'       => $mdp_estimation_depense['dziani'],
-            'kiyo'       => $mdp_estimation_depense['kiyo'],
-            'komoni'       => $mdp_estimation_depense['komoni'],
-            'trindrini'       => $mdp_estimation_depense['trindrini'],
+            'localite'       => $mdp_estimation_depense['localite'],
             'prix_unitaire'       => $mdp_estimation_depense['prix_unitaire'],
             'total'       => $mdp_estimation_depense['total']
         );

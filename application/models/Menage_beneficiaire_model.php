@@ -30,9 +30,29 @@ class Menage_beneficiaire_model extends CI_Model {
 		// Affectation des valeurs
         return array(
             'id_menage'        => $menage_benef['id_menage'],
-            'id_sous_projet'  => $menage_benef['id_sous_projet'],                      
+            'id_sous_projet'   => $menage_benef['id_sous_projet'],                      
             'date_sortie'      => $menage_benef['date_sortie'],                      
+            'motif_sortie'     => $menage_benef['motif_sortie'],                      
             'date_inscription' => $menage_benef['date_inscription'],                      
+        );
+    }
+    public function update_sortie($id,$id_sous_projet, $menage_benef)   {
+		// Mise à jour d'un enregitrement
+        $this->db->set($this->_set_sortie($menage_benef))
+                            ->where('id_menage', (int) $id)
+                            ->where('id_sous_projet', (int) $id_sous_projet)
+                            ->update($this->table);
+        if($this->db->affected_rows() === 1)
+        {
+            return true;
+        }else{
+            return null;
+        }                      
+    }
+    public function _set_sortie($menage_benef)  {
+        return array(
+            'date_sortie'      => $menage_benef['date_sortie'],                      
+            'motif_sortie'     => $menage_benef['motif_sortie'],                      
         );
     }
     public function delete($id)  {
@@ -141,7 +161,8 @@ class Menage_beneficiaire_model extends CI_Model {
     }
     public function findAllByProgrammeAndVillage($id_sous_projet,$village_id)  {
 		// Selection par intervention et par fokontany
-		$requete="select mp.id,mp.id_menage,m.nom,m.prenom,m.date_naissance,m.cin,m.profession,m.date_inscription,mp.id_sous_projet"
+		$requete="select mp.id,mp.id_menage,m.nom,m.prenom,m.date_naissance,m.cin,m.profession,m.date_inscription,mp.id_sous_projet,"
+				."mp.date_sortie,mp.motif_sortie"
 				." from menage_beneficiaire as mp"
 				." left outer join menage as m on m.id=mp.id_menage"
 				." left outer join see_village as v on v.id=m.village_id"
@@ -159,7 +180,8 @@ class Menage_beneficiaire_model extends CI_Model {
 		// Selection par intervention et par fokontany
 		$requete="select m.inapte,m.NumeroEnregistrement as numeroenregistrement,m.nomchefmenage,mp.id,mp.id_menage,mp.id_sous_projet,"
 				."m.NomTravailleur as nomtravailleur,m.SexeTravailleur as sexetravailleur,m.NomTravailleurSuppliant as nomtravailleursuppleant,"
-				."m.SexeTravailleurSuppliant as sexetravailleursuppliant"
+				."m.SexeTravailleurSuppliant as sexetravailleursuppliant,"
+				."mp.date_sortie,mp.motif_sortie"
 				." from menage_beneficiaire as mp"
 				." left outer join menage as m on m.id=mp.id_menage"
 				." left outer join see_village as v on v.id=m.village_id"

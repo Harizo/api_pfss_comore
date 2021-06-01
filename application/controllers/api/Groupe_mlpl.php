@@ -41,13 +41,23 @@ class Groupe_mlpl extends REST_Controller {
     }
     public function index_post() {
         $id = $this->post('id') ;
+        $id_menage = null ;
+		if($this->post('id_menage') && intval($this->post('id_menage')) >0) {
+			$id_menage = $this->post('id_menage') ;
+		}	
         $supprimer = $this->post('supprimer') ;
 		// Affectation des valeurs des colonnes de la table
 		$data = array(
-			'date_creation' => $this->post('date_creation'),
-			'chef_village'  => $this->post('chef_village'),
-			'nom_groupe'    => $this->post('nom_groupe'),
-			'village_id'    => $this->post('village_id'),
+			'date_creation'    => $this->post('date_creation'),
+			'chef_village'     => $this->post('chef_village'),
+			'id_menage'        => $id_menage,
+			'nom_prenom_ml_pl' => $this->post('nom_prenom_ml_pl'),
+			'nom_groupe'       => $this->post('nom_groupe'),
+			'village_id'       => $this->post('village_id'),
+			'sexe'             => $this->post('sexe'),
+			'age'              => $this->post('age'),
+			'lien_de_parente'  => $this->post('lien_de_parente'),
+			'telephone'        => $this->post('telephone'),
 		);               
          if ($supprimer == 0)  {
             if ($id == 0) {

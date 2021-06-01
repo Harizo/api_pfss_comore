@@ -28,7 +28,7 @@ class Mdp_communaute_model extends CI_Model {
         return array
         (
             'id_mdp' => $mdp_communaute['id_mdp'],
-            'id_communaute'       => $mdp_communaute['id_communaute'],
+            'id_village'       => $mdp_communaute['id_village'],
             'nbr_beneficiaire'       => $mdp_communaute['nbr_beneficiaire']
         );
     }
@@ -62,32 +62,36 @@ class Mdp_communaute_model extends CI_Model {
         $sql = 
         "
             select 
-
                 mdpc.id as id,
                 mdpc.id_mdp as id_mdp,
 
-                mdpc.id_communaute as id_communaute,
+               
                 mdpc.nbr_beneficiaire as nbr_beneficiaire,
 
-                c.code as code_communaute,
-                c.libelle as libelle_communaute,
+                sv.id AS id_village,
+                sv.Village AS nom_village,
 
-                c.id_commune as id_commune,
+                sc.id as id_commune,
                 sc.Commune as nom_commune,
 
                 sr.id as id_region,
-                sr.Region as nom_region
+                sr.Region as nom_region,
+                
+                si.id AS id_ile,
+                si.Ile AS nom_ile
 
             FROM 
                 mdp_communaute as mdpc,
-                communaute as c,
+                see_village AS sv,
                 see_region as sr,
-                see_commune as sc
+                see_commune as sc,
+                see_ile AS si
 
             WHERE 
-                mdpc.id_communaute = c.id
-                and c.id_commune = sc.id 
-                and sc.region_id = sr.id
+                mdpc.id_village = sv.id
+                AND sc.id = sv.commune_id
+                AND sr.id = sc.region_id
+                AND si.id = sr.ile_id
                 and mdpc.id_mdp = ".$id_mdp."
         ";
         return $this->db->query($sql)->result();               

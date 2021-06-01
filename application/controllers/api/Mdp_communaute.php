@@ -62,7 +62,7 @@ class Mdp_communaute extends REST_Controller {
 		
 
             'id_mdp' => $this->post('id_mdp'),
-            'id_communaute'       => $this->post('id_communaute'),
+            'id_village'       => $this->post('id_village'),
             'nbr_beneficiaire'       => $this->post('nbr_beneficiaire')
 		);       
 
