@@ -380,5 +380,35 @@ class Menage_model extends CI_Model
             return null;
         }                 
     }
+    
+    public function findmenage_ml_plBygroupe($id_groupe_ml_pl)
+    {
+        $result =  $this->db->select('menage.*')
+                        ->from($this->table)
+                        ->join('liste_ml_pl','liste_ml_pl.menage_id=menage.id')
+                        ->where('liste_ml_pl.id_groupe_ml_pl',$id_groupe_ml_pl)
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+    public function findmenageByvillage($id_village)
+    {
+        $result =  $this->db->select('menage.*')
+                        ->from($this->table)
+                        ->join('liste_menage_ml_pl','liste_menage_ml_pl.menage_id=menage.id')
+                        ->join('groupe_ml_pl','groupe_ml_pl.id=liste_menage_ml_pl.id_groupe_ml_pl')
+                        ->where('groupe_ml_pl.id_village',$id_village)
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
 
 }

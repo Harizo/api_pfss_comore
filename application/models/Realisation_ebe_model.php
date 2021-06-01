@@ -29,7 +29,7 @@ class Realisation_ebe_model extends CI_Model {
         (
             'numero'       => $realisation_ebe['numero'],
             'id_groupe_ml_pl'     => $realisation_ebe['id_groupe_ml_pl'],
-            'id_contrat_consultant_ong'  => $realisation_ebe['id_contrat_consultant_ong'],
+            'id_contrat_agex'  => $realisation_ebe['id_contrat_agex'],
             'materiel'     => $realisation_ebe['materiel'],
             'lieu'         => $realisation_ebe['lieu'],
             'date_regroupement'=> $realisation_ebe['date_regroupement'],
@@ -84,10 +84,10 @@ class Realisation_ebe_model extends CI_Model {
     public function getrealisation_ebeBysousprojetml_pl($id_sous_projet,$id_groupe_ml_pl)  {
         $result =  $this->db->select('realisation_ebe.*')
                         ->from($this->table)
-                        ->join("contrat_consultant_ong","contrat_consultant_ong.id=realisation_ebe.id_contrat_consultant_ong")
+                        ->join("contrat_ugp_agex","contrat_ugp_agex.id=realisation_ebe.id_contrat_agex")
                         ->where("id_sous_projet", $id_sous_projet)
                         ->where("id_groupe_ml_pl",$id_groupe_ml_pl) 
-                        ->order_by('contrat_consultant_ong.id', 'asc')
+                        ->order_by('contrat_ugp_agex.id', 'asc')
                         ->order_by('numero', 'asc')
                         ->get()
                         ->result();

@@ -29,7 +29,7 @@ class Formation_ml_model extends CI_Model {
         (
             'numero'           => $formation_ml['numero'],
             'id_commune'      => $formation_ml['id_commune'],
-            'id_contrat_consultant_ong'  => $formation_ml['id_contrat_consultant_ong'],
+            'id_contrat_agex'  => $formation_ml['id_contrat_agex'],
             'description'     => $formation_ml['description'],
             'lieu'            => $formation_ml['lieu'],
             'date_debut'      => $formation_ml['date_debut'],
@@ -84,10 +84,10 @@ class Formation_ml_model extends CI_Model {
     public function getformation_mlBysousprojetcommune($id_sous_projet,$id_commune)  {
         $result =  $this->db->select('formation_ml.*')
                         ->from($this->table)
-                        ->join("contrat_consultant_ong","contrat_consultant_ong.id=formation_ml.id_contrat_consultant_ong")
+                        ->join("contrat_ugp_agex","contrat_ugp_agex.id=formation_ml.id_contrat_agex")
                         ->where("id_sous_projet", $id_sous_projet)
                         ->where("id_commune",$id_commune) 
-                        ->order_by('contrat_consultant_ong.id', 'asc')
+                        ->order_by('contrat_ugp_agex.id', 'asc')
                         ->order_by('numero', 'asc')
                         ->get()
                         ->result();

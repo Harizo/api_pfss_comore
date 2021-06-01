@@ -4,11 +4,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Formation_ml extends REST_Controller {
+class Formation_thematique_agex extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('formation_ml_model', 'Formation_mlManager');
+        $this->load->model('formation_thematique_agex_model', 'Formation_thematique_agexManager');
         $this->load->model('contrat_ugp_agex_model', 'Contrat_ugp_agexManager');
     }
 
@@ -17,29 +17,33 @@ class Formation_ml extends REST_Controller {
 		$data = array();
         $menu = $this->get('menu');
         $id_sous_projet = $this->get('id_sous_projet');
-        $id_commune = $this->get('id_commune');
-		if ($menu=='getformation_mlBysousprojetcommune') 
+		if ($menu=='getformation_thematique_agexBysousprojet') 
         {
-			$tmp = $this->Formation_mlManager->getformation_mlBysousprojetcommune($id_sous_projet,$id_commune);
+			$tmp = $this->Formation_thematique_agexManager->getformation_thematique_agexBysousprojet($id_sous_projet);
 			if ($tmp) 
             {   
 				foreach ($tmp as $key => $value)
                 {   
-                    $contrat_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
+                    $contrat_ugp_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
+                    $theme_sensibilisation = $this->Formation_thematique_agexManager->findTheme_sensibilisationById($value->id_theme_sensibilisation);
                     $data[$key]['id']         = $value->id;
-                    $data[$key]['numero']     = $value->numero;
-                    $data[$key]['description']= $value->description;
-                    $data[$key]['lieu']        = $value->lieu;
-                    $data[$key]['date_debut']  = $value->date_debut;
-                    $data[$key]['date_fin']    = $value->date_fin;
-                    $data[$key]['id_commune']     = $value->id_commune;
-                    $data[$key]['contrat_agex'] = $contrat_agex;
+                    $data[$key]['nbr_participant']         = $value->nbr_participant;
+                    $data[$key]['nbr_femme']         = $value->nbr_femme;
+                    $data[$key]['theme_sensibilisation']    = $theme_sensibilisation;
+                    $data[$key]['date_debut_prevu']         = $value->date_debut_prevu;
+                    $data[$key]['date_fin_prevu']           = $value->date_fin_prevu;
+                    $data[$key]['date_debut_realisation']   = $value->date_debut_realisation;
+                    $data[$key]['date_fin_realisation']     = $value->date_fin_realisation;
+                    $data[$key]['nbr_beneficiaire_cible']  = $value->nbr_beneficiaire_cible;
+                    $data[$key]['formateur']    = $value->formateur;
+                    $data[$key]['observation']  = $value->observation;
+                    $data[$key]['contrat_agex'] = $contrat_ugp_agex;
                 }
 			}
 		} 
         elseif ($id) 
         {
-			$tmp = $this->Formation_mlManager->findById($id);
+			$tmp = $this->Formation_thematique_agexManager->findById($id);
 			if($tmp) 
             {
 				$data=$tmp;
@@ -47,18 +51,24 @@ class Formation_ml extends REST_Controller {
 		} 
         else 
         {			
-			$tmp = $this->Formation_mlManager->findAll();
+			$tmp = $this->Formation_thematique_agexManager->findAll();
 			if ($tmp) 
             {   
                 foreach ($tmp as $key => $value)
                 {   
-                    $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
-                    $data[$key]['id']                 = $value->id;
-                    $data[$key]['numero']     = $value->numero;
-                    $data[$key]['description']      = $value->description;
-                    $data[$key]['lieu']    = $value->lieu;
-                    $data[$key]['date_debut']     = $value->date_debut;
-                    $data[$key]['date_fin']     = $value->date_fin;
+                    $contrat_ugp_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
+                    $theme_sensibilisation = $this->Formation_thematique_agexManager->findTheme_sensibilisationById($value->id_theme_sensibilisation);
+                   // $nbr = $this->Formation_thematique_agexManager->findTheme_sensibilisationById($value->id_theme_sensibilisation);
+                    $data[$key]['id']         = $value->id;
+                    $data[$key]['theme_sensibilisation']    = $theme_sensibilisation;
+                    $data[$key]['date_debut_prevu']         = $value->date_debut_prevu;
+                    $data[$key]['date_fin_prevu']           = $value->date_fin_prevu;
+                    $data[$key]['date_debut_realisation']   = $value->date_debut_realisation;
+                    $data[$key]['date_fin_realisation']     = $value->date_fin_realisation;
+                    $data[$key]['nbr_beneficiaire_cible']  = $value->nbr_beneficiaire_cible;
+                    $data[$key]['formateur']    = $value->formateur;
+                    $data[$key]['observation']  = $value->observation;
+                    $data[$key]['contrat_agex'] = $contrat_ugp_agex;
                 }
 				//$data=$tmp;
 			}
@@ -86,13 +96,15 @@ class Formation_ml extends REST_Controller {
 
 		$data = array(
 			
-            'numero'     => $this->post('numero'),
-            'id_commune'            => $this->post('id_commune'),
-            'id_contrat_agex'     => $this->post('id_contrat_agex'),
-            'description'      => $this->post('description'),
-            'lieu'      => $this->post('lieu'),
-            'date_debut'     => $this->post('date_debut'),
-            'date_fin'    => $this->post('date_fin')
+            'id_theme_sensibilisation'    => $this->post('id_theme_sensibilisation'),
+            'date_debut_prevu'         => $this->post('date_debut_prevu'),
+            'date_fin_prevu'           => $this->post('date_fin_prevu'),
+            'date_debut_realisation'   => $this->post('date_debut_realisation'),
+            'date_fin_realisation'     => $this->post('date_fin_realisation'),
+            'nbr_beneficiaire_cible'         => $this->post('nbr_beneficiaire_cible'),
+            'formateur'         => $this->post('formateur'),
+            'observation'       => $this->post('observation'),
+            'id_contrat_agex'   => $this->post('id_contrat_agex')
 		);       
 
         if ($supprimer == 0) {
@@ -104,7 +116,7 @@ class Formation_ml extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->Formation_mlManager->add($data);              
+                $dataId = $this->Formation_thematique_agexManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -129,7 +141,7 @@ class Formation_ml extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->Formation_mlManager->update($id, $data);              
+                $update = $this->Formation_thematique_agexManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -156,7 +168,7 @@ class Formation_ml extends REST_Controller {
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
 
-            $delete = $this->Formation_mlManager->delete($id);   
+            $delete = $this->Formation_thematique_agexManager->delete($id);   
 
             if (!is_null($delete)) 
             {

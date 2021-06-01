@@ -22,9 +22,20 @@ class Menage extends REST_Controller {
         $beneficiaire = $this->get('beneficiaire');
         $tous = $this->get('tous');
 		$id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
+		$id_village = $this->get('id_village');
         $max_id = $this->get('max_id');
+        $menu = $this->get('menu');
 		$data=array();
-		if($id_groupe_ml_pl)
+		
+		if($id_village) 
+		{	
+			$data = $this->menageManager->findmenageByvillage($id_village);
+	   } 
+	   else if($id_groupe_ml_pl && $menu=='ml_pl') 
+		{	
+			$data = $this->menageManager->findmenage_ml_plBygroupe($id_groupe_ml_pl);
+	   } 
+	   else if($id_groupe_ml_pl) 
 		{	
 			$data = $this->menageManager->findmenageBygroupe($id_groupe_ml_pl);
 	   } else if($cle_etrangere && $tous && $id_sous_projet) {

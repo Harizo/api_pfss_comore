@@ -9,7 +9,7 @@ class realisation_ebe extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('realisation_ebe_model', 'Realisation_ebeManager');
-        $this->load->model('contrat_consultant_ong_model', 'Contrat_consultant_ongManager');
+        $this->load->model('contrat_ugp_agex_model', 'Contrat_ugp_agexManager');
     }
 
     public function index_get() {
@@ -25,7 +25,7 @@ class realisation_ebe extends REST_Controller {
             {   
 				foreach ($tmp as $key => $value)
                 {   
-                    $contrat_consultant_ong = $this->Contrat_consultant_ongManager->findByIdwithcle($value->id_contrat_consultant_ong);
+                    $contrat_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
                     $data[$key]['id']         = $value->id;
                     $data[$key]['numero']     = $value->numero;
                     $data[$key]['but_regroupement']= $value->but_regroupement;
@@ -33,7 +33,7 @@ class realisation_ebe extends REST_Controller {
                     $data[$key]['date_regroupement']  = $value->date_regroupement;
                     $data[$key]['materiel']    = $value->materiel;
                     $data[$key]['id_groupe_ml_pl']     = $value->id_groupe_ml_pl;
-                    $data[$key]['contrat_consultant_ong'] = $contrat_consultant_ong;
+                    $data[$key]['contrat_agex'] = $contrat_agex;
                 }
 			}
 		} 
@@ -88,7 +88,7 @@ class realisation_ebe extends REST_Controller {
 			
             'numero'     => $this->post('numero'),
             'id_groupe_ml_pl'   => $this->post('id_groupe_ml_pl'),
-            'id_contrat_consultant_ong'=> $this->post('id_contrat_consultant_ong'),
+            'id_contrat_agex'=> $this->post('id_contrat_agex'),
             'but_regroupement'      => $this->post('but_regroupement'),
             'lieu'       => $this->post('lieu'),
             'date_regroupement'     => $this->post('date_regroupement'),
