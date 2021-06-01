@@ -25,12 +25,14 @@ class Menage extends REST_Controller {
         $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
         $tous = $this->get('tous');
 
+
 		$id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
 		$id_village = $this->get('id_village');
 
         $max_id = $this->get('max_id');
         $menu = $this->get('menu');
 		$data=array();
+
 
 		
 		if($id_village) 
@@ -43,6 +45,7 @@ class Menage extends REST_Controller {
 	   } 
 	   else if($id_groupe_ml_pl) 
 		{	
+
 
 		if($cle_etrangere && $id_groupe_ml_pl) {
 			$data['menage'] = array();
