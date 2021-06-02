@@ -45,9 +45,10 @@ class Menage extends REST_Controller {
 	   } 
 	   else if($id_groupe_ml_pl) 
 		{	
-
-
-		if($cle_etrangere && $id_groupe_ml_pl) {
+			
+			$data = $this->menageManager->findmenageBygroupe($id_groupe_ml_pl);
+		} 
+		else if($cle_etrangere && $id_groupe_ml_pl) {
 			$data['menage'] = array();
 			$data['tab_reponse_menage_ml_pl'] = array();
 			 $retour = $this->menageManager->findAllByVillageAndMenagemlpl($cle_etrangere,$id_groupe_ml_pl);
