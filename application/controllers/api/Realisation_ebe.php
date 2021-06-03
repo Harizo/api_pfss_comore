@@ -10,6 +10,7 @@ class realisation_ebe extends REST_Controller {
         parent::__construct();
         $this->load->model('realisation_ebe_model', 'Realisation_ebeManager');
         $this->load->model('contrat_ugp_agex_model', 'Contrat_ugp_agexManager');
+        $this->load->model('Espace_bien_etre_model', 'Espace_bien_etreManager');
     }
 
     public function index_get() {
@@ -26,8 +27,9 @@ class realisation_ebe extends REST_Controller {
 				foreach ($tmp as $key => $value)
                 {   
                     $contrat_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
+                    $espace_bien_etre = $this->Espace_bien_etreManager->findByIdobjet($value->id_espace_bien_etre);
                     $data[$key]['id']         = $value->id;
-                    $data[$key]['numero']     = $value->numero;
+                    $data[$key]['espace_bien_etre']     = $espace_bien_etre;
                     $data[$key]['but_regroupement']= $value->but_regroupement;
                     $data[$key]['lieu']        = $value->lieu;
                     $data[$key]['date_regroupement']  = $value->date_regroupement;
@@ -54,7 +56,7 @@ class realisation_ebe extends REST_Controller {
                 {   
                     $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
                     $data[$key]['id']                 = $value->id;
-                    $data[$key]['numero']     = $value->numero;
+                    $data[$key]['id_espace_bien_etre']     = $value->id_espace_bien_etre;
                     $data[$key]['but_regroupement']      = $value->but_regroupement;
                     $data[$key]['lieu']    = $value->lieu;
                     $data[$key]['date_regroupement']     = $value->date_regroupement;
@@ -86,7 +88,7 @@ class realisation_ebe extends REST_Controller {
 
 		$data = array(
 			
-            'numero'     => $this->post('numero'),
+            'id_espace_bien_etre'     => $this->post('id_espace_bien_etre'),
             'id_groupe_ml_pl'   => $this->post('id_groupe_ml_pl'),
             'id_contrat_agex'=> $this->post('id_contrat_agex'),
             'but_regroupement'      => $this->post('but_regroupement'),

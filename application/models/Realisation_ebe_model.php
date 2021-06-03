@@ -27,7 +27,7 @@ class Realisation_ebe_model extends CI_Model {
     {
         return array
         (
-            'numero'       => $realisation_ebe['numero'],
+            'id_espace_bien_etre'       => $realisation_ebe['id_espace_bien_etre'],
             'id_groupe_ml_pl'     => $realisation_ebe['id_groupe_ml_pl'],
             'id_contrat_agex'  => $realisation_ebe['id_contrat_agex'],
             'materiel'     => $realisation_ebe['materiel'],
@@ -88,7 +88,7 @@ class Realisation_ebe_model extends CI_Model {
                         ->where("id_sous_projet", $id_sous_projet)
                         ->where("id_groupe_ml_pl",$id_groupe_ml_pl) 
                         ->order_by('contrat_ugp_agex.id', 'asc')
-                        ->order_by('numero', 'asc')
+                        //->order_by('numero', 'asc')
                         ->get()
                         ->result();
         if($result) {

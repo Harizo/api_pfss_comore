@@ -27,7 +27,7 @@ class Theme_formation_ebe_model extends CI_Model {
     public function _set($tutelle) {
 		// Affectation des valeurs
         return array(
-            'theme_sensibilisation' => $tutelle['theme_sensibilisation'],
+            'id_theme_sensibilisation' => $tutelle['id_theme_sensibilisation'],
             'activite' => $tutelle['activite'],
             'id_realisation_ebe' => $tutelle['id_realisation_ebe'],
         );
@@ -58,7 +58,7 @@ class Theme_formation_ebe_model extends CI_Model {
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->where("id_realisation_ebe",$id_realisation_ebe)
-                        ->order_by('theme_sensibilisation')
+                        ->order_by('id_theme_sensibilisation')
                         ->get()
                         ->result();
         if($result) {
