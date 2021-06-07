@@ -27,7 +27,7 @@ class Requete_export_model extends CI_Model
     }
     public function Etat_recepteur($id_sous_projet,$village_id)
     {
-		$requete="select m.inapte,m.NumeroEnregistrement,m.NumeroEnregistrement as menage,m.nomchefmenage,mp.id,mp.id_menage,mp.id_sous_projet,"
+		$requete="select m.id,m.inapte,m.NumeroEnregistrement,m.NumeroEnregistrement as menage,m.nomchefmenage,mp.id as id_mb,mp.id_menage,mp.id_sous_projet,"
 				."m.NomTravailleur as NomTravailleur,m.SexeTravailleur,m.NomTravailleurSuppliant as NomTravailleurSuppliant,"
 				."m.SexeTravailleurSuppliant,m.milieu,"
 				."m.identifiant_menage,DATE_FORMAT(m.datedenaissancetravailleur,'%d/%m/%Y') as datedenaissancetravailleur,m.numerocintravailleur,m.numerocarteelectoraletravailleur,"
@@ -37,7 +37,8 @@ class Requete_export_model extends CI_Model
 				." left outer join menage as m on m.id=mp.id_menage"
 				." left outer join see_village as v on v.id=m.village_id"
                 ." where mp.id_sous_projet=".$id_sous_projet
-				." and v.id=".$village_id." and m.statut='BENEFICIAIRE'";	
+				." and v.id=".$village_id." and m.statut='BENEFICIAIRE'"
+				." order by m.identifiant_menage";
 				$result = $this->db->query($requete)->result();
         if($result)
         {

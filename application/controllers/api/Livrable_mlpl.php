@@ -23,7 +23,7 @@ class Livrable_mlpl extends REST_Controller {
             {
                 foreach ($tmp as $key => $value)
                 {
-                    $contrat_consultant = $this->Contrat_consultant_ongManager->findById($value->id_contrat_consultant);
+                    $contrat_consultant = $this->Contrat_consultant_ongManager->findByIdwithcle($value->id_contrat_consultant);
                     $data[$key]['contrat_consultant']        = $contrat_consultant;
                     $data[$key]['id']                        = $value->id;
                     $data[$key]['id_groupemlpl']             = $value->id_groupemlpl;

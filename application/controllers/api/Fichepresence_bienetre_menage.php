@@ -3,40 +3,38 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Fichepresence_bienetre extends REST_Controller {
+class Fichepresence_bienetre_menage extends REST_Controller {
     public function __construct() {
         parent::__construct();
-        $this->load->model('fichepresence_bienetre_model', 'FichepresencebienetreManager');
         $this->load->model('fichepresence_bienetre_menage_model', 'FichepresencebienetremenageManager');
         $this->load->model('menage_model', 'MenageManager');
     }
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
-        $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
-        $numeroligne = $this->get('numeroligne');
+        $id_fiche_presence_bienetre = $this->get('id_fiche_presence_bienetre');
+        $id_seulement = $this->get('id_seulement');
         $menu = $this->get('menu');
         $data = array() ;
-		if($menu=="getfichepresencebygroupe") {
-			$data = $this->FichepresencebienetreManager->getfichepresencebygroupe($id_groupe_ml_pl);
+		if($cle_etrangere) {
+			$data = $this->FichepresencebienetremenageManager->findByfichepresence($cle_etrangere);
+			if($id_seulement && $data) {
+				$temporaire=$data;
+				$data=array();
+				$data['tab_reponse_presence_bienetre']=array();
+				foreach($temporaire as $k=>$v) {
+					$data['tab_reponse_presence_bienetre'][$k] = $v->id_menage;
+				}
+			}	
             if (!$data)
                 $data = array();
-		} 
-        elseif($id)
+		} elseif($id)
         {
-			$data = $this->FichepresencebienetreManager->findById($id);
+			$data = $this->FichepresencebienetremenageManager->findById($id);
             if (!$data)
                 $data = array();
-		} else if ($cle_etrangere && $numeroligne)  {
-            $data = $this->FichepresencebienetreManager->NumeroligneParGroupemlpl($cle_etrangere);
-            if (!$data)
-                $data = array();
-		} else if($cle_etrangere) { 
-            $data = $this->FichepresencebienetreManager->findAllByGroupemlpl($cle_etrangere);
-            if (!$data)
-                $data = array();			
-        } else  {
-			$data = $this->FichepresencebienetreManager->findAll();
+		} else  {
+			$data = $this->FichepresencebienetremenageManager->findAll();
             if (!$data)
                 $data = array();
         }
@@ -59,11 +57,8 @@ class Fichepresence_bienetre extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
 		// Affectation des valeurs des colonnes de la table
 		$data = array(
-			'id_groupe_ml_pl'      => $this->post('id_groupe_ml_pl'),
-			'date_presence'        => $this->post('date_presence'),
-			'numero_ligne' => $this->post('numero_ligne'),
-			'id_espace_bienetre' => $this->post('id_espace_bienetre'),
-			'nombre_menage_present' => $this->post('nombre_menage_present'),
+			'id_fiche_presence_bienetre'      => $this->post('id_fiche_presence_bienetre'),
+			'id_menage' => $this->post('id_menage')
 		);               
          if ($supprimer == 0)  {
             if ($id == 0) {
@@ -75,17 +70,7 @@ class Fichepresence_bienetre extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Ajout d'un enregistrement
-                $dataId = $this->FichepresencebienetreManager->add($data);
-				$nombre_menage_present=$this->post('nombre_menage_present') ;
-				if(intval($nombre_menage_present) >0) {
-					for($i=1;$i<=$nombre_menage_present;$i++) {
-						$data = array(
-							'id_fiche_presence_bienetre'      => $dataId,
-							'id_menage'        => $this->post('id_menage_'.$i),
-						);               
-						$ret=$this->FichepresencebienetremenageManager->add($data);
-					}	
-				}
+                $dataId = $this->FichepresencebienetremenageManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -107,20 +92,8 @@ class Fichepresence_bienetre extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-				// Mise à jour d'un enregistrement
-                $update = $this->FichepresencebienetreManager->update($id, $data);              
-				// Supprimer les dtails dans la table puis reinsérer après
-				$del=$this->FichepresencebienetremenageManager->deleteByFichepresence($id);
-				$nombre_menage_present=$this->post('nombre_menage_present') ;
-				if(intval($nombre_menage_present) >0) {
-					for($i=1;$i<=$nombre_menage_present;$i++) {
-						$data = array(
-							'id_fiche_presence_bienetre'      => $id,
-							'id_menage'        => $this->post('id_menage_'.$i),
-						);               
-						$ret=$this->FichepresencebienetremenageManager->add($data);
-					}	
-				}
+				// Mise � jour d'un enregistrement
+                $update = $this->FichepresencebienetremenageManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -143,7 +116,7 @@ class Fichepresence_bienetre extends REST_Controller {
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregistrement
-            $delete = $this->FichepresencebienetreManager->delete($id);          
+            $delete = $this->FichepresencebienetremenageManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,
