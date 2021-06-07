@@ -24,9 +24,31 @@ class Menage extends REST_Controller {
         $beneficiaire = $this->get('beneficiaire');
         $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
         $tous = $this->get('tous');
+
+
+		$id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
+		$id_village = $this->get('id_village');
+
         $max_id = $this->get('max_id');
+        $menu = $this->get('menu');
 		$data=array();
-		if($cle_etrangere && $id_groupe_ml_pl) {
+
+
+		
+		if($id_village) 
+		{	
+			$data = $this->menageManager->findmenageByvillage($id_village);
+	   } 
+	   else if($id_groupe_ml_pl && $menu=='ml_pl') 
+		{	
+			$data = $this->menageManager->findmenage_ml_plBygroupe($id_groupe_ml_pl);
+	   } 
+	   else if($id_groupe_ml_pl) 
+		{	
+			
+			$data = $this->menageManager->findmenageBygroupe($id_groupe_ml_pl);
+		} 
+		else if($cle_etrangere && $id_groupe_ml_pl) {
 			$data['menage'] = array();
 			$data['tab_reponse_menage_ml_pl'] = array();
 			 $retour = $this->menageManager->findAllByVillageAndMenagemlpl($cle_etrangere,$id_groupe_ml_pl);
@@ -42,6 +64,7 @@ class Menage extends REST_Controller {
 		} else if($cle_etrangere && $etat_statut && $id_sous_projet) {
 			 $data = $this->menageManager->findAllByVillageAndEtatstatut($cle_etrangere,$id_sous_projet,$etat_statut);
 		} else if($id_groupe_ml_pl) {	
+
 			$data = $this->menageManager->findmenageBygroupe($id_groupe_ml_pl);
 		} else if($cle_etrangere && $tous && $id_sous_projet) {
 			 $data = $this->menageManager->findAllByVillageAndSousProjet($cle_etrangere,$id_sous_projet);

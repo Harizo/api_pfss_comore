@@ -19,7 +19,18 @@ class Pges extends REST_Controller {
         $menu = $this->get('menu');
         $id_sous_projet = $this->get('id_sous_projet');
         $id_village = $this->get('id_village');
-        if ($menu=='getpgesBysousprojetvillage')
+        if ($menu=='get_pges_montant_differant')
+        {            
+            $tmp = $this->PgesManager->get_pges_montant_differant();
+            if ($tmp)
+            {
+                $data=$tmp;
+            }
+            else {
+                $data=array();
+            }
+        }
+        else if ($menu=='getpgesBysousprojetvillage')
         {
                
             $tmp = $this->PgesManager->getpgesBysousprojetvillage($id_sous_projet,$id_village);

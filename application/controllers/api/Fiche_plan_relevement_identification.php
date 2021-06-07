@@ -1,59 +1,24 @@
 <?php
-
 defined('BASEPATH') OR exit('No direct script access allowed');
-
 require APPPATH . '/libraries/REST_Controller.php';
-
-class Theme_formation_ebe extends REST_Controller {
-
+class Fiche_plan_relevement_identification extends REST_Controller {
     public function __construct() {
         parent::__construct();
-        $this->load->model('theme_formation_ebe_model', 'Theme_formation_ebeManager');
-        $this->load->model('theme_sensibilisation_model', 'Theme_sensibilisationManager');
+        $this->load->model('fiche_plan_relevement_identification_model', 'fpriManager');
+      
     }
-
     public function index_get() {
         $id = $this->get('id');
         $cle_etrangere = $this->get('cle_etrangere');
-        $id_realisation_ebe = $this->get('id_realisation_ebe');
-        $menu = $this->get('menu');
-		$data = array();
-		/*if ($menu=="theme_sensibilisation") {
-			// Selection par id
-			$tmp = $this->Theme_formation_ebeManager->findAlltheme_sensibilisation();
-			if($tmp)
-            {
-                $data=$tmp;
-			}
-		} else*/
-        if ($cle_etrangere) {
-			// Selection par id
-			$tmp = $this->Theme_formation_ebeManager->findById_realisation_ebe($cle_etrangere);
-			if($tmp)
-            {
-				foreach ($tmp as $key => $value)
-                {   
-                    
-                    $theme_sensibilisation = $this->Theme_sensibilisationManager->findById($cle_etrangere);
-                    $data[$key]['id']         = $value->id;
-                    $data[$key]['activite']     = $value->activite;
-                    $data[$key]['id_realisation_ebe']  = $value->id_realisation_ebe;
-                    $data[$key]['theme_sensibilisation'] = $theme_sensibilisation;
-                }
-               // $data=$tmp;
-			}
-		} elseif ($id) {
-			// Selection par id
-			$temporaire = $this->Theme_formation_ebeManager->findById($id);
-			if($temporaire) {
-				$data=$temporaire;
-			}
+        $id_sous_projet = $this->get('id_sous_projet');
+        $village_id = $this->get('village_id');
+        $data = array() ;
+		if ($id) {
+			// Selection ménage par id (id=clé primaire)
+			$data = $this->fpriManager->findById($id);
 		} else {
-			// Selection de tous les enregistrements	
-			$temporaire = $this->Theme_formation_ebeManager->findAll();
-			if ($temporaire) {
-				$data=$temporaire;
-			}
+			// Selection de tous les ménages
+			$data = $this->fpriManager->findAll();                   
 		}
         if (count($data)>0) {
             $this->response([
@@ -73,9 +38,16 @@ class Theme_formation_ebe extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
 		$data = array(
-			'id_theme_sensibilisation' => $this->post('id_theme_sensibilisation'),
-			'activite' => $this->post('activite'),
-			'id_realisation_ebe' => $this->post('id_realisation_ebe'),
+			
+            'id_village'                            => $this->post('id_village'),
+            'id_menage'                             => $this->post('id_menage'),                      
+            'id_agex'                               => $this->post('id_agex'),                      
+            'nbr_enfant_moin_quinze_ans'            => $this->post('nbr_enfant_moin_quinze_ans'),      
+            'composition_menage'                    => $this->post('composition_menage'),                      
+            'nom_prenom'                            => $this->post('nom_prenom'),                      
+            'age'                                   => $this->post('age'),                      
+            'representant_comite_protection_social' => $this->post('representant_comite_protection_social'),                      
+            'representant_agex'                     => $this->post('representant_agex')  
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {
@@ -86,8 +58,8 @@ class Theme_formation_ebe extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-				// Ajout d'un enregitrement
-                $dataId = $this->Theme_formation_ebeManager->add($data);              
+				// Ajout d'un enregistrement
+                $dataId = $this->fpriManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -110,11 +82,11 @@ class Theme_formation_ebe extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Mise à jour d'un enregistrement
-                $update = $this->Theme_formation_ebeManager->update($id, $data);              
+                $update = $this->fpriManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
-                        'response' => 1,
+                        'response' => $id,
                         'message' => 'Update data success'
                             ], REST_Controller::HTTP_OK);
                 } else {
@@ -132,8 +104,8 @@ class Theme_formation_ebe extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
-			// Suppression d'un enregitrement
-            $delete = $this->Theme_formation_ebeManager->delete($id);          
+			// Suppression d'un enregistrement
+            $delete = $this->fpriManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,

@@ -65,5 +65,15 @@ class Espace_bien_etre_model extends CI_Model {
             return null;
         }                 
     }
+    
+    public function findByIdobjet($id)  {
+		// Selection par id
+        $this->db->where("id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
 }
 ?>

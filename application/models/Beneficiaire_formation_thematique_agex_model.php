@@ -1,7 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Participant_realisation_ebe_model extends CI_Model {
-    protected $table = 'participant_realisation_ebe';
+class Beneficiaire_formation_thematique_agex_model extends CI_Model {
+    protected $table = 'beneficiaire_formation_thematique_agex';
 
     public function add($tutelle)  {
 		// Ajout d'un enregitrement
@@ -27,8 +27,9 @@ class Participant_realisation_ebe_model extends CI_Model {
     public function _set($tutelle) {
 		// Affectation des valeurs
         return array(
-            'id_menage' => $tutelle['id_menage'],
-            'id_realisation_ebe' => $tutelle['id_realisation_ebe'],
+            'id_groupe_ml_pl' => $tutelle['id_groupe_ml_pl'],
+            'id_village' => $tutelle['id_village'],
+            'id_formation_thematique_agex' => $tutelle['id_formation_thematique_agex'],
         );
     }
     public function delete($id) {
@@ -53,11 +54,13 @@ class Participant_realisation_ebe_model extends CI_Model {
             return null;
         }                 
     }
-    public function findById_realisation_ebe($id_realisation_ebe) {
-        $result =  $this->db->select('*')
+    public function findById_formation_thematique_agexcommune($id_formation_thematique_agex,$id_commune) {
+        $result =  $this->db->select('beneficiaire_formation_thematique_agex.*')
                         ->from($this->table)
-                        ->where("id_realisation_ebe",$id_realisation_ebe)
-                        ->order_by('id')
+                        ->join("see_village",'see_village.id=beneficiaire_formation_thematique_agex.id_village')
+                        ->where("id_formation_thematique_agex",$id_formation_thematique_agex)
+                        ->where("commune_id",$id_commune)
+                        //->order_by('id')
                         ->get()
                         ->result();
         if($result) {

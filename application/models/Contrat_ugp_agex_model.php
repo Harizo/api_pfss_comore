@@ -135,5 +135,28 @@ class Contrat_ugp_agex_model extends CI_Model {
         ";
         return $this->db->query($sql)->result(); 
     }
+    
+    public function findById_sous_projet($id_sous_projet)  {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where("id_sous_projet", $id_sous_projet)
+                        ->order_by('id', 'asc')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+    
+    public function findByIdobjet($id) {		
+        $this->db->where("id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
 }
 ?>

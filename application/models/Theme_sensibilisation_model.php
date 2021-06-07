@@ -1,7 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Participant_realisation_ebe_model extends CI_Model {
-    protected $table = 'participant_realisation_ebe';
+class Theme_sensibilisation_model extends CI_Model {
+    protected $table = 'theme_sensibilisation';
 
     public function add($tutelle)  {
 		// Ajout d'un enregitrement
@@ -27,8 +27,7 @@ class Participant_realisation_ebe_model extends CI_Model {
     public function _set($tutelle) {
 		// Affectation des valeurs
         return array(
-            'id_menage' => $tutelle['id_menage'],
-            'id_realisation_ebe' => $tutelle['id_realisation_ebe'],
+            'description' => $tutelle['description'],
         );
     }
     public function delete($id) {
@@ -53,32 +52,15 @@ class Participant_realisation_ebe_model extends CI_Model {
             return null;
         }                 
     }
-    public function findById_realisation_ebe($id_realisation_ebe) {
-        $result =  $this->db->select('*')
-                        ->from($this->table)
-                        ->where("id_realisation_ebe",$id_realisation_ebe)
-                        ->order_by('id')
-                        ->get()
-                        ->result();
-        if($result) {
-            return $result;
-        }else{
-            return null;
-        }                 
-    }
     public function findById($id) {
 		// Selection par id
-        $result =  $this->db->select('*')
-                        ->from($this->table)
-                        ->where("id", $id)
-                        ->order_by('id', 'asc')
-                        ->get()
-                        ->result();
-        if($result) {
-            return $result;
-        }else{
-            return null;
-        }                 
+        // Selection par id
+        $this->db->where("id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;                
     }
 }
 ?>

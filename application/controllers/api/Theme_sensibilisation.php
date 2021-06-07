@@ -4,53 +4,25 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Theme_formation_ebe extends REST_Controller {
+class Theme_sensibilisation extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('theme_formation_ebe_model', 'Theme_formation_ebeManager');
         $this->load->model('theme_sensibilisation_model', 'Theme_sensibilisationManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
-        $cle_etrangere = $this->get('cle_etrangere');
-        $id_realisation_ebe = $this->get('id_realisation_ebe');
-        $menu = $this->get('menu');
 		$data = array();
-		/*if ($menu=="theme_sensibilisation") {
+		if ($id) {
 			// Selection par id
-			$tmp = $this->Theme_formation_ebeManager->findAlltheme_sensibilisation();
-			if($tmp)
-            {
-                $data=$tmp;
-			}
-		} else*/
-        if ($cle_etrangere) {
-			// Selection par id
-			$tmp = $this->Theme_formation_ebeManager->findById_realisation_ebe($cle_etrangere);
-			if($tmp)
-            {
-				foreach ($tmp as $key => $value)
-                {   
-                    
-                    $theme_sensibilisation = $this->Theme_sensibilisationManager->findById($cle_etrangere);
-                    $data[$key]['id']         = $value->id;
-                    $data[$key]['activite']     = $value->activite;
-                    $data[$key]['id_realisation_ebe']  = $value->id_realisation_ebe;
-                    $data[$key]['theme_sensibilisation'] = $theme_sensibilisation;
-                }
-               // $data=$tmp;
-			}
-		} elseif ($id) {
-			// Selection par id
-			$temporaire = $this->Theme_formation_ebeManager->findById($id);
+			$temporaire = $this->Theme_sensibilisationManager->findById($id);
 			if($temporaire) {
 				$data=$temporaire;
 			}
 		} else {
 			// Selection de tous les enregistrements	
-			$temporaire = $this->Theme_formation_ebeManager->findAll();
+			$temporaire = $this->Theme_sensibilisationManager->findAll();
 			if ($temporaire) {
 				$data=$temporaire;
 			}
@@ -73,9 +45,7 @@ class Theme_formation_ebe extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
 		$data = array(
-			'id_theme_sensibilisation' => $this->post('id_theme_sensibilisation'),
-			'activite' => $this->post('activite'),
-			'id_realisation_ebe' => $this->post('id_realisation_ebe'),
+			'description' => $this->post('description'),
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {
@@ -87,7 +57,7 @@ class Theme_formation_ebe extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Ajout d'un enregitrement
-                $dataId = $this->Theme_formation_ebeManager->add($data);              
+                $dataId = $this->Theme_sensibilisationManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -110,7 +80,7 @@ class Theme_formation_ebe extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Mise à jour d'un enregistrement
-                $update = $this->Theme_formation_ebeManager->update($id, $data);              
+                $update = $this->Theme_sensibilisationManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -133,7 +103,7 @@ class Theme_formation_ebe extends REST_Controller {
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregitrement
-            $delete = $this->Theme_formation_ebeManager->delete($id);          
+            $delete = $this->Theme_sensibilisationManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,
