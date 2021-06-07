@@ -16,9 +16,18 @@ class Contrat_ugp_agex extends REST_Controller {
         $id = $this->get('id');
         $get_mdp_en_retard = $this->get('get_mdp_en_retard');
         $get_all = $this->get('get_all');
+        $id_sous_projet = $this->get('id_sous_projet');
         $data =array();
 		
-        
+        if ($id_sous_projet) 
+        {
+			$tmp = $this->cuaMng->findById_sous_projet($id_sous_projet);
+			if($tmp) 
+            {
+				$data=$tmp;
+                $taiza='taoid';
+			}
+		}
 
 		if ($id) 
         {

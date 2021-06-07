@@ -25,7 +25,7 @@ class Count_contrat_agep extends REST_Controller {
             $data = $contrat_agep;
             
         }
-        if ($menu=="andrana")
+        if ($menu=="count_by_sp")
         {
            $contrat_agep = $this->Contrat_agepManager->countAllById_sous_projet_encours_avenant($id_sous_p);          
            // $data = $contrat_agep;
