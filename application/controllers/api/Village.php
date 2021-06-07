@@ -72,6 +72,9 @@ class Village extends REST_Controller {
                         $data[$key]['id'] = $value->id;
                         $data[$key]['Code'] = $value->Code;
                         $data[$key]['Village'] = $value->Village;
+                        $data[$key]['id_zip'] = $value->id_zip;
+                        $data[$key]['zip'] = $this->ZipManager->findById($value->id_zip);
+                        $data[$key]['vague'] = $value->vague;
                         $data[$key]['commune'] = $com;
                         $data[$key]['programme'] = $prog[0];
                         
