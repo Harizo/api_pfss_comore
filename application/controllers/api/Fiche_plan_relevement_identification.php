@@ -9,16 +9,14 @@ class Fiche_plan_relevement_identification extends REST_Controller {
     }
     public function index_get() {
         $id = $this->get('id');
-        $cle_etrangere = $this->get('cle_etrangere');
-        $id_sous_projet = $this->get('id_sous_projet');
-        $village_id = $this->get('village_id');
+        $id_village = $this->get('id_village');
         $data = array() ;
 		if ($id) {
 			// Selection ménage par id (id=clé primaire)
 			$data = $this->fpriManager->findById($id);
 		} else {
 			// Selection de tous les ménages
-			$data = $this->fpriManager->findAll();                   
+			$data = $this->fpriManager->findAllby_id_village($id_village);                   
 		}
         if (count($data)>0) {
             $this->response([
@@ -40,12 +38,10 @@ class Fiche_plan_relevement_identification extends REST_Controller {
 		$data = array(
 			
             'id_village'                            => $this->post('id_village'),
+            'date_remplissage'                            => $this->post('date_remplissage'),
             'id_menage'                             => $this->post('id_menage'),                      
-            'id_agex'                               => $this->post('id_agex'),                      
-            'nbr_enfant_moin_quinze_ans'            => $this->post('nbr_enfant_moin_quinze_ans'),      
-            'composition_menage'                    => $this->post('composition_menage'),                      
-            'nom_prenom'                            => $this->post('nom_prenom'),                      
-            'age'                                   => $this->post('age'),                      
+            'id_agex'                               => $this->post('id_agex'),                         
+            'composition_menage'                    => $this->post('composition_menage'),                   
             'representant_comite_protection_social' => $this->post('representant_comite_protection_social'),                      
             'representant_agex'                     => $this->post('representant_agex')  
 		);               
