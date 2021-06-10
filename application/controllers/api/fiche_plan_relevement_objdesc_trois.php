@@ -1,40 +1,35 @@
 <?php
+
 defined('BASEPATH') OR exit('No direct script access allowed');
+
 require APPPATH . '/libraries/REST_Controller.php';
-class Fiche_plan_relevement_identification extends REST_Controller {
+
+class fiche_plan_relevement_objdesc_trois extends REST_Controller {
+
     public function __construct() {
         parent::__construct();
-        $this->load->model('fiche_plan_relevement_identification_model', 'fpriManager');
-        $this->load->model('menage_model', 'menageManager');
-      
+        $this->load->model('fiche_plan_relevement_objdesc_trois_model', 'fproaMng');
     }
-    public function index_get() {
-        $id = $this->get('id');
-        $id_village = $this->get('id_village');
-        $id_menage = $this->get('id_menage');
-        $data = array() ;
-   
-		if ($id) 
+
+    public function index_get() 
+    {
+        $id_identification = $this->get('id_identification');
+    
+        $data =array();
+		
+
+
+		if ($id_identification) 
         {
-			
-			$data = $this->fpriManager->findById($id);
+			$tmp = $this->fproaMng->findBy_id_identification($id_identification);
+			if($tmp) 
+            {
+				$data=$tmp;
+			}
 		} 
 
-        if ($id_village)
+        if ($data) 
         {
-			
-			$data = $this->fpriManager->findAllby_id_village($id_village);                   
-		}
-
-        if ($id_menage)
-        {
-            
-            $data = $this->menageManager->get_composition_menage($id_menage);                   
-        }
-
-
-
-        if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
                 'response' => $data,
@@ -48,19 +43,22 @@ class Fiche_plan_relevement_identification extends REST_Controller {
             ], REST_Controller::HTTP_OK);
         }
     }
-    public function index_post() {
+
+    public function index_post() 
+    {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
+        $etat_download = $this->post('etat_download') ;
+
 		$data = array(
-			
-            'id_village'                            => $this->post('id_village'),
-            'date_remplissage'                            => $this->post('date_remplissage'),
-            'id_menage'                             => $this->post('id_menage'),                      
-            'id_agex'                               => $this->post('id_agex'),                         
-            'composition_menage'                    => $this->post('composition_menage'),                   
-            'representant_comite_protection_social' => $this->post('representant_comite_protection_social'),                      
-            'representant_agex'                     => $this->post('representant_agex')  
-		);               
+
+
+            'id_identification'             => $this->post('id_identification'),
+            'formation'                     => $this->post('formation'),
+            'encadrement'                   => $this->post('encadrement'),
+            'suivi'                         => $this->post('suivi')
+		);       
+
         if ($supprimer == 0) {
             if ($id == 0) {
                 if (!$data) {
@@ -70,8 +68,7 @@ class Fiche_plan_relevement_identification extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-				// Ajout d'un enregistrement
-                $dataId = $this->fpriManager->add($data);
+                $dataId = $this->fproaMng->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -85,7 +82,10 @@ class Fiche_plan_relevement_identification extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-            } else {
+            } 
+            else 
+            {
+                
                 if (!$data || !$id) {
                     $this->response([
                         'status' => FALSE,
@@ -93,12 +93,11 @@ class Fiche_plan_relevement_identification extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-				// Mise à jour d'un enregistrement
-                $update = $this->fpriManager->update($id, $data);              
+                $update = $this->fproaMng->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
-                        'response' => $id,
+                        'response' => 1,
                         'message' => 'Update data success'
                             ], REST_Controller::HTTP_OK);
                 } else {
@@ -107,24 +106,32 @@ class Fiche_plan_relevement_identification extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_OK);
                 }
+                
             }
-        } else {
-            if (!$id) {
-            $this->response([
-            'status' => FALSE,
-            'response' => 0,
-            'message' => 'No request found'
-                ], REST_Controller::HTTP_BAD_REQUEST);
+        } 
+        else 
+        {
+            if (!$id) 
+            {
+                $this->response([
+                'status' => FALSE,
+                'response' => 0,
+                'message' => 'No request found'
+                    ], REST_Controller::HTTP_BAD_REQUEST);
             }
-			// Suppression d'un enregistrement
-            $delete = $this->fpriManager->delete($id);          
-            if (!is_null($delete)) {
+
+            $delete = $this->fproaMng->delete($id);   
+
+            if (!is_null($delete)) 
+            {
                 $this->response([
                     'status' => TRUE,
                     'response' => 1,
                     'message' => "Delete data success"
                         ], REST_Controller::HTTP_OK);
-            } else {
+            }
+            else 
+            {
                 $this->response([
                     'status' => FALSE,
                     'response' => 0,

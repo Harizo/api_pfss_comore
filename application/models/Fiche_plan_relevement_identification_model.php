@@ -86,8 +86,9 @@ class Fiche_plan_relevement_identification_model extends CI_Model {
                 fpri.id AS id,
                 
                 fpri.date_remplissage,
-                fpri.representant_comite_protection_social AS rep_cps,
-                fpri.representant_agex AS rep_agex,
+                fpri.representant_comite_protection_social AS representant_comite_protection_social,
+                fpri.representant_agex AS representant_agex,
+                fpri.composition_menage AS composition_menage,
                 
                 si.id AS id_ile,
                 si.Ile,
