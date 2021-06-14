@@ -1,7 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Fichepresence_bienetre_model extends CI_Model {
-    protected $table = 'fichepresence_bienetre';
+class Fichepresence_bienetre_menage_model extends CI_Model {
+    protected $table = 'fichepresence_bienetre_menage';
 
     public function add($fiche_presence)  {
 		// Ajout d'un enregitrement
@@ -27,16 +27,22 @@ class Fichepresence_bienetre_model extends CI_Model {
     public function _set($fiche_presence) {
 		// Affectation des valeurs
         return array(
-            'id_groupe_ml_pl'      => $fiche_presence['id_groupe_ml_pl'],
-            'date_presence'        => $fiche_presence['date_presence'],                       
-            'numero_ligne'         => $fiche_presence['numero_ligne'],                       
-            'id_espace_bienetre' => $fiche_presence['id_espace_bienetre'],                      
-            'nombre_menage_present' => $fiche_presence['nombre_menage_present'],                      
+            'id_menage'      => $fiche_presence['id_menage'],
+            'id_fiche_presence_bienetre' => $fiche_presence['id_fiche_presence_bienetre'],                      
         );
     }
     public function delete($id) {
 		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
+        if($this->db->affected_rows() === 1) {
+            return true;
+        }else{
+            return null;
+        }  
+    }
+    public function deleteByFichepresence($id_fiche_presence_bienetre) {
+		// Suppression d'un enregitrement
+        $this->db->where('id_fiche_presence_bienetre', (int) $id_fiche_presence_bienetre)->delete($this->table);
         if($this->db->affected_rows() === 1) {
             return true;
         }else{
@@ -56,23 +62,23 @@ class Fichepresence_bienetre_model extends CI_Model {
             return null;
         }                 
     }
-    public function getfichepresencebygroupe($id_groupe_ml_pl) {
-		// Selection de tous les enregitrements
-		$requete="select fichepresence_bienetre.*,esp.description as espace_bien_etre"
-				." from fichepresence_bienetre"
-				." left join espace_bien_etre as esp on esp.id="."fichepresence_bienetre.id_espace_bienetre"
-				." where  fichepresence_bienetre.id_groupe_ml_pl=".$id_groupe_ml_pl;
-		$result = $this->db->query($requete)->result();		
-        if($result)
-        {
-            return $result;
+    public function findByfichepresence($id_fiche_presence_bienetre) {
+		$requete="select fpm.id_fiche_presence_bienetre,fpm.id_menage, fpm.id,m.NumeroEnregistrement,m.nomchefmenage,m.nom_conjoint,m.Addresse,"
+		."m.nombre_enfant_non_scolarise,m.nombre_enfant_moins_six_ans,m.nombre_enfant_scolarise,m.identifiant_menage "
+		." from fichepresence_bienetre_menage as fpm"
+		." left outer join menage as m on m.id=fpm.id_menage"
+		." where fpm.id_fiche_presence_bienetre =".$id_fiche_presence_bienetre
+		." order by m.identifiant_menage";
+		$query= $this->db->query($requete);		
+		if($query->result()) {
+			return $query->result();
         }else{
             return null;
-        }                  
+        }  
     }
-    public function findAllByGroupemlpl($id_groupe_ml_pl)  {     
-		// Selection par id_groupe_ml_pl
-        $this->db->where("id_groupe_ml_pl", $id_groupe_ml_pl);
+    public function findAllByGroupemlpl($id_fiche_presence_bienetre)  {     
+		// Selection par id_fiche_presence_bienetre
+        $this->db->where("id_fiche_presence_bienetre", $id_fiche_presence_bienetre);
         $q = $this->db->get($this->table);
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -88,10 +94,5 @@ class Fichepresence_bienetre_model extends CI_Model {
         }
         return null;
     }
-	public function NumeroligneParGroupemlpl($id_groupe_ml_pl) {
-		$requete="select (ifnull(count(*),0) + 1) as nombre from fichepresence_bienetre where id_groupe_ml_pl=".$id_groupe_ml_pl;
-		$query = $this->db->query($requete);
-		return $query->result();						
-	}
 }
 ?>

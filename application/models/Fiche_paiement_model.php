@@ -81,6 +81,21 @@ class Fiche_paiement_model extends CI_Model {
         }
         return null;
     }
+    public function findByVillageAndEtapeAndMicroprojet($village_id,$etape_id,$microprojet_id)  {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+						->where("village_id", $village_id)
+						->where("etape_id", $etape_id)
+						->where("microprojet_id", $microprojet_id)
+                        ->order_by('id')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
  
 }
 ?>

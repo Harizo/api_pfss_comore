@@ -1,45 +1,39 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
 require APPPATH . '/libraries/REST_Controller.php';
-
-class Fichepresence_bienetre extends REST_Controller {
+class Fiche_plan_relevement_identification extends REST_Controller {
     public function __construct() {
         parent::__construct();
-        $this->load->model('fichepresence_bienetre_model', 'FichepresencebienetreManager');
-        $this->load->model('fichepresence_bienetre_menage_model', 'FichepresencebienetremenageManager');
-        $this->load->model('menage_model', 'MenageManager');
+        $this->load->model('fiche_plan_relevement_identification_model', 'fpriManager');
+        $this->load->model('menage_model', 'menageManager');
+      
     }
     public function index_get() {
         $id = $this->get('id');
-        $cle_etrangere = $this->get('cle_etrangere');
-        $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
-        $numeroligne = $this->get('numeroligne');
-        $menu = $this->get('menu');
+        $id_village = $this->get('id_village');
+        $id_menage = $this->get('id_menage');
         $data = array() ;
-		if($menu=="getfichepresencebygroupe") {
-			$data = $this->FichepresencebienetreManager->getfichepresencebygroupe($id_groupe_ml_pl);
-            if (!$data)
-                $data = array();
-		} 
-        elseif($id)
+   
+		if ($id) 
         {
-			$data = $this->FichepresencebienetreManager->findById($id);
-            if (!$data)
-                $data = array();
-		} else if ($cle_etrangere && $numeroligne)  {
-            $data = $this->FichepresencebienetreManager->NumeroligneParGroupemlpl($cle_etrangere);
-            if (!$data)
-                $data = array();
-		} else if($cle_etrangere) { 
-            $data = $this->FichepresencebienetreManager->findAllByGroupemlpl($cle_etrangere);
-            if (!$data)
-                $data = array();			
-        } else  {
-			$data = $this->FichepresencebienetreManager->findAll();
-            if (!$data)
-                $data = array();
+			
+			$data = $this->fpriManager->findById($id);
+		} 
+
+        if ($id_village)
+        {
+			
+			$data = $this->fpriManager->findAllby_id_village($id_village);                   
+		}
+
+        if ($id_menage)
+        {
+            
+            $data = $this->menageManager->get_composition_menage($id_menage);                   
         }
+
+
+
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
@@ -57,15 +51,17 @@ class Fichepresence_bienetre extends REST_Controller {
     public function index_post() {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
-		// Affectation des valeurs des colonnes de la table
 		$data = array(
-			'id_groupe_ml_pl'      => $this->post('id_groupe_ml_pl'),
-			'date_presence'        => $this->post('date_presence'),
-			'numero_ligne' => $this->post('numero_ligne'),
-			'id_espace_bienetre' => $this->post('id_espace_bienetre'),
-			'nombre_menage_present' => $this->post('nombre_menage_present'),
+			
+            'id_village'                            => $this->post('id_village'),
+            'date_remplissage'                            => $this->post('date_remplissage'),
+            'id_menage'                             => $this->post('id_menage'),                      
+            'id_agex'                               => $this->post('id_agex'),                         
+            'composition_menage'                    => $this->post('composition_menage'),                   
+            'representant_comite_protection_social' => $this->post('representant_comite_protection_social'),                      
+            'representant_agex'                     => $this->post('representant_agex')  
 		);               
-         if ($supprimer == 0)  {
+        if ($supprimer == 0) {
             if ($id == 0) {
                 if (!$data) {
                     $this->response([
@@ -75,17 +71,7 @@ class Fichepresence_bienetre extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Ajout d'un enregistrement
-                $dataId = $this->FichepresencebienetreManager->add($data);
-				$nombre_menage_present=$this->post('nombre_menage_present') ;
-				if(intval($nombre_menage_present) >0) {
-					for($i=1;$i<=$nombre_menage_present;$i++) {
-						$data = array(
-							'id_fiche_presence_bienetre'      => $dataId,
-							'id_menage'        => $this->post('id_menage_'.$i),
-						);               
-						$ret=$this->FichepresencebienetremenageManager->add($data);
-					}	
-				}
+                $dataId = $this->fpriManager->add($data);
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -108,19 +94,7 @@ class Fichepresence_bienetre extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Mise à jour d'un enregistrement
-                $update = $this->FichepresencebienetreManager->update($id, $data);              
-				// Supprimer les dtails dans la table puis reinsérer après
-				$del=$this->FichepresencebienetremenageManager->deleteByFichepresence($id);
-				$nombre_menage_present=$this->post('nombre_menage_present') ;
-				if(intval($nombre_menage_present) >0) {
-					for($i=1;$i<=$nombre_menage_present;$i++) {
-						$data = array(
-							'id_fiche_presence_bienetre'      => $id,
-							'id_menage'        => $this->post('id_menage_'.$i),
-						);               
-						$ret=$this->FichepresencebienetremenageManager->add($data);
-					}	
-				}
+                $update = $this->fpriManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -143,7 +117,7 @@ class Fichepresence_bienetre extends REST_Controller {
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregistrement
-            $delete = $this->FichepresencebienetreManager->delete($id);          
+            $delete = $this->fpriManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,

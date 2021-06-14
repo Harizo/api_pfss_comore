@@ -46,7 +46,14 @@ class Requete_import extends REST_Controller {
         $id_annee= $this->get('id_annee');
         $etape_id= $this->get('etape_id');
         $annee_id= $this->get('id_annee');
-		if($importation) {
+        $controle= $this->get('controle');
+		if($controle) {
+			if(intval($id_sous_projet)==2) {
+				$retour=$this->controler_paiement_arse($chemin,$nomfichier);
+			} else {
+				// $retour=$this->controler_menage_act($chemin,$nomfichier);				
+			}	
+		} else 	if($importation) {
 			$ile = $this->IleManager->findById($id_ile);
 			$nom_ile="";
 			if($ile) {
@@ -1007,6 +1014,697 @@ class Requete_import extends REST_Controller {
 		}	
 	}	
 //////////////////////////////////////////////////////////////////////////////////////////////////////////:
+	public function controler_paiement_arse($chemin,$nomfichier) {	
+        require_once 'Classes/PHPExcel.php';
+        require_once 'Classes/PHPExcel/IOFactory.php';
+        set_time_limit(0);
+        ini_set ('memory_limit', '2048M');
+		$search= array('é','ô','Ô','î','Î','è','ê','à','ö','ç','&','°',"'");
+		$replace=array('e','o','o','i','i','e','e','a','o','c','_','_','');
+		$directoryName = dirname(__FILE__) . "/../../../../".$chemin;
+		if(!is_dir($directoryName)) {
+			mkdir($directoryName, 0777,true);
+		}
+		$lien_vers_mon_document_excel = dirname(__FILE__) . "/../../../../".$chemin . $nomfichier;
+		$array_data = array();
+		if(strpos($lien_vers_mon_document_excel,"xlsx") >0) {
+			// pour mise à jour après : G4 = id_fiche_presence <=> déjà importé => à ignorer
+			$objet_read_write = PHPExcel_IOFactory::createReader('Excel2007');
+			$excel = $objet_read_write->load($lien_vers_mon_document_excel);			 
+			$sheet = $excel->getSheet(0);
+			// pour lecture début - fin seulement
+			$XLSXDocument = new PHPExcel_Reader_Excel2007();
+		} else {
+			$objet_read_write = PHPExcel_IOFactory::createReader('Excel5');
+			$excel = $objet_read_write->load($lien_vers_mon_document_excel);			 
+			$sheet = $excel->getSheet(0);
+			$XLSXDocument = new PHPExcel_Reader_Excel5();
+		}
+		$Excel = $XLSXDocument->load($lien_vers_mon_document_excel);
+		// get all the row of my file
+		$rowIterator = $Excel->getActiveSheet(0)->getRowIterator();
+		$numeroligne=0;
+		// DEBUT A CONTROLER
+		$erreur_village=0;
+		$erreur_tranche=0;
+		$erreur_pourcentage=0;
+		$erreur_montant_a_payer=0;
+		$erreur_date_paiement=0;
+		$erreur_menage_id=0;
+		$erreur_depassement_montant_paye=0;
+		$erreur_agep_id=0;
+		$nombre_erreur=0;
+		$deja_importe="";
+		$requete =" ";		
+		$nombre_insere=0;
+		$array_insere=array();
+		$depart_ligne_lecture=10;
+		$nom_ile="";
+		$nom_prefecture="";
+		$nom_commune="";
+		$nom_village="";
+		// FIN A CONTROLER
+		foreach($rowIterator as $row) {
+			 $ligne = $row->getRowIndex ();
+			 // Lecture a partir de la ligne 1
+			if($ligne ==1) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$village_id =$cell->getValue();
+					 }
+				}	
+				if($village_id=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I1")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_village = $erreur_village + 1;						
+				} else {
+					$vill = $this->VillageManager->findById($village_id);
+					$village="";
+					$villageois="";
+					$zone_id=null;
+					$code_zip="";
+					$id_zip="";
+					$vague="";
+					if($vill) {
+						$village = $vill->Village;
+						$villageois = $vill->Village;
+						$zone_id = $vill->id_zip;
+						$id_zip = $vill->id_zip;
+						$vague = $vill->vague;
+						if(intval($zone_id) >0) {
+							$zip = $this->ZipManager->findById($zone_id);
+							if($zip) {							
+								$code_zip=$zip->code;
+							}	
+						}	
+					} else {
+						// Erreur village
+						$sheet->getStyle("I1")->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => 'FF0000'),
+									 'endcolor'   => array('argb' => 'FF0000')
+								 )
+						 );	
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_village = $erreur_village + 1;							
+					}									
+				}					
+			} 
+			if($ligne ==2) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$tranche =$cell->getValue();
+					 }
+				}	
+				if($tranche=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I2")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_tranche = $erreur_tranche + 1;						
+				} else {
+					// Controler si paiement déjà effectué
+					$retour=$this->FichepaiementManager->findByVillageAndEtapeAndMicroprojet($village_id,$tranche,2);
+					if($retour) {
+						foreach($retour as $k=>$v) {
+							$datepaiement=date('d/m/Y',$v->datepaiement);
+							$deja_importe="Paiement déjà effectué le : ".$datepaiement ;	
+						}	
+						$nombre_erreur = $nombre_erreur +1;	
+					}
+				}
+			} 
+			if($ligne ==3) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$pourcentage =$cell->getValue();
+					 }
+				}	
+				if($pourcentage=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I3")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_pourcentage = $erreur_pourcentage + 1;						
+				}
+			} 
+			if($ligne ==4) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$montant_a_payer =$cell->getValue();
+					 }
+				}	
+				if($montant_a_payer=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I4")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_montant_a_payer = $erreur_montant_a_payer + 1;						
+				}
+			} 
+			if($ligne ==5) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$agep_id =$cell->getValue();
+					 }
+				}	
+				if($agep_id=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I5")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_agep_id = $erreur_agep_id + 1;						
+				}
+			} 
+			if($ligne ==8) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('C' == $cell->getColumn()) {
+						$date_paiement =$cell->getValue();
+						if(isset($date_paiement) && $date_paiement>"") {
+							if(PHPExcel_Shared_Date::isDateTime($cell)) {
+								 $date_paiement = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_paiement)); 
+								 $date_paiement = $date_paiement; 
+							} else {
+								$date_paiement=null;
+							}
+						} else {
+							$date_paiement=null;
+						}	
+					 }
+				}	
+				if($date_paiement=="" || !isset($date_paiement)) {
+					// Pas de date_paiement
+					$sheet->getStyle("C8")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_date_paiement = $erreur_date_paiement + 1;						
+				}
+			} 
+			if($ligne >=$depart_ligne_lecture) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 $a_inserer =0;
+				foreach ($cellIterator as $cell) {
+					if('D' == $cell->getColumn()) {
+							$montant_paye_recepteur =$cell->getValue();
+					} else if('F' == $cell->getColumn()) {
+						$montant_paye_suppleant = $cell->getValue();
+					} else if('G' == $cell->getColumn()) {
+						$montant_total_a_payer = $cell->getValue();
+					} else if('I' == $cell->getColumn()) {
+						$menage_id = $cell->getValue();
+					}
+				}
+				// Controle info erronnée
+				$montant_paye_recepteur=intval($montant_paye_recepteur);
+				$montant_paye_suppleant=intval($montant_paye_suppleant);
+				$montant_total_a_payer=intval($montant_total_a_payer);
+				if(($montant_paye_recepteur + $montant_paye_suppleant) > $montant_total_a_payer) {
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_depassement_montant_paye=$erreur_depassement_montant_paye +1;
+					$sheet->getStyle("D".$ligne)->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$sheet->getStyle("F".$ligne)->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					 $sheet->setCellValue('J', $id_fiche_paiement);	
+				}
+				if($menage_id=="") {
+					// Pas menage_id
+					$sheet->getStyle("I".$ligne)->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_menage_id = $erreur_menage_id + 1;						
+				}
+				$numeroligne = $numeroligne + 1;
+			}		
+		}	
+		$val_ret = array();
+		$val_ret["erreur_village"] = $erreur_village;
+		$val_ret["erreur_pourcentage"] = $erreur_pourcentage;
+		$val_ret["erreur_montant_a_payer"] = $erreur_montant_a_payer;
+		$val_ret["erreur_date_paiement"] = $erreur_date_paiement;
+		$val_ret["erreur_tranche"] = $erreur_tranche;
+		$val_ret["erreur_menage_id"] = $erreur_menage_id;
+		$val_ret["erreur_depassement_montant_paye"] = $erreur_depassement_montant_paye;
+		$val_ret["erreur_agep_id"] = $erreur_agep_id;
+		$val_ret["deja_importe"] = $deja_importe;
+		if($nombre_erreur==0) {
+			$status=TRUE;
+		} else {
+			$status=FALSE;
+			$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+			$objWriter->save(dirname(__FILE__) . "/../../../../" .$chemin."Erreur_". $nomfichier);
+			unset($objet_read_write,$excel,$Excel);
+			$nomfichier="Erreur_".$nomfichier;	
+		}
+		$this->response([
+			'status' => $status,
+			'retour'  => $val_ret,
+			'chemin'  => $chemin,
+			'nomfichier'  => $nomfichier,
+			'message' => 'Get file success',
+		], REST_Controller::HTTP_OK);			  
+	}	
+	public function importer_paiement_arse($chemin,$nomfichier) {	
+        require_once 'Classes/PHPExcel.php';
+        require_once 'Classes/PHPExcel/IOFactory.php';
+        set_time_limit(0);
+        ini_set ('memory_limit', '2048M');
+		$search= array('é','ô','Ô','î','Î','è','ê','à','ö','ç','&','°',"'");
+		$replace=array('e','o','o','i','i','e','e','a','o','c','_','_','');
+		$trouvez =array("'");
+		$remplacez =array(" ");
+		$directoryName = dirname(__FILE__) . "/../../../../importmenage/".$chemin;
+		if(!is_dir($directoryName)) {
+			mkdir($directoryName, 0777,true);
+		}
+		$lien_vers_mon_document_excel = dirname(__FILE__) . "/../../../../".$chemin . $nomfichier;
+		$array_data = array();
+		if(strpos($lien_vers_mon_document_excel,"xlsx") >0) {
+			// pour mise à jour après : G4 = id_fiche_presence <=> déjà importé => à ignorer
+			$objet_read_write = PHPExcel_IOFactory::createReader('Excel2007');
+			$excel = $objet_read_write->load($lien_vers_mon_document_excel);			 
+			$sheet = $excel->getSheet(0);
+			// pour lecture début - fin seulement
+			$XLSXDocument = new PHPExcel_Reader_Excel2007();
+		} else {
+			$objet_read_write = PHPExcel_IOFactory::createReader('Excel5');
+			$excel = $objet_read_write->load($lien_vers_mon_document_excel);			 
+			$sheet = $excel->getSheet(0);
+			$XLSXDocument = new PHPExcel_Reader_Excel5();
+		}
+		$Excel = $XLSXDocument->load($lien_vers_mon_document_excel);
+		// get all the row of my file
+		$rowIterator = $Excel->getActiveSheet(0)->getRowIterator();
+		$numeroligne=0;
+		// DEBUT A CONTROLER
+		$erreur_village=0;
+		$erreur_tranche=0;
+		$erreur_pourcentage=0;
+		$erreur_montant_a_payer=0;
+		$erreur_date_paiement=0;
+		$erreur_menage_id=0;
+		$erreur_depassement_montant_paye=0;
+		$erreur_agep_id=0;
+		$nombre_erreur=0;
+		$deja_importe="";
+		$requete =" ";		
+		$nombre_insere=0;
+		$array_insere=array();
+		$depart_ligne_lecture=10;
+		$nom_ile="";
+		$nom_prefecture="";
+		$nom_commune="";
+		$nom_village="";
+			$total_paye_recepteur=0;
+			$total_paye_suppleant=0;
+			$total_a_payer=0;
+			$total_paye=0;
+		// FIN A CONTROLER
+		foreach($rowIterator as $row) {
+			 $ligne = $row->getRowIndex ();
+			 // Lecture a partir de la ligne 1
+			if($ligne ==1) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$village_id =$cell->getValue();
+					 }
+				}	
+				if($village_id=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I1")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_village = $erreur_village + 1;						
+				} else {
+					$vill = $this->VillageManager->findById($village_id);
+					$village="";
+					$villageois="";
+					$zone_id=null;
+					$code_zip="";
+					$id_zip="";
+					$vague="";
+					if($vill) {
+						$village = $vill->Village;
+						$villageois = $vill->Village;
+						$zone_id = $vill->id_zip;
+						$id_zip = $vill->id_zip;
+						$vague = $vill->vague;
+						if(intval($zone_id) >0) {
+							$zip = $this->ZipManager->findById($zone_id);
+							if($zip) {							
+								$code_zip=$zip->code;
+							}	
+						}	
+					} else {
+						// Erreur village
+						$sheet->getStyle("I1")->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => 'FF0000'),
+									 'endcolor'   => array('argb' => 'FF0000')
+								 )
+						 );	
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_village = $erreur_village + 1;							
+					}									
+				}					
+			} 
+			if($ligne ==2) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$tranche =$cell->getValue();
+					 }
+				}	
+				if($tranche=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I2")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_tranche = $erreur_tranche + 1;						
+				} else {
+					// Controler si paiement déjà effectué
+					$retour=$this->FichepaiementManager->findByVillageAndEtapeAndMicroprojet($village_id,$tranche,2);
+					if($retour) {
+						foreach($retour as $k=>$v) {
+							$datepaiement=date('d/m/Y',$v->datepaiement);
+							$deja_importe="Paiement déjà effectué le : ".$datepaiement ;	
+						}	
+						$nombre_erreur = $nombre_erreur +1;	
+					}
+				}
+			} 
+			if($ligne ==3) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$pourcentage =$cell->getValue();
+					 }
+				}	
+				if($pourcentage=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I3")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_pourcentage = $erreur_pourcentage + 1;						
+				}
+			} 
+			if($ligne ==4) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$montant_a_payer =$cell->getValue();
+					 }
+				}	
+				if($montant_a_payer=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I4")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_montant_a_payer = $erreur_montant_a_payer + 1;						
+				}
+			} 
+			if($ligne ==5) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$agep_id =$cell->getValue();
+					 }
+				}	
+				if($agep_id=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I5")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_agep_id = $erreur_agep_id + 1;						
+				}
+			} 
+			if($ligne ==8) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('C' == $cell->getColumn()) {
+						$date_paiement =$cell->getValue();
+						if(isset($date_paiement) && $date_paiement>"") {
+							if(PHPExcel_Shared_Date::isDateTime($cell)) {
+								 $date_paiement = date($format='Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($date_paiement)); 
+								 $date_paiement = $date_paiement; 
+							} else {
+								$date_paiement=null;
+							}
+						} else {
+							$date_paiement=null;
+						}	
+					 }
+				}	
+				if($date_paiement=="" || !isset($date_paiement)) {
+					// Pas de date_paiement
+					$sheet->getStyle("C8")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_date_paiement = $erreur_date_paiement + 1;						
+				}
+			} 
+			 
+			 
+			 
+			 
+			if($ligne >=$depart_ligne_lecture) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 $a_inserer =0;
+				foreach ($cellIterator as $cell) {
+					if('D' == $cell->getColumn()) {
+							$montant_paye_recepteur =$cell->getValue();
+					} else if('F' == $cell->getColumn()) {
+						$montant_paye_suppleant = $cell->getValue();
+					} else if('G' == $cell->getColumn()) {
+						$montant_total_a_payer = $cell->getValue();
+					} else if('I' == $cell->getColumn()) {
+						$menage_id = $cell->getValue();
+					}
+				}
+				// Controle info erronnée
+				$montant_paye_recepteur=intval($montant_paye_recepteur);
+				$montant_paye_suppleant=intval($montant_paye_suppleant);
+				$montant_total_a_payer=intval($montant_total_a_payer);
+				$montant_total_paye=$montant_paye_recepteur + $montant_paye_suppleant;
+				
+				$total_paye_recepteur=$total_paye_recepteur + $montant_paye_recepteur;
+				$total_paye_suppleant=$total_paye_suppleant + $montant_paye_suppleant;
+				$total_a_payer=$total_a_payer + $montant_total_a_payer ;
+				$total_paye=$total_paye + $montant_total_paye; 
+				
+				
+				if(($montant_paye_recepteur + $montant_paye_suppleant) > $montant_total_a_payer) {
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_depassement_montant_paye=$erreur_depassement_montant_paye +1;
+				}
+				if($menage_id=="") {
+					// Pas menage_id
+					$sheet->getStyle("I".$ligne)->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_menage_id = $erreur_menage_id + 1;						
+				}
+				 if($menage_id >0) {
+					$a_inserer=1;
+				 }
+				if($ligne==$depart_ligne_lecture) {
+					$fiche_paiement_id= "id_temp";
+				}
+				if($a_inserer==1) {
+					// stocker dans $requete les enregistrements à insérer; puis une seule instruction suffit pour les injecter dans see_fichepresencemenage
+					$requete .="('".$fiche_paiement_id."','";
+					$requete .= $menage_id."','";					
+					$requete .= $village_id."','";					
+					$requete .= $montant_total_a_payer."','";					
+					$requete .= $montant_total_paye."','";					
+					$requete .= $montant_paye_recepteur."','";					
+					$requete .= $montant_paye_suppleant."'),";
+					
+				}	
+				if($a_inserer==1) {
+					$a_inserer=0;
+				}							
+				$numeroligne = $numeroligne + 1;
+			}		
+		}	
+		$val_ret = array();
+		$val_ret["erreur_village"] = $erreur_village;
+		$val_ret["erreur_tranche"] = $erreur_tranche;
+		$val_ret["erreur_pourcentage"] = $erreur_pourcentage;
+		$val_ret["erreur_montant_a_payer"] = $erreur_montant_a_payer;
+		$val_ret["erreur_depassement_montant_paye"] = $erreur_depassement_montant_paye;
+		$val_ret["erreur_menage_id"] = $erreur_menage_id;
+		$val_ret["erreur_agep_id"] = $erreur_agep_id;
+		$enregistrement_insere=array(); // Valeur retourné pour affichage après insertion
+		$sous_projet=array(); // Valeur retourné pour affichage après insertion
+		if($erreur_village==0 && $erreur_tranche==0 && $erreur_pourcentage==0 && $erreur_montant_a_payer==0 && $erreur_date_paiement && $erreur_menage_id==0 && $erreur_depassement_montant_paye==0 && $erreur_agep_id==0) {
+			// SANS ERREUR APRES CONTROLE
+					$sheet->setCellValue('E1', "DÉJÀ IMPORTÉ");	
+					$sheet->getStyle('E1')->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );		
+			$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+			$objWriter->save(dirname(__FILE__) . "/../../../../" .$chemin. $nomfichier);
+			$a_ete_modifie=0;
+			$microprojet_id=2;
+			// INSERTION DANS TABLE FICHE PAIEMENT
+			$query = "insert into see_fichepaiement (etape_id,datepaiement,village_id,indemnite,a_ete_modifie,microprojet_id,montanttotalapayer,montanttotalpaye,montantpayetravailleur,montantpayesuppliant,indemnite,agep_id) values ('"
+			.$etape_id."','".$date_paiement."','".$id_village."','"
+			.$montant_total_a_payer."','".$a_ete_modifie."','".$microprojet_id."','".$total_a_payer."','".$total_paye."','".$total_paye_recepteur."','".$total_paye_suppleant."','".$montant_a_payer."','".$agep_id."')";
+			$id_fiche_paiement = $this->RequeteimportManager->Requete_insertion($query);
+
+			// INSERTION DANS TABLE FICHE PAIEMENT MENAGE
+			$replace=array($id_fiche_paiement);
+			$search= array('id_temp');
+			$requete=str_replace($search,$replace,$requete);				
+			$ou_est_le_dernier_virgule = strrpos($requete,",");
+			$requete = substr($requete,0,$ou_est_le_dernier_virgule);
+			$requete = "insert into see_fichepaiementmenage(fiche_paiement_id,menage_id,village_id,montanttotalapayer,montanttotalpaye,montantpayetravailleur,montantpayesuppliant) values ".$requete;
+			$count_update = $this->RequeteimportManager->Execution_requete($requete);
+						
+			// RECUPERATION ENREGISTRMENT INSERES
+			$enregistrement_insere = $this->ImportationmenageManager->MenageInseresDernierement($id_max_menage);
+			$sous_projet = $this->SousprojetManager->findById($id_sous_projet);
+			unset($objet_read_write,$excel,$Excel);	
+		}			
+		if($nombre_erreur==0) {
+			$status=TRUE;
+		} else {
+			$status=FALSE;
+			$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+			$objWriter->save(dirname(__FILE__) . "/../../../../" .$chemin. $nomfichier);
+			unset($objet_read_write,$excel,$Excel);				
+		}
+		$this->response([
+			'status' => $status,
+			'retour'  => $val_ret,
+			'menage'  => $enregistrement_insere,
+			'sous_projet'  => $sous_projet,
+			'nom_ile'  => $nom_ile,
+			'nom_prefecture'  => $nom_prefecture,
+			'nom_commune'  => $nom_commune,
+			'nom_village'  => $nom_village,
+			'message' => 'Get file success',
+		], REST_Controller::HTTP_OK);		  
+	}
 }
 /* End of file controllername.php */
 /* Location: ./application/controllers/controllername.php */

@@ -17,7 +17,7 @@ class Liste_menage_mlpl extends REST_Controller {
             if (!$data)
                 $data = array();
 		} else if ($cle_etrangere)  {
-            $data = $this->ListemenagemlplManager->findAllByGroupemlpl($cle_etrangere);
+ 			 $data = $this->ListemenagemlplManager->findAllByGroupemlpl($cle_etrangere);
             if (!$data)
                 $data = array();
         } else  {

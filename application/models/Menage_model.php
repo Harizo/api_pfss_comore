@@ -504,4 +504,46 @@ class Menage_model extends CI_Model
         return null;
     }
 
+
+    public function get_composition_menage($id_menage)//miasa any @fiche_plan_relevement_identification controller
+    {
+        $sql = 
+        "
+            select 
+                sum(niv1.nbr_homme) AS nbr_homme,
+                sum(niv1.nbr_femme) AS nbr_femme
+            from
+
+            (
+                SELECT
+                    COUNT(i.id) AS nbr_homme,
+                    0 AS nbr_femme
+                FROM
+                    menage AS m,
+                    individu AS i
+                WHERE
+                    i.menage_id = m.id
+                    AND m.id = ".$id_menage."
+                    AND i.sexe = 1
+                    
+                union
+                
+                SELECT
+                    0 AS nbr_homme,
+                    COUNT(i.id) AS nbr_femme
+                FROM
+                    menage AS m,
+                    individu AS i
+                WHERE
+                    i.menage_id = m.id
+                    AND m.id = ".$id_menage."
+                    AND i.sexe = 0
+                
+            ) AS niv1
+        ";
+
+
+        return $this->db->query($sql)->result();
+    }
+
 }
