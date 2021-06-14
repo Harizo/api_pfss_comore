@@ -465,5 +465,43 @@ class Menage_model extends CI_Model
             return null;
         }                 
     }
+    public function menagebyvillage_withcomposition($id_village)
+    {
+        $result =  $this->db->select('menage.*,
+                                        menage.id as id_men,
+                                        (select count(indi.id) from individu as indi 
+                                        inner join menage as men on indi.menage_id=men.id
+                                        where men.id=id_men and indi.sexe=0) as nbr_feminin,
+                                        (select count(indi.id) from individu as indi 
+                                        inner join menage as men on indi.menage_id=men.id
+                                        where men.id=id_men and indi.sexe=1) as nbr_masculin')
+                        ->from($this->table)
+                        ->where('village_id',$id_village)
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+    
+    public function findByIdComposition($id)
+    {
+        $this->db->select('menage.*,
+                            menage.id as id_men,
+                            (select count(indi.id) from individu as indi 
+                            inner join menage as men on indi.menage_id=men.id
+                            where men.id=id_men and indi.sexe=0) as nbr_feminin,
+                            (select count(indi.id) from individu as indi 
+                            inner join menage as men on indi.menage_id=men.id
+                            where men.id=id_men and indi.sexe=1) as nbr_masculin')
+        ->where("menage.id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
 
 }
