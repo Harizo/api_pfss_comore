@@ -75,7 +75,7 @@ class Pges_phases extends REST_Controller {
         if ($supprimer == 0) {
             if ($id == 0) {
                 $data = array(
-                    'description'=> $this->post( 'description'), 
+                    //'description'=> $this->post( 'description'), 
                     'impacts'=> $this->post( 'impacts'),      
                     'mesures'=> $this->post( 'mesures'),      
                     'responsable'=> $this->post( 'responsable'),
@@ -111,7 +111,7 @@ class Pges_phases extends REST_Controller {
                 if ($etat_download)
                 {   
                     $data = array(
-                        'description'=> $this->post( 'description'),
+                        //'description'=> $this->post( 'description'),
                         'impacts'=> $this->post( 'impacts'),      
                         'mesures'=> $this->post( 'mesures'),      
                         'responsable'=> $this->post( 'responsable'),
@@ -145,7 +145,7 @@ class Pges_phases extends REST_Controller {
                 else
                 {
                     $data = array(
-                        'description'=> $this->post( 'description'),
+                        //'description'=> $this->post( 'description'),
                         'impacts'=> $this->post( 'impacts'),      
                         'mesures'=> $this->post( 'mesures'),      
                         'responsable'=> $this->post( 'responsable'),
