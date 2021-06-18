@@ -88,5 +88,31 @@ class Groupe_mlpl_model extends CI_Model {
         }
         return null;
     }
+    
+    public function getgroupeByvillagewithnbr_membre($id_village) {
+		// Selection de tous les enregitrements
+        $result =  $this->db->select('groupe_ml_pl.*,groupe_ml_pl.id as id_group,
+                                        (select count(liste_menage_ml_pl.id) from liste_menage_ml_pl where liste_menage_ml_pl.id_groupe_ml_pl=id_group)as nbr_menage_membre')
+                        ->from($this->table)
+                        ->order_by('id')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+    
+    public function findByIdwithnbr_membre($id) {
+		// Selection par id
+        $this->db->select('groupe_ml_pl.*,groupe_ml_pl.id as id_group,(select count(liste_menage_ml_pl.id) from liste_menage_ml_pl where liste_menage_ml_pl.id_groupe_ml_pl=id_group)as nbr_menage_membre')
+        ->where("id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
 }
 ?>
