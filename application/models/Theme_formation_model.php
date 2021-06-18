@@ -66,5 +66,16 @@ class Theme_formation_model extends CI_Model {
             return null;
         }                 
     }
+
+
+    public function findByIdobj($id) 
+    {
+        $this->db->where("id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;            
+    }
 }
 ?>
