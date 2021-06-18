@@ -508,4 +508,29 @@ class Menage_model extends CI_Model
         return $this->db->query($sql)->result();
     }
 
+
+    public function get_menage_beneficiaire_par_village($id_village)//miasa any @activites_choisis_menage controller
+    {
+        $sql = 
+        "
+            select 
+                    m.id AS id,
+                    m.identifiant_menage AS identifiant_menage,
+                    m.nomchefmenage AS nomchefmenage,
+                    grp.nom_prenom_ml_pl AS groupe
+                FROM
+                    menage AS m,
+                    menage_beneficiaire AS mb,
+                    groupe_ml_pl AS grp
+                WHERE 
+                    m.id = mb.id_menage
+                    AND m.id = grp.id_menage
+                AND m.village_id = ".$id_village."
+                            
+        ";
+
+
+        return $this->db->query($sql)->result();
+    }
+
 }
