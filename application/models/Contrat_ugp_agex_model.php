@@ -158,5 +158,18 @@ class Contrat_ugp_agex_model extends CI_Model {
         }
         return null;
     }
+    
+    public function findById_agex($id) {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where("id_agex", $id)
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
 }
 ?>

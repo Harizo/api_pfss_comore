@@ -4,45 +4,46 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Realisation_ebe extends REST_Controller {
+class fiche_collection_donnee_ebe extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('realisation_ebe_model', 'Realisation_ebeManager');
-        $this->load->model('contrat_ugp_agex_model', 'Contrat_ugp_agexManager');
-        $this->load->model('Espace_bien_etre_model', 'Espace_bien_etreManager');
+        $this->load->model('fiche_collection_donnee_ebe_model', 'Fiche_collection_donnee_ebeManager');
+        $this->load->model('outils_utilise_sensibilisation_model', 'Outils_utilise_sensibilisationManager');
+        $this->load->model('theme_sensibilisation_model', 'Theme_sensibilisationManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
 		$data = array();
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
-		if ($menu=='getrealisation_ebeBysousprojetml_pl') 
+        $id_realisation_ebe = $this->get('id_realisation_ebe');
+		if ($menu=='getfiche_collection_donnee_ebeByrealisation') 
         {
-			$tmp = $this->Realisation_ebeManager->getrealisation_ebeBysousprojetml_pl($id_sous_projet,$id_groupe_ml_pl);
+			$tmp = $this->Fiche_collection_donnee_ebeManager->getfiche_collection_donnee_ebeByrealisation($id_realisation_ebe);
 			if ($tmp) 
             {   
 				foreach ($tmp as $key => $value)
                 {   
-                    $contrat_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
-                    $espace_bien_etre = $this->Espace_bien_etreManager->findByIdobjet($value->id_espace_bien_etre);
+                    $outils_utilise = $this->Outils_utilise_sensibilisationManager->findById($value->id_outils_utilise);
+                    $theme_sensibilisation = $this->Theme_sensibilisationManager->findById($value->id_theme_sensibilisation);
                     $data[$key]['id']         = $value->id;
-                    $data[$key]['espace_bien_etre']     = $espace_bien_etre;
-                    $data[$key]['but_regroupement']= $value->but_regroupement;
-                    $data[$key]['lieu']        = $value->lieu;
-                    $data[$key]['date_regroupement']  = $value->date_regroupement;
-                    $data[$key]['date_edition']  = $value->date_edition;
-                    $data[$key]['materiel']    = $value->materiel;
-                    $data[$key]['id_groupe_ml_pl']     = $value->id_groupe_ml_pl;
-                    $data[$key]['contrat_agex'] = $contrat_agex;
+                    $data[$key]['outils_utilise'] = $outils_utilise;
+                    $data[$key]['theme_sensibilisation']     = $theme_sensibilisation;
+                    $data[$key]['date']= $value->date;
+                    $data[$key]['localite']        = $value->localite;
+                    $data[$key]['nbr_femme']  = $value->nbr_femme;
+                    $data[$key]['nbr_homme']  = $value->nbr_homme;
+                    $data[$key]['nbr_enfant']  = $value->nbr_enfant;
+                    $data[$key]['animateur']    = $value->animateur;
+                    $data[$key]['observation']    = $value->observation;
+                    $data[$key]['id_realisation_ebe']    = $value->id_realisation_ebe;
                 }
 			}
 		} 
         elseif ($id) 
         {
-			$tmp = $this->Realisation_ebeManager->findById($id);
+			$tmp = $this->Fiche_collection_donnee_ebeManager->findById($id);
 			if($tmp) 
             {
 				$data=$tmp;
@@ -50,18 +51,24 @@ class Realisation_ebe extends REST_Controller {
 		} 
         else 
         {			
-			$tmp = $this->Realisation_ebeManager->findAll();
+			$tmp = $this->Fiche_collection_donnee_ebeManager->findAll();
 			if ($tmp) 
             {   
                 foreach ($tmp as $key => $value)
                 {   
-                    $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
-                    $data[$key]['id']                 = $value->id;
-                    $data[$key]['id_espace_bien_etre']     = $value->id_espace_bien_etre;
-                    $data[$key]['but_regroupement']      = $value->but_regroupement;
-                    $data[$key]['lieu']    = $value->lieu;
-                    $data[$key]['date_regroupement']     = $value->date_regroupement;
-                    $data[$key]['materiel']     = $value->materiel;
+                    $outils_utilise = $this->Outils_utilise_sensibilisationManager->findById($value->id_outils_utilise);
+                    $theme_sensibilisation = $this->Theme_sensibilisationManager->findById($value->id_theme_sensibilisation);
+                    $data[$key]['id']         = $value->id;
+                    $data[$key]['outils_utilise'] = $outils_utilise;
+                    $data[$key]['theme_sensibilisation']     = $theme_sensibilisation;
+                    $data[$key]['date']= $value->date;
+                    $data[$key]['localite']        = $value->localite;
+                    $data[$key]['nbr_femme']  = $value->nbr_femme;
+                    $data[$key]['nbr_homme']  = $value->nbr_homme;
+                    $data[$key]['nbr_enfant']  = $value->nbr_enfant;
+                    $data[$key]['animateur']    = $value->animateur;
+                    $data[$key]['observation']    = $value->observation;
+                    $data[$key]['id_realisation_ebe']    = $value->id_realisation_ebe;
                 }
 				//$data=$tmp;
 			}
@@ -89,14 +96,16 @@ class Realisation_ebe extends REST_Controller {
 
 		$data = array(
 			
-            'id_espace_bien_etre'     => $this->post('id_espace_bien_etre'),
-            'id_groupe_ml_pl'   => $this->post('id_groupe_ml_pl'),
-            'id_contrat_agex'=> $this->post('id_contrat_agex'),
-            'but_regroupement'      => $this->post('but_regroupement'),
-            'lieu'       => $this->post('lieu'),
-            'date_regroupement'     => $this->post('date_regroupement'),
-            'materiel'   => $this->post('materiel'),
-            'date_edition'   => $this->post('date_edition')
+            'id_theme_sensibilisation'     => $this->post('id_theme_sensibilisation'),
+            'id_outils_utilise'     => $this->post('id_outils_utilise'),
+            'date'=> $this->post('date'),
+            'localite'        => $this->post('localite'),
+            'nbr_femme'  => $this->post('nbr_femme'),
+            'nbr_homme'  => $this->post('nbr_homme'),
+            'nbr_enfant'  => $this->post('nbr_enfant'),
+            'animateur'    => $this->post('animateur'),
+            'observation'    => $this->post('observation'),
+            'id_realisation_ebe'    => $this->post('id_realisation_ebe')
 		);       
 
         if ($supprimer == 0) {
@@ -108,7 +117,7 @@ class Realisation_ebe extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->Realisation_ebeManager->add($data);              
+                $dataId = $this->Fiche_collection_donnee_ebeManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -133,7 +142,7 @@ class Realisation_ebe extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->Realisation_ebeManager->update($id, $data);              
+                $update = $this->Fiche_collection_donnee_ebeManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -160,7 +169,7 @@ class Realisation_ebe extends REST_Controller {
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
 
-            $delete = $this->Realisation_ebeManager->delete($id);   
+            $delete = $this->Fiche_collection_donnee_ebeManager->delete($id);   
 
             if (!is_null($delete)) 
             {

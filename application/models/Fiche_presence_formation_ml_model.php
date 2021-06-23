@@ -1,7 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Groupe_participant_formation_ml_model extends CI_Model {
-    protected $table = 'groupe_participant_formation_ml';
+class Fiche_presence_formation_ml_model extends CI_Model {
+    protected $table = 'fiche_presence_formation_ml';
 
     public function add($tutelle)  {
 		// Ajout d'un enregitrement

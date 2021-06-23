@@ -61,10 +61,20 @@ class Groupe_mlpl_model extends CI_Model {
             return null;
         }                 
     }
+    
+    public function findById($id) {
+		// Selection par id
+        $this->db->where("id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
     public function findAllByVillage($village_id)  {     
 		// Selection par village_id
 		$requete ="select gp.id,gp.date_creation,gp.id_menage,gp.nom_prenom_ml_pl,gp.chef_village,gp.nom_groupe,gp.village_id,"
-					."m.identifiant_menage,m.nomchefmenage,gp.sexe,gp.age,gp.lien_de_parente,gp.telephone,"
+					."m.identifiant_menage,m.nomchefmenage,gp.sexe,gp.age,gp.lien_de_parente,gp.telephone,m.Addresse,"
 					."lp.description as lienparental"
 					." from groupe_ml_pl as gp"
 					." left join menage as m on m.id=gp.id_menage"
@@ -78,15 +88,6 @@ class Groupe_mlpl_model extends CI_Model {
         }else{
             return null;
         }                 
-    }
-    public function findById($id) {
-		// Selection par id
-        $this->db->where("id", $id);
-        $q = $this->db->get($this->table);
-        if ($q->num_rows() > 0) {
-            return $q->row();
-        }
-        return null;
     }
     
     public function getgroupeByvillagewithnbr_membre($id_village) {
@@ -114,5 +115,31 @@ class Groupe_mlpl_model extends CI_Model {
         }
         return null;
     }
+    
+    public function findByIdandmenage($id) {
+		// Selection par id
+        $this->db->select("groupe_ml_pl.id,
+                            groupe_ml_pl.date_creation,
+                            groupe_ml_pl.id_menage,
+                            groupe_ml_pl.nom_prenom_ml_pl,
+                            groupe_ml_pl.chef_village,
+                            groupe_ml_pl.nom_groupe,
+                            groupe_ml_pl.village_id,
+                            menage.identifiant_menage,
+                            menage.nomchefmenage,
+                            groupe_ml_pl.sexe,
+                            groupe_ml_pl.age,
+                            groupe_ml_pl.lien_de_parente,
+                            groupe_ml_pl.telephone,
+                            menage.Addresse")
+                ->join('menage','menage.id=groupe_ml_pl.id_menage','left')
+        ->where("groupe_ml_pl.id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
+    
 }
 ?>
