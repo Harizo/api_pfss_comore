@@ -1,48 +1,25 @@
 <?php
+
 defined('BASEPATH') OR exit('No direct script access allowed');
 require APPPATH . '/libraries/REST_Controller.php';
-class Fiche_paiement extends REST_Controller {
+
+class Tableau_de_bord extends REST_Controller {
+
     public function __construct() {
         parent::__construct();
-        $this->load->model('fiche_paiement_model', 'FichEpaiementManager');
-        $this->load->model('menage_model', 'menageManager');
+        $this->load->model('tableau_de_bord_model', 'TableaudebordManager');
     }
-    public function index_get() {
+
+    public function index_get()  {
+        $type_tdb = $this->get('type_tdb');
         $id = $this->get('id');
-		   
-        $ile_id = $this->get('ile_id');
-        $id_region = $this->get('id_region');
-        $id_commune = $this->get('id_commune');
-        $etape_id = $this->get('etape_id');
-        $id_sous_projet = $this->get('id_sous_projet');
-        $village_id = $this->get('village_id');
-		$requeteplus="";
-		if($ile_id && intval($ile_id) >0) {
-			$requeteplus=$requeteplus." and ile_id=".$ile_id;
-		}
-		if($id_region && intval($id_region) >0) {
-			$requeteplus=$requeteplus." and region_id=".$id_region;
-		}
-		if($id_commune && intval($id_commune) >0) {
-			$requeteplus=$requeteplus." and commune_id=".$id_commune;
-		}
-		if($village_id && intval($village_id) >0) {
-			$requeteplus=$requeteplus." and village_id=".$village_id;
-		}
-		if($etape_id && intval($etape_id) >0) {
-			$requeteplus=$requeteplus." and etape_id=".$etape_id;
-		}
-        $data = array() ;
-		if ($id) {
-			// Selection ménage par id (id=clé primaire)
-			$data = $this->FichEpaiementManager->findById($id);
-		} else if($village_id && $id_sous_projet){
-			
-			$data = $this->FichEpaiementManager->findByVillageAndEtapeAndMicroprojet($village_id,$requeteplus,$id_sous_projet);
+		if ($type_tdb) {
+            $data = $this->TableaudebordManager->findByTypeTDB($type_tdb);
+        } else if($id) {			
+			$data = $this->TableaudebordManager->findById($id);
 		} else {	
-			// Selection de tous les ménages
-			$data = $this->FichEpaiementManager->findAll();                   
-		}
+			$data = $this->TableaudebordManager->findAll();           
+        } 
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
@@ -61,24 +38,14 @@ class Fiche_paiement extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
 		$data = array(
-			'activite_id' => $this->post('activite_id'),
-			'village_id' => ($this->post('village_id')),
-			'id_annee' => ($this->post('id_annee')),
-			'microprojet_id' => ($this->post('id_sous_projet')),
-			'etape_id' => ($this->post('date_sortie')),
-			'fichepresence_id' => ($this->post('fichepresence_id')),
-			'agep_id' => ($this->post('agep_id')),
-			'inapte' => ($this->post('inapte')),
-			'datepaiement' => ($this->post('datepaiement')),
-			'nombrejourdetravail' => ($this->post('nombrejourdetravail')),
-			'montanttotalapayer' => ($this->post('montanttotalapayer')),
-			'montanttotalpaye' => ($this->post('montanttotalpaye')),
-			'montantapayertravailleur' => ($this->post('montantapayertravailleur')),
-			'montantpayetravailleur' => ($this->post('montantpayetravailleur')),
-			'montantapayersuppliant' => ($this->post('montantapayersuppliant')),
-			'montantpayesuppliant' => ($this->post('montantpayesuppliant')),
-			'indemnite' => ($this->post('indemnite')),
-			'observation' => ($this->post('observation')),
+			'type_tdb' => $this->post('type_tdb'),
+			'ile_id' => $this->post('ile_id'),
+			'vague' => $this->post('vague'),
+			'indicateur' => $this->post('indicateur'),
+			'objectif_nombre' => $this->post('objectif_nombre'),
+			'objectif_village' => $this->post('objectif_village'),
+			'rang' => $this->post('rang'),
+			'visible' => $this->post('visible'),
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {
@@ -89,8 +56,7 @@ class Fiche_paiement extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-				// Ajout d'un enregistrement
-                $dataId = $this->FichEpaiementManager->add($data);
+                $dataId = $this->TableaudebordManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -112,12 +78,11 @@ class Fiche_paiement extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-				// Mise à jour d'un enregistrement
-                $update = $this->FichEpaiementManager->update($id, $data);              
+                $update = $this->TableaudebordManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
-                        'response' => $id,
+                        'response' => 1,
                         'message' => 'Update data success'
                             ], REST_Controller::HTTP_OK);
                 } else {
@@ -135,8 +100,7 @@ class Fiche_paiement extends REST_Controller {
             'message' => 'No request found'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
-			// Suppression d'un enregistrement
-            $delete = $this->FichEpaiementManager->delete($id);          
+            $delete = $this->TableaudebordManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,

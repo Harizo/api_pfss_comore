@@ -21,34 +21,15 @@ class Indicateur extends REST_Controller {
             $indicateur = $this->IndicateurManager->getindicateurbycomposante($id_composante_indicateur);
                 if ($indicateur) {
                     $data = $indicateur;
-                    /*foreach ($indicateur as $key => $value) {
-                        $data[$key]['id'] = $value->id;
-                        $data[$key]['code'] = $value->code;
-                        $data[$key]['libelle'] = $value->libelle;
-                        
-                    };*/
-
                 } else
                     $data = array();
             
-        } elseif ($id) {
-               
+        } elseif ($id) {               
                 $data = $this->IndicateurManager->findById($id);
-                /*$data['id'] = $indicateur->id;
-                $data['code'] = $indicateur->code;
-                $data['libelle'] = $indicateur->libelle;*/
-                
             } else {
                 $indicateur = $this->IndicateurManager->findAll();
                 if ($indicateur) {
                     $data = $indicateur;
-                    /*foreach ($indicateur as $key => $value) {
-                        $data[$key]['id'] = $value->id;
-                        $data[$key]['code'] = $value->code;
-                        $data[$key]['libelle'] = $value->libelle;
-                        
-                    };*/
-
                 } else
                     $data = array();
             }
@@ -72,15 +53,15 @@ class Indicateur extends REST_Controller {
         $supprimer = $this->post('supprimer') ;        
         $etat_download = $this->post('etat_download') ;
         if ($supprimer == 0) {
+			$data = array(
+				'code' => $this->post('code'),
+				'libelle' => $this->post('libelle'),
+				'frequence' => $this->post('frequence'),
+				'utilisation' => $this->post('utilisation'),
+				'unite' => $this->post('unite'),
+				'id_composante_indicateur' => $this->post('id_composante_indicateur')
+			);               
             if ($id == 0) {
-                $data = array(
-                    'code' => $this->post('code'),
-                    'libelle' => $this->post('libelle'),
-                    'frequence' => $this->post('frequence'),
-                    'utilisation' => $this->post('utilisation'),
-                    'unite' => $this->post('unite'),
-                    'id_composante_indicateur' => $this->post('id_composante_indicateur')
-                );               
                 if (!$data) {
                     $this->response([
                         'status' => FALSE,
@@ -107,14 +88,6 @@ class Indicateur extends REST_Controller {
             {
                 if ($etat_download)
                 {   
-                    $data = array(
-                        'code' => $this->post('code'),
-                        'libelle' => $this->post('libelle'),
-                        'frequence' => $this->post('frequence'),
-                        'utilisation' => $this->post('utilisation'),
-                        'unite' => $this->post('unite'),
-                        'id_composante_indicateur' => $this->post('id_composante_indicateur')
-                    );
                     if (!$data) {
                         $this->response([
                             'status' => FALSE,
@@ -167,9 +140,7 @@ class Indicateur extends REST_Controller {
                             'message' => 'No request found'
                                 ], REST_Controller::HTTP_OK);
                     }
-                }
-                
-                
+                }             
             }
         } else {
             if (!$id) {
@@ -198,3 +169,4 @@ class Indicateur extends REST_Controller {
 }
 /* End of file controllername.php */
 /* Location: ./application/controllers/controllername.php */
+?>
