@@ -60,7 +60,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -74,7 +74,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByIntervention($id_intervention) {
@@ -88,7 +88,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByInterventionIdtypetransfert($id_intervention,$id_detail_type_transfert) {
@@ -97,7 +97,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
 		if(count($temp) >0) {
 			return $temp;
 		} else {
-			return null;
+			return array();
 		}
     }
 	public function findByInterventionParConcatenation($id_intervention) {
@@ -110,7 +110,7 @@ class Detail_type_transfert_intervention_model extends CI_Model {
 			if($query) {
 			return $query;
 			} else {
-				return null;
+				return array();
 			}
 	}
 }

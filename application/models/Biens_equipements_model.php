@@ -59,7 +59,7 @@ class Biens_equipements_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id,$nom_table) {
@@ -73,7 +73,7 @@ class Biens_equipements_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findAllByMenage($id_menage) {
@@ -87,7 +87,7 @@ class Biens_equipements_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 }

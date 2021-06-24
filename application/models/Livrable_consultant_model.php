@@ -52,7 +52,7 @@ class Livrable_consultant_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByContrat($id_contrat) {
@@ -66,7 +66,7 @@ class Livrable_consultant_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -76,7 +76,7 @@ class Livrable_consultant_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
 }
 ?>

@@ -63,7 +63,7 @@ class Fiche_presence_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id)  {
@@ -77,7 +77,7 @@ class Fiche_presence_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
  

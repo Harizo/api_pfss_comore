@@ -59,7 +59,7 @@ class Liste_menage_mlpl_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findAllByGroupemlpl($id_groupe_ml_pl)  {   
@@ -73,7 +73,7 @@ class Liste_menage_mlpl_model extends CI_Model {
 		if($query->result()) {
 			return $query->result();
         }else{
-            return null;
+            return array();
         }  
     }
     public function findById($id) {
@@ -83,7 +83,7 @@ class Liste_menage_mlpl_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
 }
 ?>

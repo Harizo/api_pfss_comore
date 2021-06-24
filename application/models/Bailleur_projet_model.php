@@ -65,7 +65,7 @@ class Bailleur_projet_model extends CI_Model {
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 	// Selection par id_projet
@@ -80,7 +80,7 @@ class Bailleur_projet_model extends CI_Model {
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -94,7 +94,7 @@ class Bailleur_projet_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }	
 }

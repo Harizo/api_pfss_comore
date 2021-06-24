@@ -87,7 +87,7 @@ class Menage_beneficiaire_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findAllByProgramme($id_sous_projet)   {
@@ -108,7 +108,7 @@ class Menage_beneficiaire_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
     public function getmenageBysous_projet($id_sous_projet)   {
@@ -129,7 +129,7 @@ class Menage_beneficiaire_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
     public function findAllByMenage($id_menage) {
@@ -139,7 +139,7 @@ class Menage_beneficiaire_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;  
+        return array();  
     }
     public function findAllByMenageSousprojet($id_menage,$id_sous_projet) {
         // Selection par id_sous_projet
@@ -148,7 +148,7 @@ class Menage_beneficiaire_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;  
+        return array();  
     }
     public function findById($id)  {
 		// Selection par id
@@ -157,7 +157,7 @@ class Menage_beneficiaire_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
     public function findAllByProgrammeAndVillage($id_sous_projet,$village_id)  {
 		// Selection par intervention et par fokontany
@@ -173,7 +173,7 @@ class Menage_beneficiaire_model extends CI_Model {
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
     public function findAllBySousprojetAndVillage($id_sous_projet,$village_id)  {
@@ -192,7 +192,7 @@ class Menage_beneficiaire_model extends CI_Model {
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
 }

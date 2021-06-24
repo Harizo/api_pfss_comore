@@ -85,7 +85,7 @@ class Village_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 //tsy niasa
@@ -101,7 +101,7 @@ class Village_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 //tsy niasa    
@@ -120,7 +120,7 @@ public function findAllByIle($ile_id)
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id)
@@ -130,7 +130,7 @@ public function findAllByIle($ile_id)
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
     public function findByIdAr($id)
     {
@@ -142,7 +142,7 @@ public function findAllByIle($ile_id)
         {
             return $result;
         }else{
-            return null;
+            return array();
         }   
     }
 

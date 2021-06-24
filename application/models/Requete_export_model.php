@@ -22,7 +22,7 @@ class Requete_export_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
     public function Etat_recepteur($id_sous_projet,$village_id)
@@ -49,7 +49,7 @@ class Requete_export_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
     public function Fiche_etat_de_paiement($village_id)
@@ -73,7 +73,7 @@ class Requete_export_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
     public function Detail_fiche_etat_de_paiement($id_fichepresence)
@@ -90,7 +90,7 @@ class Requete_export_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
 	public function Liste_etat_presence($village_id,$requetefiltre) {
@@ -120,7 +120,7 @@ class Requete_export_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
 		
 	}
@@ -154,7 +154,7 @@ class Requete_export_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
 		
 	}
@@ -176,7 +176,7 @@ class Requete_export_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
 		
 	}
@@ -186,7 +186,7 @@ class Requete_export_model extends CI_Model
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
     public function findByIdArray($id)  {
         $result =  $this->db->select('*')

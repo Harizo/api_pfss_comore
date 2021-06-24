@@ -64,7 +64,7 @@ class Fiche_paiementmenage_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id)  {
@@ -74,7 +74,7 @@ class Fiche_paiementmenage_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
     public function findByFiche_paiement_id($fiche_paiement_id)  {
 		// Selection de tous les enregitrements
@@ -107,7 +107,7 @@ class Fiche_paiementmenage_model extends CI_Model {
         {
             return $result;
         }else{ 
-            return null;
+            return array();
         }                  
     }
     public function findDetailByFiche_paiement_id($fiche_paiement_id,$id_sous_projet)  {
@@ -145,7 +145,7 @@ class Fiche_paiementmenage_model extends CI_Model {
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
  

@@ -105,7 +105,7 @@ class Plainte_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -118,7 +118,7 @@ class Plainte_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByIdArray($id)  {
@@ -131,7 +131,7 @@ class Plainte_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByVillage($village_id) {

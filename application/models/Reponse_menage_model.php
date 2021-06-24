@@ -56,7 +56,7 @@ class Reponse_menage_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 	// Récupération par id_menage : clé étrangère
@@ -70,7 +70,7 @@ class Reponse_menage_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }
     }
 	// Récupération par id (clé primaire)
@@ -84,7 +84,7 @@ class Reponse_menage_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }		
 }

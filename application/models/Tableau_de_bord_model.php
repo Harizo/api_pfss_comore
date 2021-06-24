@@ -55,7 +55,7 @@ class Tableau_de_bord_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByTypeTDB($type_tdb) {
@@ -69,7 +69,7 @@ class Tableau_de_bord_model extends CI_Model
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id)   {
@@ -82,7 +82,7 @@ class Tableau_de_bord_model extends CI_Model
         if($result)  {
             return $result;
         }else{
-            return null;
+            return array();
         }   
     }
 }

@@ -69,7 +69,7 @@ class Fiche_paiement_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id)  {
@@ -79,7 +79,7 @@ class Fiche_paiement_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
     public function findByVillageAndEtapeAndMicroprojet($village_id,$requeteplus,$microprojet_id)  {
 		 $requete="SELECT see_fichepaiement.*,i.id as ile_id,i.ile,r.id as region_id,r.region,c.id as commune_id,c.commune,v.id as village_id,v.village,"
@@ -96,7 +96,7 @@ class Fiche_paiement_model extends CI_Model {
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
  

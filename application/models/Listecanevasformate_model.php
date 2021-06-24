@@ -53,7 +53,7 @@ class Listecanevasformate_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 	public function getlescanevasformate() {
@@ -73,7 +73,7 @@ class Listecanevasformate_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
 }
 ?>

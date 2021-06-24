@@ -63,7 +63,7 @@ class Region_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 
@@ -79,7 +79,7 @@ class Region_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id)  {
@@ -88,7 +88,7 @@ class Region_model extends CI_Model
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
     public function findByIdArray($id)  {
         $result =  $this->db->select('*')
@@ -100,7 +100,7 @@ class Region_model extends CI_Model
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findPrefectureByIle($ile_id)  {
@@ -113,7 +113,7 @@ class Region_model extends CI_Model
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 
