@@ -83,7 +83,7 @@ class Sous_projet_localisation_model extends CI_Model
     public function findAll()  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("id", $id)
+                        //->where("id", $id)
                         ->order_by('id', 'asc')
                         ->get()
                         ->result();

@@ -1,0 +1,422 @@
+CREATE TABLE `formation_thematique_agex` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_theme_sensibilisation` INT NULL,
+	`id_contrat_agex` INT NULL,
+	`date_prevu` DATE NULL,
+	`date_realisation` DATE NULL,
+	`nbr_beneficiaire_cible` INT NULL,
+	`formateur` VARCHAR(50) NULL DEFAULT NULL,
+	`observation` VARCHAR(150) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_formation_thema_theme_sensibilisation` FOREIGN KEY (`id_theme_sensibilisation`) REFERENCES `theme_sensibilisation` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_formation_thema_contrat_ugp_agex` FOREIGN KEY (`id_contrat_agex`) REFERENCES `contrat_ugp_agex` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+ALTER TABLE `formation_thematique_agex`
+	CHANGE COLUMN `date_prevu` `date_debut_prevu` DATE NULL DEFAULT NULL AFTER `id_contrat_agex`,
+	ADD COLUMN `date_fin_prevu` DATE NULL DEFAULT NULL AFTER `date_debut_prevu`,
+	CHANGE COLUMN `date_realisation` `date_debut_realisation` DATE NULL DEFAULT NULL AFTER `date_fin_prevu`,
+	ADD COLUMN `date_fin_realisation` DATE NULL DEFAULT NULL AFTER `date_debut_realisation`;
+CREATE TABLE `beneficiaire_formation_thematique_agex` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_formation_thematique_agex` INT NULL,
+	`id_groupe_ml_pl` INT NULL,
+	`id_village` INT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_beneficiaire_formation_thematique_agex` FOREIGN KEY (`id_formation_thematique_agex`) REFERENCES `formation_thematique_agex` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_beneficiaire_groupe_ml_pl` FOREIGN KEY (`id_groupe_ml_pl`) REFERENCES `groupe_ml_pl` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_beneficiaire_see_village` FOREIGN KEY (`id_village`) REFERENCES `see_village` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+ALTER TABLE `formation_ml`
+	DROP COLUMN `id_contrat_consultant_ong`,
+	DROP INDEX `FK_formation_ml_contrat_consultant_ong`,
+	DROP FOREIGN KEY `FK_formation_ml_contrat_consultant_ong`;
+ALTER TABLE `formation_ml`
+	ADD COLUMN `id_contrat_agex` INT NULL DEFAULT NULL AFTER `lieu`,
+	ADD CONSTRAINT `FK_formation_ml_contrat_ugp_agex` FOREIGN KEY (`id_contrat_agex`) REFERENCES `contrat_ugp_agex` (`id`) ON UPDATE CASCADE;
+ALTER TABLE `realisation_ebe`
+	DROP COLUMN `id_contrat_consultant_ong`,
+	DROP INDEX `FK_realisation_ebe_contrat_consultant_ong`,
+	DROP FOREIGN KEY `FK_realisation_ebe_contrat_consultant_ong`;
+ALTER TABLE `realisation_ebe`
+	ADD COLUMN `id_contrat_agex` INT(11) NULL DEFAULT NULL AFTER `id_groupe_ml_pl`,
+	ADD CONSTRAINT `FK_realisation_ebe_contrat_ugp_agex` FOREIGN KEY (`id_contrat_agex`) REFERENCES `contrat_ugp_agex` (`id`) ON UPDATE CASCADE;
+ALTER TABLE `realisation_ebe`
+	ADD COLUMN `id_espace_bien_etre` INT(11) NULL DEFAULT NULL AFTER `id_contrat_agex`,
+	DROP COLUMN `numero`,
+	ADD CONSTRAINT `FK_realisation_ebe_espace_bien_etre` FOREIGN KEY (`id_espace_bien_etre`) REFERENCES `espace_bien_etre` (`id`) ON UPDATE CASCADE;
+ALTER TABLE `theme_formation_ebe`
+	ADD COLUMN `id_theme_sensibilisation` INT NULL DEFAULT NULL AFTER `activite`,
+	DROP COLUMN `theme_sensibilisation`,
+	ADD CONSTRAINT `FK_theme_formation_ebe_theme_sensibilisation` FOREIGN KEY (`id_theme_sensibilisation`) REFERENCES `theme_sensibilisation` (`id`) ON UPDATE CASCADE;
+ALTER TABLE `menage`
+	ADD COLUMN `situation_matrimoniale` SMALLINT NULL DEFAULT NULL AFTER `motif_non_selection`;
+CREATE TABLE `fiche_profilage_orientation_entete` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_village` INT NULL,
+	`date_remplissage` DATE NULL,
+	`id_agex` INT NULL DEFAULT NULL,
+	`id_menage` INT NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_profilage_see_village` FOREIGN KEY (`id_village`) REFERENCES `see_village` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_profilage_see_agex` FOREIGN KEY (`id_agex`) REFERENCES `see_agex` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_profilage_menage` FOREIGN KEY (`id_menage`) REFERENCES `menage` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `connaissance_experience_menage_entete` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`niveau_formation` SMALLINT NULL DEFAULT NULL,
+	`autre_niveau_formation` VARCHAR(100) NULL DEFAULT NULL,
+	`id_fiche_profilage_orientation` INT NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_connaissance_fiche_profilage_entete` FOREIGN KEY (`id_fiche_profilage_orientation`) REFERENCES `fiche_profilage_orientation_entete` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `activite_realise_auparavant` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`description` VARCHAR(100) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`)
+)
+COLLATE='latin1_swedish_ci'
+;
+INSERT INTO activite_realise_auparavant (description) 
+				VALUES('Agriculture'),
+				('Elevage'),
+				('Pêche'),
+				('Petit commerce'),
+				('Restauration'),
+				('Artisanat'),
+				('Autres'),
+				('Néant');
+
+CREATE TABLE `connaissance_experiance_menage_detail` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_activite_realise_auparavant` INT NULL,
+	`id_fiche_profilage_orientation` INT NULL,
+	`difficulte_rencontre` VARCHAR(100) NULL DEFAULT NULL,
+	`nbr_annee_activite` SMALLINT NULL DEFAULT NULL,
+	`formation_acquise` LONGTEXT NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_connaissance_activite_realise` FOREIGN KEY (`id_activite_realise_auparavant`) REFERENCES `activite_realise_auparavant` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_connaissance_fiche_profilage` FOREIGN KEY (`id_fiche_profilage_orientation`) REFERENCES `fiche_profilage_orientation_entete` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `ressources_disponibles` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_profilage_orientation` INT NOT NULL DEFAULT '0',
+	`designation` VARCHAR(100) NULL DEFAULT NULL,
+	`quantite` FLOAT NULL DEFAULT NULL,
+	`etat` SMALLINT NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_ressource_fiche_profilage` FOREIGN KEY (`id_profilage_orientation`) REFERENCES `fiche_profilage_orientation_entete` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `orientation` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_profilage_orientation` INT NULL,
+	`activite` VARCHAR(150) NULL DEFAULT NULL,
+	`type_activite` SMALLINT NULL DEFAULT NULL,
+	`secteur` VARCHAR(100) NULL DEFAULT NULL,
+	`groupe` VARCHAR(100) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_orientation_fiche_profilage` FOREIGN KEY (`id_profilage_orientation`) REFERENCES `fiche_profilage_orientation_entete` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `besoin_formation` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_profilage_orientation` INT NULL,
+	`type_formation` VARCHAR(150) NULL DEFAULT NULL,
+	`profile_beneficiaire` VARCHAR(150) NULL DEFAULT NULL,
+	`objectif_formation` VARCHAR(150) NULL DEFAULT NULL,
+	`duree_formation` FLOAT NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_besoin_fiche_profilage` FOREIGN KEY (`id_profilage_orientation`) REFERENCES `fiche_profilage_orientation_entete` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+ALTER TABLE `connaissance_experience_menage_entete`
+	DROP INDEX `FK_connaissance_fiche_profilage_entete`,
+	ADD UNIQUE INDEX `FK_connaissance_fiche_profilage_entete` (`id_fiche_profilage_orientation`);
+
+ALTER TABLE `connaissance_experiance_menage_detail`
+	ADD COLUMN `autre_activite_realise_auparavant` VARCHAR(100) NULL DEFAULT NULL AFTER `formation_acquise`;
+RENAME TABLE `connaissance_experiance_menage_detail` TO `connaissance_experience_menage_detail`;
+
+CREATE TABLE `fiche_profilage_ressource` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`designation` VARCHAR(100) NULL DEFAULT NULL,
+	`quantite` FLOAT NULL DEFAULT NULL,
+	`etat` VARCHAR(50) NULL DEFAULT NULL,
+	`id_fiche_profilage_orientation` INT NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_ressource_pro_fiche_profilage` FOREIGN KEY (`id_fiche_profilage_orientation`) REFERENCES `fiche_profilage_orientation_entete` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+
+CREATE TABLE `fiche_profilage_orientation` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`activite` VARCHAR(150) NULL DEFAULT NULL,
+	`type_activite` SMALLINT NULL DEFAULT NULL,
+	`groupe` VARCHAR(150) NULL DEFAULT NULL,
+	`id_fiche_profilage_orientation` INT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_orienta_fiche_profilage` FOREIGN KEY (`id_fiche_profilage_orientation`) REFERENCES `fiche_profilage_orientation_entete` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+
+CREATE TABLE `fiche_profilage_besoin_formation` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_fiche_profilage_orientation` INT NOT NULL DEFAULT '0',
+	`id_type_formation` INT NULL,
+	`objectif` VARCHAR(150) NULL DEFAULT NULL,
+	`profile` VARCHAR(100) NULL DEFAULT NULL,
+	`duree` FLOAT NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_besoin_for_theme_formation` FOREIGN KEY (`id_type_formation`) REFERENCES `theme_formation` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_besoin_for_fiche_profilage` FOREIGN KEY (`id_fiche_profilage_orientation`) REFERENCES `fiche_profilage_orientation_entete` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `fiche_supervision_formation_ml_cps` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_village` INT NULL,
+	`date_supervision` DATE NULL,
+	`date_debut` DATE NULL,
+	`date_fin` DATE NULL,
+	`nom_missionaire` VARCHAR(150) NULL DEFAULT NULL,
+	`id_agex` INT NULL,
+	`nom_ml_cps` VARCHAR(150) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_fiche_supervision_mcps_see_village` FOREIGN KEY (`id_village`) REFERENCES `see_village` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_fiche_supervision_mcps_see_agex` FOREIGN KEY (`id_agex`) REFERENCES `see_agex` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+ALTER TABLE `fiche_supervision_formation_ml_cps`
+	DROP COLUMN `date_debut`,
+	DROP COLUMN `date_fin`;
+CREATE TABLE `fiche_supervision_formation_ml_cps_planning` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_supervision_formation` INT NULL,
+	`planning` VARCHAR(250) NULL DEFAULT NULL,
+	`date_debut` DATE NULL,
+	`date_fin` DATE NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_planning_fiche_supervision_f` FOREIGN KEY (`id_supervision_formation`) REFERENCES `fiche_supervision_formation_ml_cps` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+ALTER TABLE `fiche_supervision_formation_ml_cps_planning`
+	CHANGE COLUMN `id_supervision_formation` `id_fiche_supervision` INT(11) NULL DEFAULT NULL AFTER `id`;
+
+
+CREATE TABLE `fiche_supervision_formation_ml_cps_point_verifier` (
+	`id` INT NOT NULL,
+	`id_fiche_supervision` INT NULL,
+	`description` VARCHAR(150) NULL DEFAULT NULL,
+	`point_verifier` VARCHAR(250) NULL DEFAULT NULL,
+	`prevision` VARCHAR(150) NULL DEFAULT NULL,
+	`reelle` VARCHAR(150) NULL DEFAULT NULL,
+	`observation` VARCHAR(150) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_point_fiche_supervision` FOREIGN KEY (`id_fiche_suprvision`) REFERENCES `fiche_supervision_formation_ml_cps` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+ALTER TABLE `fiche_supervision_formation_ml_cps_point_verifier`
+	CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT FIRST;
+
+
+CREATE TABLE `fiche_supervision_formation_ml_cps_probleme` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_fiche_supervision` INT NULL,
+	`probleme` VARCHAR(250) NULL DEFAULT NULL,
+	`solution` VARCHAR(250) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_probleme_fiche_supervision` FOREIGN KEY (`id_fiche_supervision`) REFERENCES `fiche_supervision_formation_ml_cps` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `fiche_supervision_formation_ebe` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_village` INT NULL,
+	`date_supervision` DATE NULL,
+	`nom_missionaire` VARCHAR(100) NULL DEFAULT NULL,
+	`nom_ml_cps` VARCHAR(100) NULL DEFAULT NULL,
+	`id_agex` INT NULL,
+	`id_theme_sensibilisation` INT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_supervision_ebe_see_village` FOREIGN KEY (`id_village`) REFERENCES `see_village` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_supervision_ebe_see_agex` FOREIGN KEY (`id_agex`) REFERENCES `see_agex` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_supervision_ebe_theme_sensibilisation` FOREIGN KEY (`id_theme_sensibilisation`) REFERENCES `theme_sensibilisation` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `fiche_supervision_formation_ebe_planning` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_fiche_supervision` INT NULL,
+	`date_debut` DATE NULL,
+	`date_fin` DATE NULL,
+	`planning` VARCHAR(250) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_ebe_fiche_supervision` FOREIGN KEY (`id_fiche_supervision`) REFERENCES `fiche_supervision_formation_ebe` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `fiche_supervision_formation_ebe_point_verifier` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_fiche_supervision` INT NULL DEFAULT NULL,
+	`point_verifier` VARCHAR(250) NULL DEFAULT NULL,
+	`appreciation` VARCHAR(50) NULL DEFAULT NULL,
+	`solution` VARCHAR(250) NULL DEFAULT NULL,
+	`observation` VARCHAR(100) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_supervision_ebe_fiche` FOREIGN KEY (`id_fiche_supervision`) REFERENCES `fiche_supervision_formation_ebe` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `fiche_supervision_formation_ebe_conclusion` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`description` LONGTEXT NULL DEFAULT NULL,
+	`id_fiche_supervision` INT NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK__fiche_supervision_formation_ebe` FOREIGN KEY (`id_fiche_supervision`) REFERENCES `fiche_supervision_formation_ebe` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+
+CREATE TABLE `formation_ml_repartition` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_formation_ml` INT NULL DEFAULT NULL,
+	`num_groupe` INT NULL DEFAULT NULL,
+	`date_formation` DATE NULL,
+	`nbr_ml` INT NULL DEFAULT NULL,
+	`lieu_formation` VARCHAR(50) NULL DEFAULT NULL,
+	`responsable` VARCHAR(100) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_repartition_formation_ml` FOREIGN KEY (`id_formation_ml`) REFERENCES `formation_ml` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `formation_ml_repartition_village` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_village` INT NULL,
+	`id_formation_ml_repartition` INT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_village_see_village` FOREIGN KEY (`id_village`) REFERENCES `see_village` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_village_formation_ml_repartition` FOREIGN KEY (`id_formation_ml_repartition`) REFERENCES `formation_ml_repartition` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `planning_ebe` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`numero` INT NULL,
+	`id_groupe_ml_pl` INT NULL,
+	`date_ebe` DATE NULL,
+	`duree` FLOAT NULL DEFAULT NULL,
+	`lieu` VARCHAR(100) NULL DEFAULT NULL,
+	`id_village` INT NULL,
+	`id_theme_sensibilisation` INT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_planning_groupe_ml_pl` FOREIGN KEY (`id_groupe_ml_pl`) REFERENCES `groupe_ml_pl` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_planning_theme_sensibilisation` FOREIGN KEY (`id_theme_sensibilisation`) REFERENCES `theme_sensibilisation` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_planning_see_village` FOREIGN KEY (`id_village`) REFERENCES `see_village` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+
+CREATE TABLE `livrable_ong_encadrement` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_agex` INT NULL,
+	`id_contrat_agex` INT NULL,
+	`id_commune` INT NULL,
+	`mission` VARCHAR(250) NULL DEFAULT NULL,
+	`outil_travail` VARCHAR(250) NULL DEFAULT NULL,
+	`methodologie` VARCHAR(250) NULL DEFAULT NULL,
+	`planning` LONGTEXT NULL DEFAULT NULL,
+	`date_edition` DATE NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_livrable_ong_see_agex` FOREIGN KEY (`id_agex`) REFERENCES `see_agex` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_livrable_ong_contrat_ugp_agex` FOREIGN KEY (`id_contrat_agex`) REFERENCES `contrat_ugp_agex` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_livrable_ong_see_commune` FOREIGN KEY (`id_commune`) REFERENCES `see_commune` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `livrable_ong_encadrement_village` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_livrable_ong_encadrement` INT NULL,
+	`id_village` INT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_liv_village_livrable_ong_encadrement` FOREIGN KEY (`id_livrable_ong_encadrement`) REFERENCES `livrable_ong_encadrement` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_liv_village_see_village` FOREIGN KEY (`id_village`) REFERENCES `see_village` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+ALTER TABLE `formation_ml`
+	ADD COLUMN `formateur` VARCHAR(100) NULL DEFAULT NULL AFTER `lieu`,
+	ADD COLUMN `date_edition` DATE NULL DEFAULT NULL AFTER `formateur`,
+	ADD COLUMN `outils_didactique` VARCHAR(200) NULL DEFAULT NULL AFTER `date_edition`,
+	ADD COLUMN `probleme` VARCHAR(250) NULL DEFAULT NULL AFTER `outils_didactique`,
+	ADD COLUMN `solution` VARCHAR(250) NULL DEFAULT NULL AFTER `probleme`;
+
+ALTER TABLE `realisation_ebe`
+	ADD COLUMN `date_edition` DATE NULL DEFAULT NULL AFTER `date_regroupement`;
+ALTER TABLE `participant_realisation_ebe`
+	ADD COLUMN `date_presence` DATE NULL AFTER `id_menage`;
+
+INSERT INTO theme_sensibilisation (`description`) 
+	VALUES ('Affirmation de soie et la planification'),
+ ('Développement  de la Petite Enfance'),
+	  ('Santé \, Nutrition et Wash '),
+	 ('Education financière '),
+	  ('Gestes Barrière de COVID-19');
+CREATE TABLE `outils_utilise_sensibilisation` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`description` VARCHAR(100) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`)
+)
+COLLATE='latin1_swedish_ci'
+;
+INSERT INTO outils_utilise_sensibilisation (`description`) 
+	VALUES ('Boite à image '),('Affiche'),('Roll up '),(' Dépliant '),('Bâche'),('Brochure');
+
+CREATE TABLE `fiche_collection_donnee_ebe` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_realisation_ebe` INT NULL,
+	`id_theme_sensibilisation` INT NULL,
+	`id_outils_utilise` INT NULL,
+	`date` DATE NULL,
+	`localite` VARCHAR(100) NULL DEFAULT NULL,
+	`nbr_femme` INT NULL DEFAULT NULL,
+	`nbr_homme` INT NULL DEFAULT NULL,
+	`nbr_enfant` INT NULL DEFAULT NULL,
+	`animateur` VARCHAR(150) NULL DEFAULT NULL,
+	`observation` LONGTEXT NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_fiche_collect_realisation_ebe` FOREIGN KEY (`id_realisation_ebe`) REFERENCES `realisation_ebe` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_fiche_collect_theme_sensibilisation` FOREIGN KEY (`id_theme_sensibilisation`) REFERENCES `theme_sensibilisation` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `FK_fiche_co_outils_utilise_sensibilisation` FOREIGN KEY (`id_outils_utilise`) REFERENCES `outils_utilise_sensibilisation` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+CREATE TABLE `participant_formation_ml` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`id_formation_ml` INT NULL,
+	`nom` VARCHAR(250) NULL DEFAULT NULL,
+	`fonction` VARCHAR(100) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_parti_formation_ml` FOREIGN KEY (`id_formation_ml`) REFERENCES `formation_ml` (`id`) ON UPDATE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+;
+RENAME TABLE `groupe_participant_formation_ml` TO `fiche_presence_formation_ml`;
