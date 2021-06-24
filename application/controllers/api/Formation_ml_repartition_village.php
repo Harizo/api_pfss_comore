@@ -4,45 +4,51 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Groupe_participant_formation_ml extends REST_Controller {
+class Formation_ml_repartition_village extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('groupe_participant_formation_ml_model', 'Groupe_participant_formation_mlManager');
+        $this->load->model('formation_ml_repartition_village_model', 'Formation_ml_repartition_villageManager');
         $this->load->model('village_model', 'VillageManager');
-        $this->load->model('groupe_mlpl_model', 'Groupe_mlplManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
-        $cle_etrangere = $this->get('cle_etrangere');
-        $id_formation_ml = $this->get('id_formation_ml');
+        $id_commune = $this->get('id_commune');
+        $id_formation_ml_repartition = $this->get('id_formation_ml_repartition');
+        $menu = $this->get('menu');
 		$data = array();
-		if ($cle_etrangere) {
+		
+		if ($menu=="get_villageBycommune") {
 			// Selection par id
-			$tmp = $this->Groupe_participant_formation_mlManager->findById_formation_ml($cle_etrangere);
+			$tmp = $this->VillageManager->get_villageBycommuneWithnbr_ml($id_commune);
+			if($tmp)
+            {
+                $data=$tmp;
+			}
+		} elseif ($menu=="get_repartition_villageByrepartition") {
+			// Selection par id
+			$tmp = $this->Formation_ml_repartition_villageManager->get_repartition_villageByrepartition($id_formation_ml_repartition);
 			if($tmp)
             {
 				foreach ($tmp as $key => $value)
                 {   
-                    $groupe_ml_pl = $this->Groupe_mlplManager->findById($value->id_groupe_ml_pl);
-                    $village = $this->VillageManager->findById($value->id_village);
+                    $village = $this->VillageManager->get_villageByidWithnbr_ml($value->id_village);
                     $data[$key]['id']         = $value->id;
-                    $data[$key]['id_formation_ml']  = $value->id_formation_ml;
-                    $data[$key]['groupe_ml_pl'] = $groupe_ml_pl;
-                    $data[$key]['village'] = $village;
+                    $data[$key]['id_formation_ml_repartition']  = $value->id_formation_ml_repartition;
+                    $data[$key]['village']  = $village;
                 }
                 //$data=$tmp;
 			}
 		} elseif ($id) {
 			// Selection par id
-			$temporaire = $this->Groupe_participant_formation_mlManager->findById($id);
+			$temporaire = $this->Formation_ml_repartition_villageManager->findById($id);
 			if($temporaire) {
 				$data=$temporaire;
 			}
 		} else {
 			// Selection de tous les enregistrements	
-			$temporaire = $this->Groupe_participant_formation_mlManager->findAll();
+			$temporaire = $this->Formation_ml_repartition_villageManager->findAll();
 			if ($temporaire) {
 				$data=$temporaire;
 			}
@@ -65,9 +71,8 @@ class Groupe_participant_formation_ml extends REST_Controller {
         $id = $this->post('id') ;
         $supprimer = $this->post('supprimer') ;
 		$data = array(
-			'id_groupe_ml_pl' => $this->post('id_groupe_ml_pl'),
 			'id_village' => $this->post('id_village'),
-			'id_formation_ml' => $this->post('id_formation_ml')
+			'id_formation_ml_repartition' => $this->post('id_formation_ml_repartition')
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {
@@ -79,7 +84,7 @@ class Groupe_participant_formation_ml extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Ajout d'un enregitrement
-                $dataId = $this->Groupe_participant_formation_mlManager->add($data);              
+                $dataId = $this->Formation_ml_repartition_villageManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -102,7 +107,7 @@ class Groupe_participant_formation_ml extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
 				// Mise à jour d'un enregistrement
-                $update = $this->Groupe_participant_formation_mlManager->update($id, $data);              
+                $update = $this->Formation_ml_repartition_villageManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -125,7 +130,7 @@ class Groupe_participant_formation_ml extends REST_Controller {
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
 			// Suppression d'un enregitrement
-            $delete = $this->Groupe_participant_formation_mlManager->delete($id);          
+            $delete = $this->Formation_ml_repartition_villageManager->delete($id);          
             if (!is_null($delete)) {
                 $this->response([
                     'status' => TRUE,

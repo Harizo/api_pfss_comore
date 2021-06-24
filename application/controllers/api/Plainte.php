@@ -56,6 +56,10 @@ class Plainte extends REST_Controller {
 		if($tempo && intval($tempo) >0) {
 			$menage_id=$tempo;
 		}
+		$datedepot=null;
+		if($this->post('datedepot')) {
+			$datedepot=$this->post('datedepot');
+		}
 		$dateresolution=null;
 		if($this->post('dateresolution')) {
 			$dateresolution=$this->post('dateresolution');
@@ -64,17 +68,37 @@ class Plainte extends REST_Controller {
 		if($this->post('datemodification')) {
 			$datemodification=$this->post('datemodification');
 		}
+		$activite_id=null;
+		$temporaire=$this->post('activite_id');
+		if($temporaire && intval($temporaire) >0) {
+			$activite_id=$temporaire;
+		}
+		$cellulederecours_id=null;
+		$temporaire=$this->post('cellulederecours_id');
+		if($temporaire && intval($temporaire) >0) {
+			$cellulederecours_id=$temporaire;
+		}
+		$solution_id=null;
+		$temporaire=$this->post('solution_id');
+		if($temporaire && intval($temporaire) >0) {
+			$solution_id=$temporaire;
+		}
+		$tranche_id=null;
+		$temporaire=$this->post('tranche_id');
+		if($temporaire && intval($temporaire) >0) {
+			$tranche_id=$temporaire;
+		}
 		$data = array(
             'menage_id'                 => $menage_id,
-            'activite_id'               => $this->post('activite_id'),
+            'activite_id'               => $activite_id,
             'id_sous_projet'            => $this->post('id_sous_projet'),
-            'cellulederecours_id'       => $this->post('cellulederecours_id'),
+            'cellulederecours_id'       => $cellulederecours_id,
             'typeplainte_id'            => $this->post('typeplainte_id'),
-            'solution_id'               => $this->post('solution_id'),
+            'solution_id'               => $solution_id,
             'village_id'                => $this->post('village_id'),
             'programme_id'              => $this->post('programme_id'),
             'Objet'                     => $this->post('Objet'),
-            'datedepot'                 => $this->post('datedepot'),
+            'datedepot'                 => $datedepot,
             'reference'                 => $this->post('reference'),
             'nomplaignant'              => $this->post('nomplaignant'),
             'adresseplaignant'          => $this->post('adresseplaignant'),
@@ -87,6 +111,7 @@ class Plainte extends REST_Controller {
             'supprime'                  => $this->post('supprime'),
             'userid'                    => $this->post('userid'),
             'datemodification'          => $datemodification,
+            'tranche_id'                => $tranche_id,
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {

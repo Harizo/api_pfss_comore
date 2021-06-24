@@ -1,11 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Groupe_participant_formation_ml_model extends CI_Model {
-    protected $table = 'groupe_participant_formation_ml';
+class Fiche_supervision_formation_ebe_model extends CI_Model {
+    protected $table = 'fiche_supervision_formation_ebe';
 
-    public function add($tutelle)  {
-		// Ajout d'un enregitrement
-        $this->db->set($this->_set($tutelle))
+    public function add($fiche_supervision_formation_ebe)  {
+        $this->db->set($this->_set($fiche_supervision_formation_ebe))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -13,9 +12,9 @@ class Groupe_participant_formation_ml_model extends CI_Model {
             return null;
         }                    
     }
-    public function update($id, $tutelle)  {
-		// Mise à jour d'un enregitrement
-        $this->db->set($this->_set($tutelle))
+
+    public function update($id, $fiche_supervision_formation_ebe)  {
+        $this->db->set($this->_set($fiche_supervision_formation_ebe))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -24,16 +23,21 @@ class Groupe_participant_formation_ml_model extends CI_Model {
             return null;
         }                      
     }
-    public function _set($tutelle) {
-		// Affectation des valeurs
-        return array(
-            'id_groupe_ml_pl' => $tutelle['id_groupe_ml_pl'],
-            'id_village' => $tutelle['id_village'],
-            'id_formation_ml' => $tutelle['id_formation_ml'],
+    public function _set($fiche_supervision_formation_ebe) 
+    {
+        return array
+        (
+            'id_village'     => $fiche_supervision_formation_ebe['id_village'],
+            'date_supervision'   => $fiche_supervision_formation_ebe['date_supervision'],
+            'nom_missionaire'       => $fiche_supervision_formation_ebe['nom_missionaire'],
+            'id_agex'     => $fiche_supervision_formation_ebe['id_agex'],
+            'id_theme_sensibilisation'     => $fiche_supervision_formation_ebe['id_theme_sensibilisation'],
+            'nom_ml_cps'   => $fiche_supervision_formation_ebe['nom_ml_cps']
         );
     }
+
+
     public function delete($id) {
-		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)  {
             return true;
@@ -42,7 +46,6 @@ class Groupe_participant_formation_ml_model extends CI_Model {
         }  
     }
     public function findAll() {
-		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')
@@ -54,11 +57,19 @@ class Groupe_participant_formation_ml_model extends CI_Model {
             return null;
         }                 
     }
-    public function findById_formation_ml($id_formation_ml) {
+    public function findById($id) {		
+        $this->db->where("id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
+    public function findByIdArray($id)  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("id_formation_ml",$id_formation_ml)
-                        ->order_by('id_village')
+                        ->where("id", $id)
+                        ->order_by('id', 'asc')
                         ->get()
                         ->result();
         if($result) {
@@ -66,13 +77,14 @@ class Groupe_participant_formation_ml_model extends CI_Model {
         }else{
             return null;
         }                 
-    }
-    public function findById($id) {
-		// Selection par id
+    }    
+    
+    
+    public function get_supervision_formationbyvillage($id_village)  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("id", $id)
-                        ->order_by('id', 'asc')
+                        ->where("id_village", $id_village)
+                        ->order_by('date_supervision', 'asc')
                         ->get()
                         ->result();
         if($result) {

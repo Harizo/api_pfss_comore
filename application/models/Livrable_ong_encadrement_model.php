@@ -1,10 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Formation_ml_model extends CI_Model {
-    protected $table = 'formation_ml';
+class Livrable_ong_encadrement_model extends CI_Model {
+    protected $table = 'livrable_ong_encadrement';
 
-    public function add($formation_ml)  {
-        $this->db->set($this->_set($formation_ml))
+    public function add($livrable_ong_encadrement)  {
+        $this->db->set($this->_set($livrable_ong_encadrement))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -13,8 +13,8 @@ class Formation_ml_model extends CI_Model {
         }                    
     }
 
-    public function update($id, $formation_ml)  {
-        $this->db->set($this->_set($formation_ml))
+    public function update($id, $livrable_ong_encadrement)  {
+        $this->db->set($this->_set($livrable_ong_encadrement))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -23,22 +23,18 @@ class Formation_ml_model extends CI_Model {
             return null;
         }                      
     }
-    public function _set($formation_ml) 
+    public function _set($livrable_ong_encadrement) 
     {
         return array
         (
-            'numero'           => $formation_ml['numero'],
-            'id_commune'      => $formation_ml['id_commune'],
-            'id_contrat_agex'  => $formation_ml['id_contrat_agex'],
-            'description'     => $formation_ml['description'],
-            'lieu'            => $formation_ml['lieu'],
-            'date_debut'      => $formation_ml['date_debut'],
-            'date_fin'        => $formation_ml['date_fin'],            
-            'formateur'  => $formation_ml['formateur'],
-            'date_edition'  => $formation_ml['date_edition'],
-            'outils_didactique'  => $formation_ml['outils_didactique'],
-            'probleme'  => $formation_ml['probleme'],
-            'solution'  => $formation_ml['solution']
+            'id_contrat_agex'     => $livrable_ong_encadrement['id_contrat_agex'],
+            'id_agex'   => $livrable_ong_encadrement['id_agex'],
+            'mission'=> $livrable_ong_encadrement['mission'],
+            'date_edition'      => $livrable_ong_encadrement['date_edition'],
+            'outil_travail'       => $livrable_ong_encadrement['outil_travail'],
+            'methodologie'     => $livrable_ong_encadrement['methodologie'],
+            'planning'     => $livrable_ong_encadrement['planning'],
+            'id_commune'     => $livrable_ong_encadrement['id_commune']
         );
     }
 
@@ -86,14 +82,11 @@ class Formation_ml_model extends CI_Model {
     }    
     
     
-    public function getformation_mlBysousprojetcommune($id_sous_projet,$id_commune)  {
-        $result =  $this->db->select('formation_ml.*')
+    public function getlivrable_ong_encadrementBycommune($id_commune)  {
+        $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->join("contrat_ugp_agex","contrat_ugp_agex.id=formation_ml.id_contrat_agex")
-                        ->where("id_sous_projet", $id_sous_projet)
-                        ->where("id_commune",$id_commune) 
-                        ->order_by('contrat_ugp_agex.id', 'asc')
-                        ->order_by('numero', 'asc')
+                        ->where("id_commune", $id_commune)
+                        //->order_by('numero', 'asc')
                         ->get()
                         ->result();
         if($result) {

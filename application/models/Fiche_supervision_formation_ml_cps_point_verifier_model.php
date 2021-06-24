@@ -1,10 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Formation_ml_model extends CI_Model {
-    protected $table = 'formation_ml';
+class Fiche_supervision_formation_ml_cps_point_verifier_model extends CI_Model {
+    protected $table = 'fiche_supervision_formation_ml_cps_point_verifier';
 
-    public function add($formation_ml)  {
-        $this->db->set($this->_set($formation_ml))
+    public function add($fiche_supervision_formation_ml_cps_point_verifier)  {
+        $this->db->set($this->_set($fiche_supervision_formation_ml_cps_point_verifier))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -13,8 +13,8 @@ class Formation_ml_model extends CI_Model {
         }                    
     }
 
-    public function update($id, $formation_ml)  {
-        $this->db->set($this->_set($formation_ml))
+    public function update($id, $fiche_supervision_formation_ml_cps_point_verifier)  {
+        $this->db->set($this->_set($fiche_supervision_formation_ml_cps_point_verifier))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -23,22 +23,16 @@ class Formation_ml_model extends CI_Model {
             return null;
         }                      
     }
-    public function _set($formation_ml) 
+    public function _set($fiche_supervision_formation_ml_cps_point_verifier) 
     {
         return array
-        (
-            'numero'           => $formation_ml['numero'],
-            'id_commune'      => $formation_ml['id_commune'],
-            'id_contrat_agex'  => $formation_ml['id_contrat_agex'],
-            'description'     => $formation_ml['description'],
-            'lieu'            => $formation_ml['lieu'],
-            'date_debut'      => $formation_ml['date_debut'],
-            'date_fin'        => $formation_ml['date_fin'],            
-            'formateur'  => $formation_ml['formateur'],
-            'date_edition'  => $formation_ml['date_edition'],
-            'outils_didactique'  => $formation_ml['outils_didactique'],
-            'probleme'  => $formation_ml['probleme'],
-            'solution'  => $formation_ml['solution']
+        (            
+            'id_fiche_supervision'     => $fiche_supervision_formation_ml_cps_point_verifier['id_fiche_supervision'],
+            'description'=> $fiche_supervision_formation_ml_cps_point_verifier['description'],
+            'point_verifier'      => $fiche_supervision_formation_ml_cps_point_verifier['point_verifier'],
+            'prevision'       => $fiche_supervision_formation_ml_cps_point_verifier['prevision'],
+            'reelle'       => $fiche_supervision_formation_ml_cps_point_verifier['reelle'],
+            'observation'       => $fiche_supervision_formation_ml_cps_point_verifier['observation']
         );
     }
 
@@ -86,14 +80,10 @@ class Formation_ml_model extends CI_Model {
     }    
     
     
-    public function getformation_mlBysousprojetcommune($id_sous_projet,$id_commune)  {
-        $result =  $this->db->select('formation_ml.*')
+    public function get_point_verifierbyfiche($id_fiche_supervision)  {
+        $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->join("contrat_ugp_agex","contrat_ugp_agex.id=formation_ml.id_contrat_agex")
-                        ->where("id_sous_projet", $id_sous_projet)
-                        ->where("id_commune",$id_commune) 
-                        ->order_by('contrat_ugp_agex.id', 'asc')
-                        ->order_by('numero', 'asc')
+                        ->where("id_fiche_supervision", $id_fiche_supervision)
                         ->get()
                         ->result();
         if($result) {

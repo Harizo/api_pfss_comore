@@ -56,6 +56,7 @@ class Plainte_model extends CI_Model {
             'supprime'                  => $plainte['supprime'],
             'userid'                    => $plainte['userid'],
             'datemodification'          => $plainte['datemodification'],
+            'tranche_id'                => $plainte['tranche_id'],
         );
     }
 
@@ -84,6 +85,7 @@ class Plainte_model extends CI_Model {
             'supprime'                  => $plainte['supprime'],
             'userid'                    => $plainte['userid'],
             'datemodification'          => $plainte['datemodification'],
+            'tranche_id'                => $plainte['tranche_id'],
         );
     }
     public function delete($id) {
@@ -137,16 +139,17 @@ class Plainte_model extends CI_Model {
 					."p.id,p.village_id,p.cellulederecours_id,p.typeplainte_id,p.solution_id,p.Objet,p.datedepot,p.reference,"
 					."p.nomplaignant,p.adresseplaignant,p.dateresolution,"
 					."ssp.code as code_sous_projet,ssp.description as sous_projet,"
-					."p.menage_id,m.NumeroEnregistrement,m.nomchefmenage,p.telephone,"
+					."p.menage_id,m.NumeroEnregistrement,m.nomchefmenage,p.telephone,m.identifiant_menage,m.nomchefmenage,"
 					."p.responsableenregistrement,p.mesureprise,p.id_sous_projet,p.statut,p.a_ete_modifie,"
-					."p.userid,p.datemodification"
+					."p.userid,p.datemodification,p.tranche_id,ph.Phase as tranche"
 					." from see_plainte as p"
 					." left outer join see_village as v on v.id=p.village_id"
-					." left outer join see_menage as m on m.id=p.menage_id"
+					." left outer join menage as m on m.id=p.menage_id"
 					." left outer join see_celluleprotectionsociale as cp on cp.id=p.cellulederecours_id"
 					." left outer join see_typeplainte as tp on tp.id=p.typeplainte_id"
 					." left outer join resultat_plainte as rp on rp.id=p.solution_id"
 					." left outer join sous_projet as ssp on ssp.id=p.id_sous_projet"
+					." left outer join see_phaseexecution as ph on ph.id=p.tranche_id"
 					." where p.village_id=".$village_id;
 		$query = $this->db->query($requete);
         return $query->result();                 

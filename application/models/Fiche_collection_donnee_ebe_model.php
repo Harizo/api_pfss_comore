@@ -1,10 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Formation_ml_model extends CI_Model {
-    protected $table = 'formation_ml';
+class Fiche_collection_donnee_ebe_model extends CI_Model {
+    protected $table = 'fiche_collection_donnee_ebe';
 
-    public function add($formation_ml)  {
-        $this->db->set($this->_set($formation_ml))
+    public function add($fiche_collection_donnee_ebe)  {
+        $this->db->set($this->_set($fiche_collection_donnee_ebe))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -13,8 +13,8 @@ class Formation_ml_model extends CI_Model {
         }                    
     }
 
-    public function update($id, $formation_ml)  {
-        $this->db->set($this->_set($formation_ml))
+    public function update($id, $fiche_collection_donnee_ebe)  {
+        $this->db->set($this->_set($fiche_collection_donnee_ebe))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -23,22 +23,20 @@ class Formation_ml_model extends CI_Model {
             return null;
         }                      
     }
-    public function _set($formation_ml) 
+    public function _set($fiche_collection_donnee_ebe) 
     {
         return array
         (
-            'numero'           => $formation_ml['numero'],
-            'id_commune'      => $formation_ml['id_commune'],
-            'id_contrat_agex'  => $formation_ml['id_contrat_agex'],
-            'description'     => $formation_ml['description'],
-            'lieu'            => $formation_ml['lieu'],
-            'date_debut'      => $formation_ml['date_debut'],
-            'date_fin'        => $formation_ml['date_fin'],            
-            'formateur'  => $formation_ml['formateur'],
-            'date_edition'  => $formation_ml['date_edition'],
-            'outils_didactique'  => $formation_ml['outils_didactique'],
-            'probleme'  => $formation_ml['probleme'],
-            'solution'  => $formation_ml['solution']
+            'id_theme_sensibilisation'     => $fiche_collection_donnee_ebe['id_theme_sensibilisation'],
+            'id_outils_utilise'     => $fiche_collection_donnee_ebe['id_outils_utilise'],
+            'date'=> $fiche_collection_donnee_ebe['date'],
+            'localite'        => $fiche_collection_donnee_ebe['localite'],
+            'nbr_femme'  => $fiche_collection_donnee_ebe['nbr_femme'],
+            'nbr_homme'  => $fiche_collection_donnee_ebe['nbr_homme'],
+            'nbr_enfant'  => $fiche_collection_donnee_ebe['nbr_enfant'],
+            'animateur'    => $fiche_collection_donnee_ebe['animateur'],
+            'observation'    => $fiche_collection_donnee_ebe['observation'],
+            'id_realisation_ebe'    => $fiche_collection_donnee_ebe['id_realisation_ebe']
         );
     }
 
@@ -86,14 +84,11 @@ class Formation_ml_model extends CI_Model {
     }    
     
     
-    public function getformation_mlBysousprojetcommune($id_sous_projet,$id_commune)  {
-        $result =  $this->db->select('formation_ml.*')
+    public function getfiche_collection_donnee_ebeByrealisation($id_realisation_ebe)  {
+        $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->join("contrat_ugp_agex","contrat_ugp_agex.id=formation_ml.id_contrat_agex")
-                        ->where("id_sous_projet", $id_sous_projet)
-                        ->where("id_commune",$id_commune) 
-                        ->order_by('contrat_ugp_agex.id', 'asc')
-                        ->order_by('numero', 'asc')
+                        ->where("id_realisation_ebe", $id_realisation_ebe)
+                        ->order_by('date', 'asc')
                         ->get()
                         ->result();
         if($result) {

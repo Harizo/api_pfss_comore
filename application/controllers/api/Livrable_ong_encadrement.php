@@ -4,45 +4,44 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Realisation_ebe extends REST_Controller {
+class Livrable_ong_encadrement extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('realisation_ebe_model', 'Realisation_ebeManager');
+        $this->load->model('livrable_ong_encadrement_model', 'Livrable_ong_encadrementManager');
+        $this->load->model('agent_ex_model', 'Agent_exManager');
         $this->load->model('contrat_ugp_agex_model', 'Contrat_ugp_agexManager');
-        $this->load->model('Espace_bien_etre_model', 'Espace_bien_etreManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
 		$data = array();
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
-		if ($menu=='getrealisation_ebeBysousprojetml_pl') 
+        $id_commune = $this->get('id_commune');
+		if ($menu=='getlivrable_ong_encadrementBycommune') 
         {
-			$tmp = $this->Realisation_ebeManager->getrealisation_ebeBysousprojetml_pl($id_sous_projet,$id_groupe_ml_pl);
+			$tmp = $this->Livrable_ong_encadrementManager->getlivrable_ong_encadrementBycommune($id_commune);
 			if ($tmp) 
             {   
 				foreach ($tmp as $key => $value)
                 {   
+                    $agex = $this->Agent_exManager->findById($value->id_agex);
                     $contrat_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
-                    $espace_bien_etre = $this->Espace_bien_etreManager->findByIdobjet($value->id_espace_bien_etre);
                     $data[$key]['id']         = $value->id;
-                    $data[$key]['espace_bien_etre']     = $espace_bien_etre;
-                    $data[$key]['but_regroupement']= $value->but_regroupement;
-                    $data[$key]['lieu']        = $value->lieu;
-                    $data[$key]['date_regroupement']  = $value->date_regroupement;
+                    $data[$key]['agex'] = $agex;
+                    $data[$key]['contrat_agex']     = $contrat_agex;
                     $data[$key]['date_edition']  = $value->date_edition;
-                    $data[$key]['materiel']    = $value->materiel;
-                    $data[$key]['id_groupe_ml_pl']     = $value->id_groupe_ml_pl;
-                    $data[$key]['contrat_agex'] = $contrat_agex;
+                    $data[$key]['mission']= $value->mission;
+                    $data[$key]['outil_travail']        = $value->outil_travail;
+                    $data[$key]['methodologie']    = $value->methodologie;
+                    $data[$key]['planning']    = $value->planning;
+                    $data[$key]['id_commune']  = $value->id_commune;
                 }
 			}
 		} 
         elseif ($id) 
         {
-			$tmp = $this->Realisation_ebeManager->findById($id);
+			$tmp = $this->Livrable_ong_encadrementManager->findById($id);
 			if($tmp) 
             {
 				$data=$tmp;
@@ -50,18 +49,22 @@ class Realisation_ebe extends REST_Controller {
 		} 
         else 
         {			
-			$tmp = $this->Realisation_ebeManager->findAll();
+			$tmp = $this->Livrable_ong_encadrementManager->findAll();
 			if ($tmp) 
             {   
                 foreach ($tmp as $key => $value)
                 {   
-                    $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
-                    $data[$key]['id']                 = $value->id;
-                    $data[$key]['id_espace_bien_etre']     = $value->id_espace_bien_etre;
-                    $data[$key]['but_regroupement']      = $value->but_regroupement;
-                    $data[$key]['lieu']    = $value->lieu;
-                    $data[$key]['date_regroupement']     = $value->date_regroupement;
-                    $data[$key]['materiel']     = $value->materiel;
+                    $agex = $this->Agent_exManager->findById($value->id_agex);
+                    $contrat_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
+                    $data[$key]['id']         = $value->id;
+                    $data[$key]['agex'] = $agex;
+                    $data[$key]['contrat_agex']     = $contrat_agex;
+                    $data[$key]['date_edition']  = $value->date_edition;
+                    $data[$key]['mission']= $value->mission;
+                    $data[$key]['outil_travail']        = $value->outil_travail;
+                    $data[$key]['methodologie']    = $value->methodologie;
+                    $data[$key]['planning']    = $value->planning;
+                    $data[$key]['id_commune']  = $value->id_commune;
                 }
 				//$data=$tmp;
 			}
@@ -89,14 +92,14 @@ class Realisation_ebe extends REST_Controller {
 
 		$data = array(
 			
-            'id_espace_bien_etre'     => $this->post('id_espace_bien_etre'),
-            'id_groupe_ml_pl'   => $this->post('id_groupe_ml_pl'),
-            'id_contrat_agex'=> $this->post('id_contrat_agex'),
-            'but_regroupement'      => $this->post('but_regroupement'),
-            'lieu'       => $this->post('lieu'),
-            'date_regroupement'     => $this->post('date_regroupement'),
-            'materiel'   => $this->post('materiel'),
-            'date_edition'   => $this->post('date_edition')
+            'id_contrat_agex'     => $this->post('id_contrat_agex'),
+            'id_agex'   => $this->post('id_agex'),
+            'mission'=> $this->post('mission'),
+            'date_edition'      => $this->post('date_edition'),
+            'outil_travail'       => $this->post('outil_travail'),
+            'methodologie'     => $this->post('methodologie'),
+            'planning'     => $this->post('planning'),
+            'id_commune'     => $this->post('id_commune')
 		);       
 
         if ($supprimer == 0) {
@@ -108,7 +111,7 @@ class Realisation_ebe extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->Realisation_ebeManager->add($data);              
+                $dataId = $this->Livrable_ong_encadrementManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -133,7 +136,7 @@ class Realisation_ebe extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->Realisation_ebeManager->update($id, $data);              
+                $update = $this->Livrable_ong_encadrementManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -160,7 +163,7 @@ class Realisation_ebe extends REST_Controller {
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
 
-            $delete = $this->Realisation_ebeManager->delete($id);   
+            $delete = $this->Livrable_ong_encadrementManager->delete($id);   
 
             if (!is_null($delete)) 
             {

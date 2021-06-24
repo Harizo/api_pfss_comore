@@ -4,45 +4,29 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Realisation_ebe extends REST_Controller {
+class Formation_ml_repartition extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('realisation_ebe_model', 'Realisation_ebeManager');
-        $this->load->model('contrat_ugp_agex_model', 'Contrat_ugp_agexManager');
-        $this->load->model('Espace_bien_etre_model', 'Espace_bien_etreManager');
+        $this->load->model('formation_ml_repartition_model', 'Formation_ml_repartitionManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
 		$data = array();
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
-		if ($menu=='getrealisation_ebeBysousprojetml_pl') 
+        $id_formation_ml = $this->get('id_formation_ml');
+		if ($menu=='getformation_ml_repartitionByformation') 
         {
-			$tmp = $this->Realisation_ebeManager->getrealisation_ebeBysousprojetml_pl($id_sous_projet,$id_groupe_ml_pl);
+			$tmp = $this->Formation_ml_repartitionManager->getformation_ml_repartitionByformation($id_formation_ml);
 			if ($tmp) 
             {   
-				foreach ($tmp as $key => $value)
-                {   
-                    $contrat_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
-                    $espace_bien_etre = $this->Espace_bien_etreManager->findByIdobjet($value->id_espace_bien_etre);
-                    $data[$key]['id']         = $value->id;
-                    $data[$key]['espace_bien_etre']     = $espace_bien_etre;
-                    $data[$key]['but_regroupement']= $value->but_regroupement;
-                    $data[$key]['lieu']        = $value->lieu;
-                    $data[$key]['date_regroupement']  = $value->date_regroupement;
-                    $data[$key]['date_edition']  = $value->date_edition;
-                    $data[$key]['materiel']    = $value->materiel;
-                    $data[$key]['id_groupe_ml_pl']     = $value->id_groupe_ml_pl;
-                    $data[$key]['contrat_agex'] = $contrat_agex;
-                }
+				$data=$tmp;
 			}
 		} 
         elseif ($id) 
         {
-			$tmp = $this->Realisation_ebeManager->findById($id);
+			$tmp = $this->Formation_ml_repartitionManager->findById($id);
 			if($tmp) 
             {
 				$data=$tmp;
@@ -50,20 +34,10 @@ class Realisation_ebe extends REST_Controller {
 		} 
         else 
         {			
-			$tmp = $this->Realisation_ebeManager->findAll();
+			$tmp = $this->Formation_ml_repartitionManager->findAll();
 			if ($tmp) 
             {   
-                foreach ($tmp as $key => $value)
-                {   
-                    $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
-                    $data[$key]['id']                 = $value->id;
-                    $data[$key]['id_espace_bien_etre']     = $value->id_espace_bien_etre;
-                    $data[$key]['but_regroupement']      = $value->but_regroupement;
-                    $data[$key]['lieu']    = $value->lieu;
-                    $data[$key]['date_regroupement']     = $value->date_regroupement;
-                    $data[$key]['materiel']     = $value->materiel;
-                }
-				//$data=$tmp;
+				$data=$tmp;
 			}
 		}
         if (count($data)>0) {
@@ -89,14 +63,12 @@ class Realisation_ebe extends REST_Controller {
 
 		$data = array(
 			
-            'id_espace_bien_etre'     => $this->post('id_espace_bien_etre'),
-            'id_groupe_ml_pl'   => $this->post('id_groupe_ml_pl'),
-            'id_contrat_agex'=> $this->post('id_contrat_agex'),
-            'but_regroupement'      => $this->post('but_regroupement'),
-            'lieu'       => $this->post('lieu'),
-            'date_regroupement'     => $this->post('date_regroupement'),
-            'materiel'   => $this->post('materiel'),
-            'date_edition'   => $this->post('date_edition')
+            'num_groupe'     => $this->post('num_groupe'),
+            'date_formation'            => $this->post('date_formation'),
+            'nbr_ml'     => $this->post('nbr_ml'),
+            'lieu_formation'      => $this->post('lieu_formation'),
+            'responsable'      => $this->post('responsable'),
+            'id_formation_ml'      => $this->post('id_formation_ml')
 		);       
 
         if ($supprimer == 0) {
@@ -108,7 +80,7 @@ class Realisation_ebe extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->Realisation_ebeManager->add($data);              
+                $dataId = $this->Formation_ml_repartitionManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -133,7 +105,7 @@ class Realisation_ebe extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->Realisation_ebeManager->update($id, $data);              
+                $update = $this->Formation_ml_repartitionManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -160,7 +132,7 @@ class Realisation_ebe extends REST_Controller {
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
 
-            $delete = $this->Realisation_ebeManager->delete($id);   
+            $delete = $this->Formation_ml_repartitionManager->delete($id);   
 
             if (!is_null($delete)) 
             {

@@ -172,6 +172,9 @@ class Menage_model extends CI_Model
 			'possede_frigo_enquete' => $menage['possede_frigo_enquete'],
 			'antenne_parabolique_enquete' => $menage['antenne_parabolique_enquete'],
 			'motif_non_selection' => $menage['motif_non_selection'],
+			'situation_matrimoniale' => $menage['situation_matrimoniale'],
+			'telephone_travailleur' => $menage['telephone_travailleur'],
+			'telephone_suppleant' => $menage['telephone_suppleant'],
         );
     }
     public function _set_reponse($menage)
@@ -217,7 +220,10 @@ class Menage_model extends CI_Model
 			'membre_fonctionnaire_enquete' => $menage['membre_fonctionnaire_enquete'],
 			'possede_frigo_enquete' => $menage['possede_frigo_enquete'],
 			'antenne_parabolique_enquete' => $menage['antenne_parabolique_enquete'],
-			'motif_non_selection' => $menage['motif_non_selection'],
+			// 'motif_non_selection' => $menage['motif_non_selection'],
+			// 'situation_matrimoniale' => $menage['situation_matrimoniale'],
+			// 'telephone_travailleur' => $menage['telephone_travailleur'],
+			// 'telephone_suppleant' => $menage['telephone_suppleant'],
         );
     }
     public function _set_statut($menage)
@@ -352,11 +358,12 @@ class Menage_model extends CI_Model
     }
     public function findAllByVillageAndEtatstatut($village_id,$id_sous_projet,$etat_statut)
     {
-		$requete="select menage.*,lp1.description as lien_parente_travailleur,"
+		$requete="select menage.*,lp1.description as lien_parente_travailleur,st.description as situation_matrimoniale,"
 				."lp2.description as lien_parente_suppleant"
 				." from menage"
 				." left join liendeparente as lp1 on lp1.id="."menage.lien_travailleur"
 				." left join liendeparente as lp2 on lp2.id="."menage.lien_suppleant"
+				." left join situation_matrimoniale as st on st.id="."menage.situation_matrimoniale"
 				." where  village_id=".$village_id
 				." and statut!='SORTI' and ".$etat_statut."=1".($id_sous_projet>0 ? " and id_sous_projet=".$id_sous_projet : "");
 		$result = $this->db->query($requete)->result();		

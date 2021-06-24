@@ -15,6 +15,7 @@ class Phaseexecution extends REST_Controller {
 
     public function index_get() {
         $id = $this->get('id');
+        $cle_etrangere = $this->get('cle_etrangere');
         if ($id) {
                
                 $data = $this->PhaseexecutionManager->findById($id);
@@ -22,8 +23,9 @@ class Phaseexecution extends REST_Controller {
                 $data['code'] = $phaseexecution->code;
                 $data['description'] = $phaseexecution->description;*/
                 
-            } else 
-            {
+            } else if($cle_etrangere) {
+				$data = $this->PhaseexecutionManager->findByIdsousprojet($cle_etrangere);
+			} else {	
                $phaseexecution = $this->PhaseexecutionManager->findAll();
                 if ($phaseexecution)
                 {   

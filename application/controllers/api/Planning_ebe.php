@@ -4,45 +4,51 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Realisation_ebe extends REST_Controller {
+class Planning_ebe extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('realisation_ebe_model', 'Realisation_ebeManager');
-        $this->load->model('contrat_ugp_agex_model', 'Contrat_ugp_agexManager');
-        $this->load->model('Espace_bien_etre_model', 'Espace_bien_etreManager');
+        $this->load->model('planning_ebe_model', 'Planning_ebeManager');
+        $this->load->model('groupe_mlpl_model', 'Groupe_ml_plManager');
+        $this->load->model('theme_sensibilisation_model', 'Theme_sensibilisationManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
 		$data = array();
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
-		if ($menu=='getrealisation_ebeBysousprojetml_pl') 
+        $id_village = $this->get('id_village');
+		if ($menu=='getgroupeByvillagewithnbr_membre') 
         {
-			$tmp = $this->Realisation_ebeManager->getrealisation_ebeBysousprojetml_pl($id_sous_projet,$id_groupe_ml_pl);
+			$tmp = $this->Groupe_ml_plManager->getgroupeByvillagewithnbr_membre($id_village);
+			if ($tmp) 
+            {   
+				$data=$tmp;
+			}
+		} 
+        elseif ($menu=='getplanning_ebeByvillage') 
+        {
+			$tmp = $this->Planning_ebeManager->getplanning_ebeByvillage($id_village);
 			if ($tmp) 
             {   
 				foreach ($tmp as $key => $value)
                 {   
-                    $contrat_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
-                    $espace_bien_etre = $this->Espace_bien_etreManager->findByIdobjet($value->id_espace_bien_etre);
+                    $groupe_ml_pl = $this->Groupe_ml_plManager->findByIdwithnbr_membre($value->id_groupe_ml_pl);
+                    $theme_sensibilisation = $this->Theme_sensibilisationManager->findById($value->id_theme_sensibilisation);
                     $data[$key]['id']         = $value->id;
-                    $data[$key]['espace_bien_etre']     = $espace_bien_etre;
-                    $data[$key]['but_regroupement']= $value->but_regroupement;
-                    $data[$key]['lieu']        = $value->lieu;
-                    $data[$key]['date_regroupement']  = $value->date_regroupement;
-                    $data[$key]['date_edition']  = $value->date_edition;
-                    $data[$key]['materiel']    = $value->materiel;
-                    $data[$key]['id_groupe_ml_pl']     = $value->id_groupe_ml_pl;
-                    $data[$key]['contrat_agex'] = $contrat_agex;
+                    $data[$key]['groupe_ml_pl'] = $groupe_ml_pl;
+                    $data[$key]['theme_sensibilisation']     = $theme_sensibilisation;
+                    $data[$key]['numero']= $value->numero;
+                    $data[$key]['duree']        = $value->duree;
+                    $data[$key]['date_ebe']  = $value->date_ebe;
+                    $data[$key]['lieu']    = $value->lieu;
+                    $data[$key]['id_village']    = $value->id_village;
                 }
 			}
 		} 
         elseif ($id) 
         {
-			$tmp = $this->Realisation_ebeManager->findById($id);
+			$tmp = $this->Planning_ebeManager->findById($id);
 			if($tmp) 
             {
 				$data=$tmp;
@@ -50,18 +56,21 @@ class Realisation_ebe extends REST_Controller {
 		} 
         else 
         {			
-			$tmp = $this->Realisation_ebeManager->findAll();
+			$tmp = $this->Planning_ebeManager->findAll();
 			if ($tmp) 
             {   
                 foreach ($tmp as $key => $value)
                 {   
-                    $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
-                    $data[$key]['id']                 = $value->id;
-                    $data[$key]['id_espace_bien_etre']     = $value->id_espace_bien_etre;
-                    $data[$key]['but_regroupement']      = $value->but_regroupement;
+                    $groupe_ml_pl = $this->Groupe_ml_plManager->findByIdwithnbr_membre($value->id_groupe_ml_pl);
+                    $theme_sensibilisation = $this->Theme_sensibilisationManager->findById($value->id_theme_sensibilisation);
+                    $data[$key]['id']         = $value->id;
+                    $data[$key]['groupe_ml_pl'] = $groupe_ml_pl;
+                    $data[$key]['theme_sensibilisation']     = $theme_sensibilisation;
+                    $data[$key]['numero']= $value->numero;
+                    $data[$key]['duree']        = $value->duree;
+                    $data[$key]['date_ebe']  = $value->date_ebe;
                     $data[$key]['lieu']    = $value->lieu;
-                    $data[$key]['date_regroupement']     = $value->date_regroupement;
-                    $data[$key]['materiel']     = $value->materiel;
+                    $data[$key]['id_village']    = $value->id_village;
                 }
 				//$data=$tmp;
 			}
@@ -89,14 +98,13 @@ class Realisation_ebe extends REST_Controller {
 
 		$data = array(
 			
-            'id_espace_bien_etre'     => $this->post('id_espace_bien_etre'),
+            'id_theme_sensibilisation'     => $this->post('id_theme_sensibilisation'),
             'id_groupe_ml_pl'   => $this->post('id_groupe_ml_pl'),
-            'id_contrat_agex'=> $this->post('id_contrat_agex'),
-            'but_regroupement'      => $this->post('but_regroupement'),
-            'lieu'       => $this->post('lieu'),
-            'date_regroupement'     => $this->post('date_regroupement'),
-            'materiel'   => $this->post('materiel'),
-            'date_edition'   => $this->post('date_edition')
+            'numero'=> $this->post('numero'),
+            'date_ebe'      => $this->post('date_ebe'),
+            'duree'       => $this->post('duree'),
+            'lieu'     => $this->post('lieu'),
+            'id_village'     => $this->post('id_village')
 		);       
 
         if ($supprimer == 0) {
@@ -108,7 +116,7 @@ class Realisation_ebe extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->Realisation_ebeManager->add($data);              
+                $dataId = $this->Planning_ebeManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -133,7 +141,7 @@ class Realisation_ebe extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->Realisation_ebeManager->update($id, $data);              
+                $update = $this->Planning_ebeManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -160,7 +168,7 @@ class Realisation_ebe extends REST_Controller {
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
 
-            $delete = $this->Realisation_ebeManager->delete($id);   
+            $delete = $this->Planning_ebeManager->delete($id);   
 
             if (!is_null($delete)) 
             {

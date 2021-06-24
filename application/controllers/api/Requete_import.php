@@ -48,10 +48,15 @@ class Requete_import extends REST_Controller {
         $annee_id= $this->get('id_annee');
         $controle= $this->get('controle');
 		if($controle) {
-			if(intval($id_sous_projet)==2) {
-				$retour=$this->controler_paiement_arse($chemin,$nomfichier);
+			if(intval($controle)==1) {
+				$id_village= $this->get('id_village');
+				$choix_village= $this->get('choix_village');
+				$numero_tranche= $this->get('numero_tranche');
+				$libelle_tranche= $this->get('libelle_tranche');
+				$pourcentage= $this->get('pourcentage');
+				$retour=$this->controler_paiement_arse($chemin,$nomfichier,$id_village,$choix_village,$numero_tranche,$libelle_tranche,$pourcentage,$id_sous_projet);
 			} else {
-				// $retour=$this->controler_menage_act($chemin,$nomfichier);				
+				$retour=$this->importer_paiement_arse($chemin,$nomfichier,$id_sous_projet,$etape_id);				
 			}	
 		} else 	if($importation) {
 			$ile = $this->IleManager->findById($id_ile);
@@ -1014,7 +1019,7 @@ class Requete_import extends REST_Controller {
 		}	
 	}	
 //////////////////////////////////////////////////////////////////////////////////////////////////////////:
-	public function controler_paiement_arse($chemin,$nomfichier) {	
+	public function controler_paiement_arse($chemin,$nomfichier,$id_village,$choix_village,$numero_tranche,$libelle_tranche,$pourcentage,$id_sous_projet) {	
         require_once 'Classes/PHPExcel.php';
         require_once 'Classes/PHPExcel/IOFactory.php';
         set_time_limit(0);
@@ -1045,6 +1050,7 @@ class Requete_import extends REST_Controller {
 		$rowIterator = $Excel->getActiveSheet(0)->getRowIterator();
 		$numeroligne=0;
 		// DEBUT A CONTROLER
+		$erreur_montant_en_plus=true;
 		$erreur_village=0;
 		$erreur_tranche=0;
 		$erreur_pourcentage=0;
@@ -1052,9 +1058,14 @@ class Requete_import extends REST_Controller {
 		$erreur_date_paiement=0;
 		$erreur_menage_id=0;
 		$erreur_depassement_montant_paye=0;
+		$erreur_etape_id=0;
 		$erreur_agep_id=0;
+		$erreur_sous_projet_id=0;
 		$nombre_erreur=0;
 		$deja_importe="";
+		$village_different="";
+		$tranche_different="";
+		$sous_projet_different="";
 		$requete =" ";		
 		$nombre_insere=0;
 		$array_insere=array();
@@ -1106,7 +1117,18 @@ class Requete_import extends REST_Controller {
 							if($zip) {							
 								$code_zip=$zip->code;
 							}	
-						}	
+						}
+						if($id_village!=$village_id) {
+							// Comparer le choix village via angular et celui enregistré dans le fichier excel 
+							$nombre_erreur = $nombre_erreur + 1;
+							$village_different = "Le choix du village : ".$choix_village." est différent de celui dans le fichier : ".$village;
+							$sheet->getStyle("I1")->getFill()->applyFromArray(
+									 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+										 'startcolor' => array('rgb' => 'FF0000'),
+										 'endcolor'   => array('argb' => 'FF0000')
+									 )
+							 );	
+						}
 					} else {
 						// Erreur village
 						$sheet->getStyle("I1")->getFill()->applyFromArray(
@@ -1117,7 +1139,7 @@ class Requete_import extends REST_Controller {
 						 );	
 						$nombre_erreur = $nombre_erreur + 1;
 						$erreur_village = $erreur_village + 1;							
-					}									
+					}	
 				}					
 			} 
 			if($ligne ==2) {
@@ -1142,13 +1164,21 @@ class Requete_import extends REST_Controller {
 					$erreur_tranche = $erreur_tranche + 1;						
 				} else {
 					// Controler si paiement déjà effectué
-					$retour=$this->FichepaiementManager->findByVillageAndEtapeAndMicroprojet($village_id,$tranche,2);
+					$requeteplus=" and etape_id=".$etape_id." and village_id=".$village_id;
+					$retour=$this->FichepaiementManager->findByVillageAndEtapeAndMicroprojet($village_id,$requeteplus,$id_sous_projet);
 					if($retour) {
 						foreach($retour as $k=>$v) {
-							$datepaiement=date('d/m/Y',$v->datepaiement);
-							$deja_importe="Paiement déjà effectué le : ".$datepaiement ;	
+							$daty = new DateTime($v->datepaiement);
+							$datepaiement=$daty->format('d/m/Y');
+							$deja_importe="Paiement".$libelle_tranche." de ".$pourcentage."% déjà effectué le : ".$datepaiement. " pour le village : ".$village; ;	
 						}	
 						$nombre_erreur = $nombre_erreur +1;	
+					} else if($tranche!=$numero_tranche) {
+						// tranche <> fichier et menu choisi
+						if($numero_tranche!=$tranche) {
+							$tranche_different="Vous êtes dans le menu Tranche ".$numero_tranche." et le fichier à importer Tranche ".$tranche;
+							$nombre_erreur = $nombre_erreur +1;	
+						}
 					}
 				}
 			} 
@@ -1216,6 +1246,66 @@ class Requete_import extends REST_Controller {
 					 );	
 					$nombre_erreur = $nombre_erreur + 1;
 					$erreur_agep_id = $erreur_agep_id + 1;						
+				}
+			} 
+			if($ligne ==6) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$etape_id =$cell->getValue();
+					 }
+				}	
+				if($etape_id=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I6")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_etape_id = $erreur_etape_id + 1;						
+				}
+			} 
+			if($ligne ==7) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$sous_projet_id =$cell->getValue();
+					 }
+				}	
+				if($sous_projet_id=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I7")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_sous_projet_id = $erreur_sous_projet_id + 1;						
+				} else {
+					if($sous_projet_id!=$id_sous_projet) {
+						$sheet->getStyle("I7")->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => 'FF0000'),
+									 'endcolor'   => array('argb' => 'FF0000')
+								 )
+						 );	
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_sous_projet_id = $erreur_sous_projet_id + 1;	
+						if(intval($sous_projet_id)==2 && intval($id_sous_projet)==4) {
+							$sous_projet_different="ATTENTION !. Vous avez tenté d'importer un fichier de sous-projet ARSE dans le sous-projet COVD-19.Merci"
+						} else {
+							$sous_projet_different="ATTENTION !. Vous avez tenté d'importer un fichier de sous-projet COVD-19 dans le sous-projet ARSE.Merci"							
+						}
+					}
 				}
 			} 
 			if($ligne ==8) {
@@ -1286,7 +1376,17 @@ class Requete_import extends REST_Controller {
 								 'endcolor'   => array('argb' => 'FF0000')
 							 )
 					 );	
-					 $sheet->setCellValue('J', $id_fiche_paiement);	
+					$sheet->getStyle("J".$ligne)->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					 $sheet->setCellValue('J'.$ligne, "total > ".$montant_total_a_payer);	
+					 if($erreur_montant_en_plus==true) {
+						 $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth(13);
+						 $erreur_montant_en_plus=false;
+					 }
 				}
 				if($menage_id=="") {
 					// Pas menage_id
@@ -1312,6 +1412,9 @@ class Requete_import extends REST_Controller {
 		$val_ret["erreur_depassement_montant_paye"] = $erreur_depassement_montant_paye;
 		$val_ret["erreur_agep_id"] = $erreur_agep_id;
 		$val_ret["deja_importe"] = $deja_importe;
+		$val_ret["village_different"] = $village_different;
+		$val_ret["tranche_different"] = $tranche_different;
+		$val_ret["sous_projet_different"] = $sous_projet_different;
 		if($nombre_erreur==0) {
 			$status=TRUE;
 		} else {
@@ -1329,7 +1432,7 @@ class Requete_import extends REST_Controller {
 			'message' => 'Get file success',
 		], REST_Controller::HTTP_OK);			  
 	}	
-	public function importer_paiement_arse($chemin,$nomfichier) {	
+	public function importer_paiement_arse($chemin,$nomfichier,$id_sous_projet,$etape_id) {	
         require_once 'Classes/PHPExcel.php';
         require_once 'Classes/PHPExcel/IOFactory.php';
         set_time_limit(0);
@@ -1370,6 +1473,8 @@ class Requete_import extends REST_Controller {
 		$erreur_menage_id=0;
 		$erreur_depassement_montant_paye=0;
 		$erreur_agep_id=0;
+		$erreur_etape_id=0;
+		$erreur_sous_projet_id=0;
 		$nombre_erreur=0;
 		$deja_importe="";
 		$requete =" ";		
@@ -1463,7 +1568,8 @@ class Requete_import extends REST_Controller {
 					$erreur_tranche = $erreur_tranche + 1;						
 				} else {
 					// Controler si paiement déjà effectué
-					$retour=$this->FichepaiementManager->findByVillageAndEtapeAndMicroprojet($village_id,$tranche,2);
+					$requeteplus=" and etape_id=".$etape_id." and village_id=".$village_id;
+					$retour=$this->FichepaiementManager->findByVillageAndEtapeAndMicroprojet($village_id,$requeteplus,$id_sous_projet);
 					if($retour) {
 						foreach($retour as $k=>$v) {
 							$datepaiement=date('d/m/Y',$v->datepaiement);
@@ -1539,6 +1645,61 @@ class Requete_import extends REST_Controller {
 					$erreur_agep_id = $erreur_agep_id + 1;						
 				}
 			} 
+			if($ligne ==6) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$etape_id =$cell->getValue();
+					 }
+				}	
+				if($etape_id=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I6")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_etape_id = $erreur_etape_id + 1;						
+				}
+			} 
+			if($ligne ==7) {
+				 $cellIterator = $row->getCellIterator();
+				 // Loop all cells, even if it is not set
+				 $cellIterator->setIterateOnlyExistingCells(false);
+				 $rowIndex = $row->getRowIndex ();
+				 foreach ($cellIterator as $cell) {
+					 if('I' == $cell->getColumn()) {
+							$sous_projet_id =$cell->getValue();
+					 }
+				}	
+				if($sous_projet_id=="") {
+					// Pas de sous projet : 
+					$sheet->getStyle("I7")->getFill()->applyFromArray(
+							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 'startcolor' => array('rgb' => 'FF0000'),
+								 'endcolor'   => array('argb' => 'FF0000')
+							 )
+					 );	
+					$nombre_erreur = $nombre_erreur + 1;
+					$erreur_sous_projet_id = $erreur_sous_projet_id + 1;						
+				} else {
+					if($sous_projet_id!=$id_sous_projet) {
+						$sheet->getStyle("I7")->getFill()->applyFromArray(
+								 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+									 'startcolor' => array('rgb' => 'FF0000'),
+									 'endcolor'   => array('argb' => 'FF0000')
+								 )
+						 );	
+						$nombre_erreur = $nombre_erreur + 1;
+						$erreur_sous_projet_id = $erreur_sous_projet_id + 1;						
+					}
+				}
+			} 
 			if($ligne ==8) {
 				 $cellIterator = $row->getCellIterator();
 				 // Loop all cells, even if it is not set
@@ -1571,10 +1732,6 @@ class Requete_import extends REST_Controller {
 					$erreur_date_paiement = $erreur_date_paiement + 1;						
 				}
 			} 
-			 
-			 
-			 
-			 
 			if($ligne >=$depart_ligne_lecture) {
 				 $cellIterator = $row->getCellIterator();
 				 // Loop all cells, even if it is not set
@@ -1647,28 +1804,30 @@ class Requete_import extends REST_Controller {
 		$val_ret["erreur_tranche"] = $erreur_tranche;
 		$val_ret["erreur_pourcentage"] = $erreur_pourcentage;
 		$val_ret["erreur_montant_a_payer"] = $erreur_montant_a_payer;
-		$val_ret["erreur_depassement_montant_paye"] = $erreur_depassement_montant_paye;
+		$val_ret["erreur_date_paiement"] = $erreur_date_paiement;
 		$val_ret["erreur_menage_id"] = $erreur_menage_id;
+		$val_ret["erreur_depassement_montant_paye"] = $erreur_depassement_montant_paye;
 		$val_ret["erreur_agep_id"] = $erreur_agep_id;
 		$enregistrement_insere=array(); // Valeur retourné pour affichage après insertion
 		$sous_projet=array(); // Valeur retourné pour affichage après insertion
-		if($erreur_village==0 && $erreur_tranche==0 && $erreur_pourcentage==0 && $erreur_montant_a_payer==0 && $erreur_date_paiement && $erreur_menage_id==0 && $erreur_depassement_montant_paye==0 && $erreur_agep_id==0) {
+		// if($erreur_village==0 && $erreur_tranche==0 && $erreur_pourcentage==0 && $erreur_montant_a_payer==0 && $erreur_date_paiement && $erreur_menage_id==0 && $erreur_depassement_montant_paye==0 && $erreur_agep_id==0) {
+		if($nombre_erreur==0) {
 			// SANS ERREUR APRES CONTROLE
-					$sheet->setCellValue('E1', "DÉJÀ IMPORTÉ");	
-					$sheet->getStyle('E1')->getFill()->applyFromArray(
-							 array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
-								 'startcolor' => array('rgb' => 'FF0000'),
-								 'endcolor'   => array('argb' => 'FF0000')
-							 )
-					 );		
-			$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
-			$objWriter->save(dirname(__FILE__) . "/../../../../" .$chemin. $nomfichier);
+					// $sheet->setCellValue('E1', "DÉJÀ IMPORTÉ");	
+					// $sheet->getStyle('E1')->getFill()->applyFromArray(
+							 // array('type'       => PHPExcel_Style_Fill::FILL_SOLID,'rotation'   => 0,
+								 // 'startcolor' => array('rgb' => 'FF0000'),
+								 // 'endcolor'   => array('argb' => 'FF0000')
+							 // )
+					 // );		
+			// $objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+			// $objWriter->save(dirname(__FILE__) . "/../../../../" .$chemin. $nomfichier);
 			$a_ete_modifie=0;
 			$microprojet_id=2;
 			// INSERTION DANS TABLE FICHE PAIEMENT
-			$query = "insert into see_fichepaiement (etape_id,datepaiement,village_id,indemnite,a_ete_modifie,microprojet_id,montanttotalapayer,montanttotalpaye,montantpayetravailleur,montantpayesuppliant,indemnite,agep_id) values ('"
-			.$etape_id."','".$date_paiement."','".$id_village."','"
-			.$montant_total_a_payer."','".$a_ete_modifie."','".$microprojet_id."','".$total_a_payer."','".$total_paye."','".$total_paye_recepteur."','".$total_paye_suppleant."','".$montant_a_payer."','".$agep_id."')";
+			$query = "insert into see_fichepaiement (etape_id,datepaiement,village_id,a_ete_modifie,microprojet_id,montanttotalapayer,montanttotalpaye,montantpayetravailleur,montantpayesuppliant,indemnite,agep_id) values ('"
+			.$etape_id."','".$date_paiement."','".$village_id."','"
+			.$a_ete_modifie."','".$microprojet_id."','".$total_a_payer."','".$total_paye."','".$total_paye_recepteur."','".$total_paye_suppleant."','".$montant_a_payer."','".$agep_id."')";
 			$id_fiche_paiement = $this->RequeteimportManager->Requete_insertion($query);
 
 			// INSERTION DANS TABLE FICHE PAIEMENT MENAGE
@@ -1681,7 +1840,7 @@ class Requete_import extends REST_Controller {
 			$count_update = $this->RequeteimportManager->Execution_requete($requete);
 						
 			// RECUPERATION ENREGISTRMENT INSERES
-			$enregistrement_insere = $this->ImportationmenageManager->MenageInseresDernierement($id_max_menage);
+			$enregistrement_insere = $this->FichepaiementmenageManager->findDetailByFiche_paiement_id($id_fiche_paiement);
 			$sous_projet = $this->SousprojetManager->findById($id_sous_projet);
 			unset($objet_read_write,$excel,$Excel);	
 		}			
@@ -1689,9 +1848,9 @@ class Requete_import extends REST_Controller {
 			$status=TRUE;
 		} else {
 			$status=FALSE;
-			$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
-			$objWriter->save(dirname(__FILE__) . "/../../../../" .$chemin. $nomfichier);
-			unset($objet_read_write,$excel,$Excel);				
+			// $objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+			// $objWriter->save(dirname(__FILE__) . "/../../../../" .$chemin. $nomfichier);
+			// unset($objet_read_write,$excel,$Excel);				
 		}
 		$this->response([
 			'status' => $status,
@@ -1702,6 +1861,7 @@ class Requete_import extends REST_Controller {
 			'nom_prefecture'  => $nom_prefecture,
 			'nom_commune'  => $nom_commune,
 			'nom_village'  => $nom_village,
+			'requete'  => $requete,
 			'message' => 'Get file success',
 		], REST_Controller::HTTP_OK);		  
 	}

@@ -1,10 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Formation_ml_model extends CI_Model {
-    protected $table = 'formation_ml';
+class Formation_ml_repartition_model extends CI_Model {
+    protected $table = 'formation_ml_repartition';
 
-    public function add($formation_ml)  {
-        $this->db->set($this->_set($formation_ml))
+    public function add($formation_ml_repartition)  {
+        $this->db->set($this->_set($formation_ml_repartition))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -13,8 +13,8 @@ class Formation_ml_model extends CI_Model {
         }                    
     }
 
-    public function update($id, $formation_ml)  {
-        $this->db->set($this->_set($formation_ml))
+    public function update($id, $formation_ml_repartition)  {
+        $this->db->set($this->_set($formation_ml_repartition))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -23,22 +23,16 @@ class Formation_ml_model extends CI_Model {
             return null;
         }                      
     }
-    public function _set($formation_ml) 
+    public function _set($formation_ml_repartition) 
     {
         return array
         (
-            'numero'           => $formation_ml['numero'],
-            'id_commune'      => $formation_ml['id_commune'],
-            'id_contrat_agex'  => $formation_ml['id_contrat_agex'],
-            'description'     => $formation_ml['description'],
-            'lieu'            => $formation_ml['lieu'],
-            'date_debut'      => $formation_ml['date_debut'],
-            'date_fin'        => $formation_ml['date_fin'],            
-            'formateur'  => $formation_ml['formateur'],
-            'date_edition'  => $formation_ml['date_edition'],
-            'outils_didactique'  => $formation_ml['outils_didactique'],
-            'probleme'  => $formation_ml['probleme'],
-            'solution'  => $formation_ml['solution']
+            'num_groupe'     => $formation_ml_repartition['num_groupe'],
+            'date_formation'            => $formation_ml_repartition['date_formation'],
+            'nbr_ml'     => $formation_ml_repartition['nbr_ml'],
+            'lieu_formation'      => $formation_ml_repartition['lieu_formation'],
+            'responsable'      => $formation_ml_repartition['responsable'],
+            'id_formation_ml'      => $formation_ml_repartition['id_formation_ml']
         );
     }
 
@@ -86,14 +80,11 @@ class Formation_ml_model extends CI_Model {
     }    
     
     
-    public function getformation_mlBysousprojetcommune($id_sous_projet,$id_commune)  {
-        $result =  $this->db->select('formation_ml.*')
+    public function getformation_ml_repartitionByformation($id_formation_ml)  {
+        $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->join("contrat_ugp_agex","contrat_ugp_agex.id=formation_ml.id_contrat_agex")
-                        ->where("id_sous_projet", $id_sous_projet)
-                        ->where("id_commune",$id_commune) 
-                        ->order_by('contrat_ugp_agex.id', 'asc')
-                        ->order_by('numero', 'asc')
+                        ->where("id_formation_ml", $id_formation_ml)
+                        ->order_by('num_groupe', 'asc')
                         ->get()
                         ->result();
         if($result) {

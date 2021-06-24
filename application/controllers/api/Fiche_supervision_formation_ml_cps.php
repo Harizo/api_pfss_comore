@@ -4,45 +4,39 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Realisation_ebe extends REST_Controller {
+class Fiche_supervision_formation_ml_cps extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('realisation_ebe_model', 'Realisation_ebeManager');
-        $this->load->model('contrat_ugp_agex_model', 'Contrat_ugp_agexManager');
-        $this->load->model('Espace_bien_etre_model', 'Espace_bien_etreManager');
+        $this->load->model('fiche_supervision_formation_ml_cps_model', 'Fiche_supervision_formation_ml_cpsManager');
+        $this->load->model('agent_ex_model', 'Agent_exManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
 		$data = array();
         $menu = $this->get('menu');
-        $id_sous_projet = $this->get('id_sous_projet');
-        $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
-		if ($menu=='getrealisation_ebeBysousprojetml_pl') 
+        $id_village = $this->get('id_village');
+		if ($menu=='get_supervision_formationbyvillage') 
         {
-			$tmp = $this->Realisation_ebeManager->getrealisation_ebeBysousprojetml_pl($id_sous_projet,$id_groupe_ml_pl);
+			$tmp = $this->Fiche_supervision_formation_ml_cpsManager->get_supervision_formationbyvillage($id_village);
 			if ($tmp) 
             {   
 				foreach ($tmp as $key => $value)
                 {   
-                    $contrat_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
-                    $espace_bien_etre = $this->Espace_bien_etreManager->findByIdobjet($value->id_espace_bien_etre);
+                    $agex = $this->Agent_exManager->findById($value->id_agex);
                     $data[$key]['id']         = $value->id;
-                    $data[$key]['espace_bien_etre']     = $espace_bien_etre;
-                    $data[$key]['but_regroupement']= $value->but_regroupement;
-                    $data[$key]['lieu']        = $value->lieu;
-                    $data[$key]['date_regroupement']  = $value->date_regroupement;
-                    $data[$key]['date_edition']  = $value->date_edition;
-                    $data[$key]['materiel']    = $value->materiel;
-                    $data[$key]['id_groupe_ml_pl']     = $value->id_groupe_ml_pl;
-                    $data[$key]['contrat_agex'] = $contrat_agex;
+                    $data[$key]['id_village']= $value->id_village;
+                    $data[$key]['date_supervision']        = $value->date_supervision;
+                    $data[$key]['nom_missionaire']     = $value->nom_missionaire;
+                    $data[$key]['nom_ml_cps'] = $value->nom_ml_cps;
+                    $data[$key]['agex'] = $agex;
                 }
 			}
 		} 
         elseif ($id) 
         {
-			$tmp = $this->Realisation_ebeManager->findById($id);
+			$tmp = $this->Fiche_supervision_formation_ml_cpsManager->findById($id);
 			if($tmp) 
             {
 				$data=$tmp;
@@ -50,18 +44,18 @@ class Realisation_ebe extends REST_Controller {
 		} 
         else 
         {			
-			$tmp = $this->Realisation_ebeManager->findAll();
+			$tmp = $this->Fiche_supervision_formation_ml_cpsManager->findAll();
 			if ($tmp) 
             {   
                 foreach ($tmp as $key => $value)
                 {   
-                    $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
-                    $data[$key]['id']                 = $value->id;
-                    $data[$key]['id_espace_bien_etre']     = $value->id_espace_bien_etre;
-                    $data[$key]['but_regroupement']      = $value->but_regroupement;
-                    $data[$key]['lieu']    = $value->lieu;
-                    $data[$key]['date_regroupement']     = $value->date_regroupement;
-                    $data[$key]['materiel']     = $value->materiel;
+                    $agex = $this->Agent_exManager->findById($value->id_agex);
+                    $data[$key]['id']         = $value->id;
+                    $data[$key]['id_village']= $value->id_village;
+                    $data[$key]['date_supervision']        = $value->date_supervision;
+                    $data[$key]['nom_missionaire']     = $value->nom_missionaire;
+                    $data[$key]['nom_ml_cps'] = $value->nom_ml_cps;
+                    $data[$key]['agex'] = $agex;;
                 }
 				//$data=$tmp;
 			}
@@ -89,14 +83,11 @@ class Realisation_ebe extends REST_Controller {
 
 		$data = array(
 			
-            'id_espace_bien_etre'     => $this->post('id_espace_bien_etre'),
-            'id_groupe_ml_pl'   => $this->post('id_groupe_ml_pl'),
-            'id_contrat_agex'=> $this->post('id_contrat_agex'),
-            'but_regroupement'      => $this->post('but_regroupement'),
-            'lieu'       => $this->post('lieu'),
-            'date_regroupement'     => $this->post('date_regroupement'),
-            'materiel'   => $this->post('materiel'),
-            'date_edition'   => $this->post('date_edition')
+            'id_village'     => $this->post('id_village'),
+            'date_supervision'   => $this->post('date_supervision'),
+            'nom_missionaire'       => $this->post('nom_missionaire'),
+            'id_agex'     => $this->post('id_agex'),
+            'nom_ml_cps'   => $this->post('nom_ml_cps')
 		);       
 
         if ($supprimer == 0) {
@@ -108,7 +99,7 @@ class Realisation_ebe extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->Realisation_ebeManager->add($data);              
+                $dataId = $this->Fiche_supervision_formation_ml_cpsManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -133,7 +124,7 @@ class Realisation_ebe extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->Realisation_ebeManager->update($id, $data);              
+                $update = $this->Fiche_supervision_formation_ml_cpsManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -160,7 +151,7 @@ class Realisation_ebe extends REST_Controller {
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
 
-            $delete = $this->Realisation_ebeManager->delete($id);   
+            $delete = $this->Fiche_supervision_formation_ml_cpsManager->delete($id);   
 
             if (!is_null($delete)) 
             {
