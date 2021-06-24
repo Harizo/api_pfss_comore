@@ -5,21 +5,35 @@ class Fiche_plan_relevement_identification extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('fiche_plan_relevement_identification_model', 'fpriManager');
+        $this->load->model('menage_model', 'menageManager');
       
     }
     public function index_get() {
         $id = $this->get('id');
-        $cle_etrangere = $this->get('cle_etrangere');
-        $id_sous_projet = $this->get('id_sous_projet');
-        $village_id = $this->get('village_id');
+        $id_village = $this->get('id_village');
+        $id_menage = $this->get('id_menage');
         $data = array() ;
-		if ($id) {
-			// Selection ménage par id (id=clé primaire)
+   
+		if ($id) 
+        {
+			
 			$data = $this->fpriManager->findById($id);
-		} else {
-			// Selection de tous les ménages
-			$data = $this->fpriManager->findAll();                   
+		} 
+
+        if ($id_village)
+        {
+			
+			$data = $this->fpriManager->findAllby_id_village($id_village);                   
 		}
+
+        if ($id_menage)
+        {
+            
+            $data = $this->menageManager->get_composition_menage($id_menage);                   
+        }
+
+
+
         if (count($data)>0) {
             $this->response([
                 'status' => TRUE,
@@ -40,12 +54,10 @@ class Fiche_plan_relevement_identification extends REST_Controller {
 		$data = array(
 			
             'id_village'                            => $this->post('id_village'),
+            'date_remplissage'                            => $this->post('date_remplissage'),
             'id_menage'                             => $this->post('id_menage'),                      
-            'id_agex'                               => $this->post('id_agex'),                      
-            'nbr_enfant_moin_quinze_ans'            => $this->post('nbr_enfant_moin_quinze_ans'),      
-            'composition_menage'                    => $this->post('composition_menage'),                      
-            'nom_prenom'                            => $this->post('nom_prenom'),                      
-            'age'                                   => $this->post('age'),                      
+            'id_agex'                               => $this->post('id_agex'),                         
+            'composition_menage'                    => $this->post('composition_menage'),                   
             'representant_comite_protection_social' => $this->post('representant_comite_protection_social'),                      
             'representant_agex'                     => $this->post('representant_agex')  
 		);               

@@ -33,7 +33,8 @@ class Realisation_ebe_model extends CI_Model {
             'materiel'     => $realisation_ebe['materiel'],
             'lieu'         => $realisation_ebe['lieu'],
             'date_regroupement'=> $realisation_ebe['date_regroupement'],
-            'but_regroupement' => $realisation_ebe['but_regroupement']
+            'but_regroupement' => $realisation_ebe['but_regroupement'],
+            'date_edition' => $realisation_ebe['date_edition']
         );
     }
 

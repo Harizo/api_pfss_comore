@@ -33,7 +33,12 @@ class Formation_ml_model extends CI_Model {
             'description'     => $formation_ml['description'],
             'lieu'            => $formation_ml['lieu'],
             'date_debut'      => $formation_ml['date_debut'],
-            'date_fin'        => $formation_ml['date_fin']
+            'date_fin'        => $formation_ml['date_fin'],            
+            'formateur'  => $formation_ml['formateur'],
+            'date_edition'  => $formation_ml['date_edition'],
+            'outils_didactique'  => $formation_ml['outils_didactique'],
+            'probleme'  => $formation_ml['probleme'],
+            'solution'  => $formation_ml['solution']
         );
     }
 

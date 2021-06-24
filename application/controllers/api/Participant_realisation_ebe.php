@@ -14,8 +14,12 @@ class Participant_realisation_ebe extends REST_Controller {
 
     public function index_get() {
         $id = $this->get('id');
-        $cle_etrangere = $this->get('cle_etrangere');
+        //$cle_etrangere = $this->get('cle_etrangere');        
+        $menu = $this->get('menu');
         $id_realisation_ebe = $this->get('id_realisation_ebe');
+        $id_groupe_ml_pl = $this->get('id_groupe_ml_pl');
+		$data = array();
+        /*$id_realisation_ebe = $this->get('id_realisation_ebe');
 		$data = array();
 		if ($cle_etrangere) {
 			// Selection par id
@@ -31,7 +35,34 @@ class Participant_realisation_ebe extends REST_Controller {
                 }
                 //$data=$tmp;
 			}
-		} elseif ($id) {
+		}*/
+		if ($menu=="get_participantByrealisationgroupe") {
+			// Selection par id
+			$tmp = $this->Participant_realisation_ebeManager->get_participantByrealisationgroupe($id_realisation_ebe,$id_groupe_ml_pl);
+			if($tmp)
+            {
+				foreach ($tmp as $key => $value)
+                {   
+                    $menage = $this->MenageManager->findById($value->id_menage);
+                    $data[$key]['id']         = $value->id;
+                    $data[$key]['id_realisation_ebe']  = $value->id_realisation_ebe;
+                    $data[$key]['nombre_enfant_moins_six_ans']  = $value->nombre_enfant_moins_six_ans;
+                    $data[$key]['id_menage_prevu']  = $value->id_menage_prevu;
+                    $data[$key]['id_menage']  = $value->id_menage;
+                    $data[$key]['date_presence']  = $value->date_presence;
+                    $data[$key]['identifiant_menage']  = $value->identifiant_menage;
+                    $data[$key]['nomchefmenage']  = $value->nomchefmenage;
+                    if ($value->id_menage)
+                    {                        
+                        $data[$key]['checkbox_menage']  = true;
+                    }
+                    $data[$key]['id_realisation_ebe']  = $value->id_realisation_ebe;
+                    //$data[$key]['menage'] = $menage;
+                }
+                //$data=$tmp;
+			}
+		} 
+        elseif ($id) {
 			// Selection par id
 			$temporaire = $this->Participant_realisation_ebeManager->findById($id);
 			if($temporaire) {
@@ -63,7 +94,8 @@ class Participant_realisation_ebe extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
 		$data = array(
 			'id_menage' => $this->post('id_menage'),
-			'id_realisation_ebe' => $this->post('id_realisation_ebe')
+			'id_realisation_ebe' => $this->post('id_realisation_ebe'),
+			'date_presence' => $this->post('date_presence')
 		);               
         if ($supprimer == 0) {
             if ($id == 0) {

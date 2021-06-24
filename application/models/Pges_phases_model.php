@@ -34,7 +34,7 @@ class Pges_phases_model extends CI_Model
     public function _set($pges_phases)
     {
         return array(            
-            'description'=> $pges_phases['description'],            
+            //'description'=> $pges_phases['description'],            
             'impacts'=> $pges_phases['impacts'],      
             'mesures'=> $pges_phases['mesures'],      
             'responsable'=> $pges_phases['responsable'],
@@ -57,7 +57,7 @@ class Pges_phases_model extends CI_Model
     public function _set_down($pges_phases, $id)
     {
         return array(            
-            'description'=> $pges_phases['description'],
+            //'description'=> $pges_phases['description'],
             'impacts'=> $pges_phases['impacts'],      
             'mesures'=> $pges_phases['mesures'],      
             'responsable'=> $pges_phases['responsable'],

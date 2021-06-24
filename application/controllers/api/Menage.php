@@ -34,7 +34,11 @@ class Menage extends REST_Controller {
 		$data=array();
 
 		
-		if($id_village) 
+		if($id_village && $menu=='menagebyvillage_withcomposition') 
+		{	
+			$data = $this->menageManager->menagebyvillage_withcomposition($id_village);
+	   } 
+	   else if($id_village) 
 		{	
 			$data = $this->menageManager->findmenageByvillage($id_village);
 	   } 
@@ -42,11 +46,11 @@ class Menage extends REST_Controller {
 		{	
 			$data = $this->menageManager->findmenage_ml_plBygroupe($id_groupe_ml_pl);
 	   } 
-	   else if($id_groupe_ml_pl) 
+	   /*else if($id_groupe_ml_pl) 
 		{	
 			
 			$data = $this->menageManager->findmenageBygroupe($id_groupe_ml_pl);
-		} 
+		} */
 		else if($cle_etrangere && $id_groupe_ml_pl) {
 			$data['menage'] = array();
 			$data['tab_reponse_menage_ml_pl'] = array();

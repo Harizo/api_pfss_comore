@@ -17,6 +17,7 @@ class Contrat_ugp_agex extends REST_Controller {
         $get_mdp_en_retard = $this->get('get_mdp_en_retard');
         $get_all = $this->get('get_all');
         $id_sous_projet = $this->get('id_sous_projet');
+        $id_agex = $this->get('id_agex');
         $data =array();
 		
         if ($id_sous_projet) 
@@ -60,7 +61,15 @@ class Contrat_ugp_agex extends REST_Controller {
 
 			}
 		}
-
+        
+		if ($id_agex) 
+        {
+			$tmp = $this->cuaMng->findById_agex($id_agex);
+			if($tmp) 
+            {
+				$data=$tmp;
+			}
+		}
         if ($data) 
         {
             $this->response([

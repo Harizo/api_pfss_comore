@@ -146,4 +146,32 @@ public function findAllByIle($ile_id)
         }   
     }
 
+    
+    public function get_villageBycommuneWithnbr_ml($id_commune)
+    {
+ 		$requete="select see_village.*,see_village.id as id_vil,"
+                        ."(select count(groupe_ml_pl.id) from "
+                                    ."groupe_ml_pl where groupe_ml_pl.village_id=id_vil) as nbr_ml_pl_elu"
+				." from see_village"
+                ." where see_village.commune_id=".$id_commune;
+				$result = $this->db->query($requete)->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }   
+    }
+    
+    public function get_villageByidWithnbr_ml($id)
+    {
+        $this->db->select("see_village.*,see_village.id as id_vil,(select count(groupe_ml_pl.id) from groupe_ml_pl where groupe_ml_pl.village_id=id_vil) as nbr_ml_pl_elu")
+                ->where("id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
+
 }

@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class realisation_ebe extends REST_Controller {
+class Realisation_ebe extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
@@ -33,6 +33,7 @@ class realisation_ebe extends REST_Controller {
                     $data[$key]['but_regroupement']= $value->but_regroupement;
                     $data[$key]['lieu']        = $value->lieu;
                     $data[$key]['date_regroupement']  = $value->date_regroupement;
+                    $data[$key]['date_edition']  = $value->date_edition;
                     $data[$key]['materiel']    = $value->materiel;
                     $data[$key]['id_groupe_ml_pl']     = $value->id_groupe_ml_pl;
                     $data[$key]['contrat_agex'] = $contrat_agex;
@@ -94,7 +95,8 @@ class realisation_ebe extends REST_Controller {
             'but_regroupement'      => $this->post('but_regroupement'),
             'lieu'       => $this->post('lieu'),
             'date_regroupement'     => $this->post('date_regroupement'),
-            'materiel'   => $this->post('materiel')
+            'materiel'   => $this->post('materiel'),
+            'date_edition'   => $this->post('date_edition')
 		);       
 
         if ($supprimer == 0) {

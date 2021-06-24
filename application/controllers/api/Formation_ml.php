@@ -33,6 +33,11 @@ class Formation_ml extends REST_Controller {
                     $data[$key]['date_debut']  = $value->date_debut;
                     $data[$key]['date_fin']    = $value->date_fin;
                     $data[$key]['id_commune']     = $value->id_commune;
+                    $data[$key]['formateur']     = $value->formateur;
+                    $data[$key]['date_edition']     = $value->date_edition;
+                    $data[$key]['outils_didactique']     = $value->outils_didactique;
+                    $data[$key]['probleme']     = $value->probleme;
+                    $data[$key]['solution']     = $value->solution;
                     $data[$key]['contrat_agex'] = $contrat_agex;
                 }
 			}
@@ -92,7 +97,12 @@ class Formation_ml extends REST_Controller {
             'description'      => $this->post('description'),
             'lieu'      => $this->post('lieu'),
             'date_debut'     => $this->post('date_debut'),
-            'date_fin'    => $this->post('date_fin')
+            'date_fin'    => $this->post('date_fin'),            
+            'formateur'     => $this->post('formateur'),
+            'date_edition'     => $this->post('date_edition'),
+            'outils_didactique'     => $this->post('outils_didactique'),
+            'probleme'     => $this->post('probleme'),
+            'solution'     => $this->post('solution')
 		);       
 
         if ($supprimer == 0) {

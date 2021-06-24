@@ -1,11 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Groupe_participant_formation_ml_model extends CI_Model {
-    protected $table = 'groupe_participant_formation_ml';
+class Fiche_profilage_ressource_model extends CI_Model {
+    protected $table = 'fiche_profilage_ressource';
 
-    public function add($tutelle)  {
-		// Ajout d'un enregitrement
-        $this->db->set($this->_set($tutelle))
+    public function add($fiche_profilage_ressource)  {
+        $this->db->set($this->_set($fiche_profilage_ressource))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -13,9 +12,9 @@ class Groupe_participant_formation_ml_model extends CI_Model {
             return null;
         }                    
     }
-    public function update($id, $tutelle)  {
-		// Mise à jour d'un enregitrement
-        $this->db->set($this->_set($tutelle))
+
+    public function update($id, $fiche_profilage_ressource)  {
+        $this->db->set($this->_set($fiche_profilage_ressource))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -24,16 +23,19 @@ class Groupe_participant_formation_ml_model extends CI_Model {
             return null;
         }                      
     }
-    public function _set($tutelle) {
-		// Affectation des valeurs
-        return array(
-            'id_groupe_ml_pl' => $tutelle['id_groupe_ml_pl'],
-            'id_village' => $tutelle['id_village'],
-            'id_formation_ml' => $tutelle['id_formation_ml'],
+    public function _set($fiche_profilage_ressource) 
+    {
+        return array
+        (
+            'designation'       => $fiche_profilage_ressource['designation'],
+            'quantite'     => $fiche_profilage_ressource['quantite'],
+            'etat'  => $fiche_profilage_ressource['etat'],
+            'id_fiche_profilage_orientation'     => $fiche_profilage_ressource['id_fiche_profilage_orientation']
         );
     }
+
+
     public function delete($id) {
-		// Suppression d'un enregitrement
         $this->db->where('id', (int) $id)->delete($this->table);
         if($this->db->affected_rows() === 1)  {
             return true;
@@ -42,7 +44,6 @@ class Groupe_participant_formation_ml_model extends CI_Model {
         }  
     }
     public function findAll() {
-		// Selection de tous les enregitrements
         $result =  $this->db->select('*')
                         ->from($this->table)
                         ->order_by('id')
@@ -54,11 +55,19 @@ class Groupe_participant_formation_ml_model extends CI_Model {
             return null;
         }                 
     }
-    public function findById_formation_ml($id_formation_ml) {
+    public function findById($id) {		
+        $this->db->where("id", $id);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
+    public function findByIdArray($id)  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("id_formation_ml",$id_formation_ml)
-                        ->order_by('id_village')
+                        ->where("id", $id)
+                        ->order_by('id', 'asc')
                         ->get()
                         ->result();
         if($result) {
@@ -66,13 +75,13 @@ class Groupe_participant_formation_ml_model extends CI_Model {
         }else{
             return null;
         }                 
-    }
-    public function findById($id) {
-		// Selection par id
+    }    
+    
+    
+    public function getfiche_profilage_ressourceByentete($id_fiche_profilage_orientation)  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("id", $id)
-                        ->order_by('id', 'asc')
+                        ->where("id_fiche_profilage_orientation", $id_fiche_profilage_orientation)
                         ->get()
                         ->result();
         if($result) {
