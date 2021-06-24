@@ -40,7 +40,7 @@ class Zip extends REST_Controller {
                     $data = array();
             }
         
-        if (count($data)>0) {
+        if ($data) {
             $this->response([
                 'status' => TRUE,
                 'response' => $data,
