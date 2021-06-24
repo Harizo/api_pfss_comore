@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class fiche_plan_relevement_objdesc_trois extends REST_Controller {
+class Fiche_plan_relevement_objdesc_trois extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
