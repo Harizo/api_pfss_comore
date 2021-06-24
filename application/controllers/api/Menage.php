@@ -92,7 +92,7 @@ class Menage extends REST_Controller {
 		} else {
 			$data = $this->menageManager->findAll();
 		}  
-        if (count($data)>0) {
+        if ($data) {
             $this->response([
                 'status' => TRUE,
                 'response' => $data,
