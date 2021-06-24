@@ -48,7 +48,7 @@ class Indicateur_tdb_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -62,7 +62,7 @@ class Indicateur_tdb_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 }

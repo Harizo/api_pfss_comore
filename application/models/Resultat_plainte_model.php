@@ -71,7 +71,7 @@ class Resultat_plainte_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -84,7 +84,7 @@ class Resultat_plainte_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByIdArray($id)  {
@@ -97,7 +97,7 @@ class Resultat_plainte_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 }

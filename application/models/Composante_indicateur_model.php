@@ -82,7 +82,7 @@ class Composante_indicateur_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 
@@ -98,7 +98,7 @@ class Composante_indicateur_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 
@@ -109,7 +109,7 @@ class Composante_indicateur_model extends CI_Model
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
 
 }

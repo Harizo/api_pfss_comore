@@ -56,7 +56,7 @@ class Fiche_presencemenage_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id)  {
@@ -70,7 +70,7 @@ class Fiche_presencemenage_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByFiche_presence_id($fiche_presence_id)  {
@@ -86,7 +86,7 @@ class Fiche_presencemenage_model extends CI_Model {
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
  

@@ -71,7 +71,7 @@ class Individu_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 
@@ -87,7 +87,7 @@ class Individu_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 	 public function findByMenage($menage_id) {
@@ -102,7 +102,7 @@ class Individu_model extends CI_Model
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
 	 }	
     public function findById($id)
@@ -112,7 +112,7 @@ class Individu_model extends CI_Model
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
 
 }

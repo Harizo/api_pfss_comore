@@ -53,7 +53,7 @@ class Liste_variable_individu_model extends CI_Model
         if($result)  {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 	// Récupération par id (clé primaire)
@@ -63,7 +63,7 @@ class Liste_variable_individu_model extends CI_Model
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
 	// Récupération par id (clé primaire) : réponse : tableau
     public function findByIdArray($id)  {

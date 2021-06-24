@@ -52,7 +52,7 @@ class Detail_type_transfert_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -66,7 +66,7 @@ class Detail_type_transfert_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByTypetransfert($id_type_transfert) {
@@ -80,7 +80,7 @@ class Detail_type_transfert_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByIntervention($id_intervention) {
@@ -102,7 +102,7 @@ class Detail_type_transfert_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 }

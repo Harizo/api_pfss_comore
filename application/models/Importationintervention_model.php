@@ -119,7 +119,7 @@ class Importationintervention_model extends CI_Model
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 		
 	}	
 	

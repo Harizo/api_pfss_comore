@@ -58,7 +58,7 @@ class Livrable_mlpl_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByGoupemlpl($id_groupemlpl) {
@@ -72,7 +72,7 @@ class Livrable_mlpl_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -82,7 +82,7 @@ class Livrable_mlpl_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
 }
 ?>

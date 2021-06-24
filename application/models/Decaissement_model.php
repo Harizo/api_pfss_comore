@@ -74,7 +74,7 @@ class Decaissement_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -88,7 +88,7 @@ class Decaissement_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findAllByFinancementintervention($id_financement_intervention)  {
@@ -102,7 +102,7 @@ class Decaissement_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return array();
+            return array()();
         }                 
     }
 }

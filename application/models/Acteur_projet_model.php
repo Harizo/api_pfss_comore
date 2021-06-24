@@ -62,7 +62,7 @@ class Acteur_projet_model extends CI_Model {
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByIdParent($id_projet) {
@@ -77,7 +77,7 @@ class Acteur_projet_model extends CI_Model {
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -91,7 +91,7 @@ class Acteur_projet_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }	
  

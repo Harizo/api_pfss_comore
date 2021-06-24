@@ -51,7 +51,7 @@ class Probleme_solution_propose_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByFicheSupervision($id_fiche_supervision) {
@@ -65,7 +65,7 @@ class Probleme_solution_propose_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -75,7 +75,7 @@ class Probleme_solution_propose_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
 }
 ?>

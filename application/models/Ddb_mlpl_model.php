@@ -94,7 +94,7 @@ class Ddb_mlpl_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id,$nom_table) {
@@ -108,7 +108,7 @@ class Ddb_mlpl_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByIdrapportNomcleEtrangere($nom_table,$nom_table_rapport,$id_rapport,$nom_cle_etrangere) {
@@ -133,7 +133,7 @@ class Ddb_mlpl_model extends CI_Model {
 		if($query->result()) {
 			return $query->result();
         }else{
-            return null;
+            return array();
         }  
     }
     public function findByIdrapportReponseChoixMultiple($nom_table_rapport,$id_rapport,$nom_cle_etrangere) {
@@ -148,7 +148,7 @@ class Ddb_mlpl_model extends CI_Model {
 		if($query->result()) {
 			return $query->result();
         }else{
-            return null;
+            return array();
         }  
     }
 }

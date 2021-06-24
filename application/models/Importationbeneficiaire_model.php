@@ -130,7 +130,7 @@ class Importationbeneficiaire_model extends CI_Model
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }	
 	public function recuperer_code_region_district_commune_fokontany($id_fokontany) {
@@ -146,7 +146,7 @@ class Importationbeneficiaire_model extends CI_Model
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 		
 	}	
 	public function recuperer_id_situation_matrimoniale($description) {
@@ -157,7 +157,7 @@ class Importationbeneficiaire_model extends CI_Model
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 		
 		
 	}
@@ -170,7 +170,7 @@ class Importationbeneficiaire_model extends CI_Model
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 		
 		
 	}
@@ -183,7 +183,7 @@ class Importationbeneficiaire_model extends CI_Model
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 		
 		
 	}

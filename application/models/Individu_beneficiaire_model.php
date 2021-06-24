@@ -52,7 +52,7 @@ class Individu_beneficiaire_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findAllByProgramme($id_interventions)  {
@@ -73,7 +73,7 @@ class Individu_beneficiaire_model extends CI_Model {
         if($result)  {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
     public function findAllByindividu($id_individu)   {
@@ -83,7 +83,7 @@ class Individu_beneficiaire_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;  
+        return array();  
     }
     public function findById($id)    {
 		// Selection par id
@@ -92,7 +92,7 @@ class Individu_beneficiaire_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
     public function findAllByProgrammeAndVillage($id_interventions,$id_fokontany)    {
 		// Selection individu bénéficiaire par intervention et par 
@@ -107,7 +107,7 @@ class Individu_beneficiaire_model extends CI_Model {
         if($result)  {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
 }

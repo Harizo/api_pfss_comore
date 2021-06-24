@@ -50,7 +50,7 @@ class Variable_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 	// Récupération pa id_liste_variable : clé étrangère
@@ -64,7 +64,7 @@ class Variable_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 	// Récupération par id (clé primaire)
@@ -78,7 +78,7 @@ class Variable_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }		
 }

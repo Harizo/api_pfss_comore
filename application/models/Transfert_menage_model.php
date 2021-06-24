@@ -20,7 +20,7 @@ class Importation_menage_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
     public function Fiche_etat_de_paiement($village_id)
@@ -44,7 +44,7 @@ class Importation_menage_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
     public function Detail_fiche_etat_de_paiement($id_fichepresence)
@@ -61,7 +61,7 @@ class Importation_menage_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
     }
 	public function Liste_etat_presence($village_id,$requetefiltre) {
@@ -91,7 +91,7 @@ class Importation_menage_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
 		
 	}
@@ -125,7 +125,7 @@ class Importation_menage_model extends CI_Model
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                  
 		
 	}
@@ -135,7 +135,7 @@ class Importation_menage_model extends CI_Model
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
     public function findByIdArray($id)  {
         $result =  $this->db->select('*')

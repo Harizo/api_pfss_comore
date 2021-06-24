@@ -58,7 +58,7 @@ class Groupe_mlpl_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     
@@ -69,7 +69,7 @@ class Groupe_mlpl_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
     public function findAllByVillage($village_id)  {     
 		// Selection par village_id
@@ -86,7 +86,7 @@ class Groupe_mlpl_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     
@@ -101,7 +101,7 @@ class Groupe_mlpl_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     
@@ -113,7 +113,7 @@ class Groupe_mlpl_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
     
     public function findByIdandmenage($id) {
@@ -138,7 +138,7 @@ class Groupe_mlpl_model extends CI_Model {
         if ($q->num_rows() > 0) {
             return $q->row();
         }
-        return null;
+        return array();
     }
     
 }

@@ -48,7 +48,7 @@ class Fokontany_model extends CI_Model {
         {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }    
 	public function find_Fokontany_avec_Commune_et_District_et_Region($id=null) {
@@ -63,7 +63,7 @@ class Fokontany_model extends CI_Model {
 		if($query->result()) {
 			return $query->result();
         }else{
-            return null;
+            return array();
         }  
 	}
 	public function find_Liste_Fokontany_avec_Commune_et_District_et_Region($id_commune=null) {
@@ -78,7 +78,7 @@ class Fokontany_model extends CI_Model {
 		if($query->result()) {
 			return $query->result();
         }else{
-            return null;
+            return array();
         }  
 	}
     public function findAllByCommune($id_commune) {
@@ -91,7 +91,7 @@ class Fokontany_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -104,7 +104,7 @@ class Fokontany_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }	
     /*public function findById($id)  {

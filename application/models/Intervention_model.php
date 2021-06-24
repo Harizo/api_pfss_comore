@@ -71,7 +71,7 @@ class Intervention_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findById($id) {
@@ -85,7 +85,7 @@ class Intervention_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByIntitule($intitule) {
@@ -103,7 +103,7 @@ class Intervention_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
     public function findByProgramme($id_programme) {
@@ -117,7 +117,7 @@ class Intervention_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 }
