@@ -578,4 +578,60 @@ class Menage_model extends CI_Model
         return $this->db->query($sql)->result();
     }
 
+
+    public function get_travailleur($id_village)//miasa any @fiche travailleur controller
+    {
+        $sql = 
+        "
+            select
+                m.identifiant_menage ,
+                m.NomTravailleur,
+                m.SexeTravailleur,
+                m.numerocintravailleur,
+                
+                m.NomTravailleurSuppliant,
+                m.SexeTravailleurSuppliant,
+                m.numerocinsuppliant
+            FROM
+                menage AS m,
+                menage_beneficiaire AS mb,
+                sous_projet AS sp
+            WHERE
+                m.NomTravailleur IS NOT null
+                AND m.NomTravailleurSuppliant IS NOT NULL 
+                AND m.id = mb.id_menage
+                AND sp.id = mb.id_sous_projet
+                AND sp.id = 2 
+                AND m.village_id = ".$id_village."
+                            
+        ";
+        //sp.id = 1 no ACT
+
+        return $this->db->query($sql)->result();
+    }
+
+    public function get_nbr_menage_beneficiaire_by_village_sousprojet($id_village)//miasa any @fiche travailleur controller
+    {
+        $sql = 
+        "
+            select
+                count(m.id) as nbr
+            FROM
+                menage AS m,
+                menage_beneficiaire AS mb,
+                sous_projet AS sp
+            WHERE
+                m.NomTravailleur IS NOT null
+                AND m.NomTravailleurSuppliant IS NOT NULL 
+                AND m.id = mb.id_menage
+                AND sp.id = mb.id_sous_projet
+                AND sp.id = 2 
+                AND m.village_id = ".$id_village."
+                            
+        ";
+        //sp.id = 1 no ACT
+
+        return $this->db->query($sql)->result();
+    }
+
 }
