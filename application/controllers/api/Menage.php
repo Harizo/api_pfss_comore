@@ -33,7 +33,6 @@ class Menage extends REST_Controller {
         $menu = $this->get('menu');
 		$data=array();
 
-
 		
 		if($id_village && $menu=='menagebyvillage_withcomposition') 
 		{	
@@ -66,6 +65,7 @@ class Menage extends REST_Controller {
 			 if($retour)
 				$data['menage'] = $retour;
 		} else if($cle_etrangere && $etat_statut && $id_sous_projet) {
+			// Ménage bénéficiaire par village et par sous projet
 			 $data = $this->menageManager->findAllByVillageAndEtatstatut($cle_etrangere,$id_sous_projet,$etat_statut);
 		} else if($id_groupe_ml_pl) {	
 
@@ -111,6 +111,11 @@ class Menage extends REST_Controller {
         $supprimer = $this->post('supprimer') ;
         $mise_a_jour_statut = $this->post('mise_a_jour_statut') ;
         $mise_a_jour_photo = $this->post('mise_a_jour_photo') ;
+		$situation_matrimoniale=null;
+        $temporaire = $this->post('situation_matrimoniale') ;
+		if($temporaire && intval($temporaire) >0) {
+			$situation_matrimoniale=$temporaire;
+		}
 		$data = array(
 			'id_serveur_centrale' => null,
 			'DateInscription' => $this->post('DateInscription'),
@@ -205,6 +210,9 @@ class Menage extends REST_Controller {
 			'possede_frigo_enquete' => $this->post('possede_frigo_enquete'),
 			'antenne_parabolique_enquete' => $this->post('antenne_parabolique_enquete'),
 			'motif_non_selection' => $this->post('motif_non_selection'),
+			'situation_matrimoniale' => $situation_matrimoniale,
+			'telephone_travailleur' =>  $this->post('telephone_travailleur'),
+			'telephone_suppleant' =>  $this->post('telephone_suppleant'),
 		);   
         if ($supprimer == 0) {
             if ($id == 0) {

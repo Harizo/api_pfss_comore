@@ -32,10 +32,15 @@ class Requete_export_model extends CI_Model
 				."m.SexeTravailleurSuppliant,m.milieu,"
 				."m.identifiant_menage,DATE_FORMAT(m.datedenaissancetravailleur,'%d/%m/%Y') as datedenaissancetravailleur,m.numerocintravailleur,m.numerocarteelectoraletravailleur,"
 				."DATE_FORMAT(m.datedenaissancesuppliant,'%d/%m/%Y') as datedenaissancesuppliant,m.numerocinsuppliant,m.numerocarteelectoralesuppliant,m.Addresse,m.SexeChefMenage,"
-				."m.agetravailleur,m.agesuppliant,m.NumeroCIN,m.NumeroCarteElectorale"
+				."m.agetravailleur,m.agesuppliant,m.NumeroCIN,m.NumeroCarteElectorale,"
+				."m.telephone_travailleur,m.telephone_suppleant,st.description as situation_matrimoniale,"
+				."lp1.description as lien_parente_travailleur,lp2.description as lien_parente_suppleant"
 				." from menage_beneficiaire as mp" 
 				." left outer join menage as m on m.id=mp.id_menage"
 				." left outer join see_village as v on v.id=m.village_id"
+				." left join liendeparente as lp1 on lp1.id="."m.lien_travailleur"
+				." left join liendeparente as lp2 on lp2.id="."m.lien_suppleant"
+				." left outer join situation_matrimoniale as st on st.id=m.situation_matrimoniale"
                 ." where mp.id_sous_projet=".$id_sous_projet
 				." and v.id=".$village_id." and m.statut='BENEFICIAIRE'"
 				." order by m.identifiant_menage";

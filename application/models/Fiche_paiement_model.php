@@ -81,20 +81,23 @@ class Fiche_paiement_model extends CI_Model {
         }
         return null;
     }
-    public function findByVillageAndEtapeAndMicroprojet($village_id,$etape_id,$microprojet_id)  {
-        $result =  $this->db->select('*')
-                        ->from($this->table)
-						->where("village_id", $village_id)
-						->where("etape_id", $etape_id)
-						->where("microprojet_id", $microprojet_id)
-                        ->order_by('id')
-                        ->get()
-                        ->result();
-        if($result) {
+    public function findByVillageAndEtapeAndMicroprojet($village_id,$requeteplus,$microprojet_id)  {
+		 $requete="SELECT see_fichepaiement.*,i.id as ile_id,i.ile,r.id as region_id,r.region,c.id as commune_id,c.commune,v.id as village_id,v.village,"
+				."ph.phase as tranche"
+				."  from see_fichepaiement"
+				." left join see_village as v on v.id=see_fichepaiement.village_id"
+				." left join see_commune as c on c.id=v.commune_id"
+				." left join see_region as r on r.id=c.region_id"
+				." left join see_ile as i on i.id=r.ile_id"
+				." left join see_phaseexecution as ph on ph.id=see_fichepaiement.etape_id"
+				." where microprojet_id=".$microprojet_id.$requeteplus;
+				$result = $this->db->query($requete)->result();
+        if($result)
+        {
             return $result;
         }else{
             return null;
-        }                 
+        }                  
     }
  
 }
