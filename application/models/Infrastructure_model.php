@@ -141,6 +141,22 @@ class Infrastructure_model extends CI_Model
             return null;
         }                 
     }
+    public function getinfrastructurebyvillage($id_village)
+    {
+        $result =  $this->db->select('*')
+                        ->from($this->table)
+                        ->where('id_village',$id_village)
+                        //->where('statu','ELIGIBLE')
+                        ->order_by('code_numero')
+                        ->get()
+                        ->result();
+        if($result)
+        {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
 
     public function findById($id)
     {
