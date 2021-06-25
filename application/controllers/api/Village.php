@@ -66,7 +66,7 @@ class Village extends REST_Controller {
                 if ($village) {
                     foreach ($village as $key => $value) {
                         
-                        $prog = $this->ProgrammeManager->findById($value->programme_id);
+                        //$prog = $this->ProgrammeManager->findById($value->programme_id);
                         $com = $this->CommuneManager->findById($value->commune_id);
 
                         $data[$key]['id'] = $value->id;
@@ -76,7 +76,7 @@ class Village extends REST_Controller {
                         $data[$key]['zip'] = $this->ZipManager->findById($value->id_zip);
                         $data[$key]['vague'] = $value->vague;
                         $data[$key]['commune'] = $com;
-                        $data[$key]['programme'] = $prog[0];
+                       // $data[$key]['programme'] = $prog[0];
                         
                     };
                 } else
