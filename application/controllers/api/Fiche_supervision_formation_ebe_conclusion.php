@@ -17,7 +17,7 @@ class Fiche_supervision_formation_ebe_conclusion extends REST_Controller {
 		$data = array();
         $menu = $this->get('menu');
         $id_fiche_supervision = $this->get('id_fiche_supervision');
-		if ($menu=='get_conclusionbyfiche') 
+		if ($menu=='get_problemebyfiche') 
         {
 			$tmp = $this->Fiche_supervision_formation_ebe_conclusionManager->get_conclusionbyfiche($id_fiche_supervision);
 			if ($tmp) 
