@@ -35,12 +35,34 @@ class Connaissance_experience_menage_detail_model extends CI_Model {
             'id_fiche_profilage_orientation' => $Connaissance_experience_menage_detail['id_fiche_profilage_orientation'],
             'difficulte_rencontre' => $Connaissance_experience_menage_detail['difficulte_rencontre'],
             'nbr_annee_activite' => $Connaissance_experience_menage_detail['nbr_annee_activite'],
-            'formation_acquise' => $Connaissance_experience_menage_detail['formation_acquise']
+            'formation_acquise' => $Connaissance_experience_menage_detail['formation_acquise'],
+            'autre_activite_realise_auparavant' => $Connaissance_experience_menage_detail['autre_activite_realise_auparavant']
         );
     }
     
     public function delete($id) {
         $this->db->where('id', (int) $id)->delete($this->table);
+        if($this->db->affected_rows() === 1)  {
+            return true;
+        }else{
+            return null;
+        }  
+    }
+    
+    public function delete_autreque_neant($id_fiche_profilage_orientation) {
+        $this->db->where('id_fiche_profilage_orientation', (int) $id_fiche_profilage_orientation)
+        ->where('id_activite_realise_auparavant!=', 8)
+        ->delete($this->table);
+        if($this->db->affected_rows() === 1)  {
+            return true;
+        }else{
+            return null;
+        }  
+    }
+    public function delete_neant($id_fiche_profilage_orientation) {
+        $this->db->where('id_fiche_profilage_orientation', (int) $id_fiche_profilage_orientation)
+        ->where('id_activite_realise_auparavant=', 8)
+        ->delete($this->table);
         if($this->db->affected_rows() === 1)  {
             return true;
         }else{

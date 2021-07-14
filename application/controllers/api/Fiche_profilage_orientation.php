@@ -64,6 +64,7 @@ class fiche_profilage_orientation extends REST_Controller {
 		$data = array(
             'activite'     => $this->post('activite'),
             'type_activite'   => $this->post('type_activite'),
+            'secteur'   => $this->post('secteur'),
             'groupe'=> $this->post('groupe'),
             'id_fiche_profilage_orientation'      => $this->post('id_fiche_profilage_orientation')
 		);       

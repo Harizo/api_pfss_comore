@@ -4,38 +4,54 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class fiche_profilage_besoin_formation extends REST_Controller {
+class Formation_thematique_agex_activite extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('fiche_profilage_besoin_formation_model', 'Fiche_profilage_besoin_formationManager');
-        $this->load->model('theme_formation_model', 'Theme_formationManager');
+        $this->load->model('formation_thematique_agex_activite_model', 'Formation_thematique_agex_activiteManager');
+        $this->load->model('contrat_ugp_agex_model', 'Contrat_ugp_agexManager');
     }
 
     public function index_get() {
         $id = $this->get('id');
 		$data = array();
         $menu = $this->get('menu');
-        $id_fiche_profilage_orientation = $this->get('id_fiche_profilage_orientation');
-		if ($menu=='getfiche_profilage_besoin_formationByentete') 
+        $id_theme_formation = $this->get('id_theme_formation');
+        //$id_sous_projet = $this->get('id_sous_projet');
+		if ($menu=='gettheme_formation_datailBytheme') 
         {
-			$tmp = $this->Fiche_profilage_besoin_formationManager->getfiche_profilage_besoin_formationByentete($id_fiche_profilage_orientation);
+			$tmp = $this->Formation_thematique_agex_activiteManager->gettheme_formation_datailBytheme($id_theme_formation);
+			if ($tmp) 
+            {   
+				$data=$tmp;
+			}
+		} 
+        elseif ($menu=='getformation_thematique_agex') 
+        {
+			$tmp = $this->Formation_thematique_agex_activiteManager->getformation_thematique_agex();
 			if ($tmp) 
             {   
 				foreach ($tmp as $key => $value)
                 {   
-                    $type_formation = $this->Theme_formationManager->findByIdobj($value->id_type_formation);
+                    $contrat_ugp_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
+                    $theme_formation = $this->Formation_thematique_agex_activiteManager->findTheme_formationById($value->id_theme_formation);
+                    $theme_formation_detail = $this->Formation_thematique_agex_activiteManager->findTheme_formation_detailById($value->id_theme_formation_detail);
                     $data[$key]['id']         = $value->id;
-                    $data[$key]['profile']= $value->profile;
-                    $data[$key]['objectif']= $value->objectif;
-                    $data[$key]['duree']= $value->duree;
-                    $data[$key]['type_formation'] = $type_formation;
+                    $data[$key]['theme_formation']    = $theme_formation;
+                    $data[$key]['theme_formation_detail']    = $theme_formation_detail;
+                    $data[$key]['contenu']         = $value->contenu;
+                    $data[$key]['objectif']           = $value->objectif;
+                    $data[$key]['methodologie']   = $value->methodologie;
+                    $data[$key]['materiel']     = $value->materiel;
+                    $data[$key]['date']  = $value->date;
+                    $data[$key]['duree']  = $value->duree;
+                    $data[$key]['contrat_agex'] = $contrat_ugp_agex;
                 }
 			}
 		} 
         elseif ($id) 
         {
-			$tmp = $this->Fiche_profilage_besoin_formationManager->findById($id);
+			$tmp = $this->Formation_thematique_agex_activiteManager->findById($id);
 			if($tmp) 
             {
 				$data=$tmp;
@@ -43,10 +59,25 @@ class fiche_profilage_besoin_formation extends REST_Controller {
 		} 
         else 
         {			
-			$tmp = $this->Fiche_profilage_besoin_formationManager->findAll();
+			$tmp = $this->Formation_thematique_agex_activiteManager->findAll();
 			if ($tmp) 
             {   
-				$data=$tmp;
+                foreach ($tmp as $key => $value)
+                {   
+                    $contrat_ugp_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
+                    $theme_formation = $this->Formation_thematique_agex_activiteManager->findTheme_formationById($value->id_theme_formation);
+                   // $nbr = $this->Formation_thematique_agex_activiteManager->findTheme_formationById($value->id_theme_formation);
+                    $data[$key]['id']         = $value->id;
+                    $data[$key]['theme_formation']    = $theme_formation;
+                    $data[$key]['contenu']         = $value->contenu;
+                    $data[$key]['objectif']           = $value->objectif;
+                    $data[$key]['methodologie']   = $value->methodologie;
+                    $data[$key]['materiel']     = $value->materiel;
+                    $data[$key]['date']  = $value->date;
+                    $data[$key]['duree']  = $value->duree;
+                    $data[$key]['contrat_agex'] = $contrat_ugp_agex;
+                }
+				//$data=$tmp;
 			}
 		}
         if (count($data)>0) {
@@ -71,11 +102,16 @@ class fiche_profilage_besoin_formation extends REST_Controller {
         $etat_download = $this->post('etat_download') ;
 
 		$data = array(
-            'id_type_formation'     => $this->post('id_type_formation'),
-            'profile'   => $this->post('profile'),
-            'objectif'=> $this->post('objectif'),
-            'duree'=> $this->post('duree'),
-            'id_fiche_profilage_orientation'      => $this->post('id_fiche_profilage_orientation')
+			
+            'id_theme_formation'    => $this->post('id_theme_formation'),
+            'id_theme_formation_detail'    => $this->post('id_theme_formation_detail'),
+            'contenu'         => $this->post('contenu'),
+            'objectif'           => $this->post('objectif'),
+            'methodologie'   => $this->post('methodologie'),
+            'materiel'     => $this->post('materiel'),
+            'date'         => $this->post('date'),
+            'duree'         => $this->post('duree'),
+            'id_contrat_agex'   => $this->post('id_contrat_agex')
 		);       
 
         if ($supprimer == 0) {
@@ -87,7 +123,7 @@ class fiche_profilage_besoin_formation extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->Fiche_profilage_besoin_formationManager->add($data);              
+                $dataId = $this->Formation_thematique_agex_activiteManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -112,7 +148,7 @@ class fiche_profilage_besoin_formation extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->Fiche_profilage_besoin_formationManager->update($id, $data);              
+                $update = $this->Formation_thematique_agex_activiteManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -139,7 +175,7 @@ class fiche_profilage_besoin_formation extends REST_Controller {
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
 
-            $delete = $this->Fiche_profilage_besoin_formationManager->delete($id);   
+            $delete = $this->Formation_thematique_agex_activiteManager->delete($id);   
 
             if (!is_null($delete)) 
             {

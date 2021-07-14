@@ -1,7 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Formation_thematique_agex_model extends CI_Model {
-    protected $table = 'formation_thematique_agex';
+class Formation_thematique_agex_activite_model extends CI_Model {
+    protected $table = 'formation_thematique_agex_activite';
 
     public function add($formation_thematique_agex)  {
         $this->db->set($this->_set($formation_thematique_agex))
@@ -27,7 +27,8 @@ class Formation_thematique_agex_model extends CI_Model {
     {
         return array
         (
-            'id_theme_sensibilisation'    => $formation_thematique_agex['id_theme_sensibilisation'],
+            'id_theme_formation'    => $formation_thematique_agex['id_theme_formation'],
+            'id_theme_formation_detail'    => $formation_thematique_agex['id_theme_formation_detail'],
             'contenu'         => $formation_thematique_agex['contenu'],
             'objectif'           => $formation_thematique_agex['objectif'],
             'methodologie'   => $formation_thematique_agex['methodologie'],
@@ -98,39 +99,10 @@ class Formation_thematique_agex_model extends CI_Model {
             return null;
         }                 
     }
-    
-    /*public function getformation_thematique_agexBysousprojet($id_sous_projet)  {
-        $result =  $this->db->select('
-                                        formation_thematique_agex.*,
-                                        formation_thematique_agex.id as id_theme,
-                                        (select count(menage.id) from menage
-                                                inner join liste_ml_pl on liste_ml_pl.menage_id=menage.id
-                                                inner join groupe_ml_pl on groupe_ml_pl.id=liste_ml_pl.id_groupe_ml_pl
-                                                inner join beneficiaire_formation_thematique_agex on beneficiaire_formation_thematique_agex.id_groupe_ml_pl=groupe_ml_pl.id
-                                                where beneficiaire_formation_thematique_agex.id_formation_thematique_agex=id_theme) as nbr_participant,
-                                        (select count(menage.id) from menage
-                                                inner join liste_ml_pl on liste_ml_pl.menage_id=menage.id
-                                                inner join groupe_ml_pl on groupe_ml_pl.id=liste_ml_pl.id_groupe_ml_pl
-                                                inner join beneficiaire_formation_thematique_agex on beneficiaire_formation_thematique_agex.id_groupe_ml_pl=groupe_ml_pl.id
-                                                where beneficiaire_formation_thematique_agex.id_formation_thematique_agex=id_theme
-                                                        and menage.SexeChefMenage="F") as nbr_femme')
-                        ->from($this->table)
-                        ->join("contrat_ugp_agex","contrat_ugp_agex.id=formation_thematique_agex.id_contrat_agex")
-                        ->where("id_sous_projet", $id_sous_projet) 
-                        ->order_by('contrat_ugp_agex.id', 'asc')
-                        ->order_by('contenu', 'asc')
-                        ->get()
-                        ->result();
-        if($result) {
-            return $result;
-        }else{
-            return null;
-        }                 
-    }*/
-    
-    public function findAlltheme_sensibilisation() {
+        
+    public function gettheme_formation() {
         $result =  $this->db->select('*')
-                        ->from('theme_sensibilisation')
+                        ->from('theme_formation')
                         ->order_by('id')
                         ->get()
                         ->result();
@@ -140,11 +112,33 @@ class Formation_thematique_agex_model extends CI_Model {
             return null;
         }                 
     }
-    
-    public function findTheme_sensibilisationById($id)
+      
+    public function gettheme_formation_datailBytheme($id_theme_formation) {
+        $result =  $this->db->select('*')
+                        ->from('theme_formation_detail')
+                        ->where('id_theme_formation',$id_theme_formation)
+                        ->order_by('id')
+                        ->get()
+                        ->result();
+        if($result) {
+            return $result;
+        }else{
+            return null;
+        }                 
+    }
+    public function findTheme_formationById($id)
     {
         $this->db->where("id", $id);
-        $q = $this->db->get("theme_sensibilisation");
+        $q = $this->db->get("theme_formation");
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
+    public function findTheme_formation_detailById($id)
+    {
+        $this->db->where("id", $id);
+        $q = $this->db->get("theme_formation_detail");
         if ($q->num_rows() > 0) {
             return $q->row();
         }
