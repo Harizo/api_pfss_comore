@@ -91,5 +91,14 @@ class Connaissance_experiance_menage_entete_model extends CI_Model {
             return null;
         }                 
     }
+    
+    public function findByprofilage_objet($id_fiche_profilage_orientation) {
+        $this->db->where("id_fiche_profilage_orientation", $id_fiche_profilage_orientation);
+        $q = $this->db->get($this->table);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return null;
+    }
 }
 ?>

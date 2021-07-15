@@ -34,6 +34,7 @@ class Contrat_agep extends REST_Controller {
                             $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
                             $agep = $this->Agence_pManager->findById($value->id_agep);
                             $data[$i]['id']                 = $value->id;
+                            $data[$i]['numero_ordre']     = $value->numero_ordre;
                             $data[$i]['numero_contrat']     = $value->numero_contrat;
                             $data[$i]['agep']               = $agep;
                             $data[$i]['sous_projet']        = $sous_projet;
@@ -55,6 +56,7 @@ class Contrat_agep extends REST_Controller {
                         $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
                         $agep = $this->Agence_pManager->findById($value->id_agep);
                         $data[$i]['id']                 = $value->id;
+                        $data[$i]['numero_ordre']     = $value->numero_ordre;
                         $data[$i]['numero_contrat']     = $value->numero_contrat;
                         $data[$i]['agep']               = $agep;
                         $data[$i]['sous_projet']        = $sous_projet;
@@ -116,6 +118,7 @@ class Contrat_agep extends REST_Controller {
                     //$sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
                     $agep = $this->Agence_pManager->findById($value->id_agep);
                     $data[$key]['id']                 = $value->id;
+                    $data[$key]['numero_ordre']     = $value->numero_ordre;
                     $data[$key]['numero_contrat']     = $value->numero_contrat;
                     $data[$key]['agep']               = $agep;
                     //$data[$key]['sous_projet']        = $sous_projet;
@@ -151,6 +154,7 @@ class Contrat_agep extends REST_Controller {
                     $sous_projet = $this->Sous_projetManager->findById($value->id_sous_projet);
                     $agep = $this->Agence_pManager->findById($value->id_agep);
                     $data[$key]['id']                 = $value->id;
+                    $data[$key]['numero_ordre']     = $value->numero_ordre;
                     $data[$key]['numero_contrat']     = $value->numero_contrat;
                     $data[$key]['agep']               = $agep;
                     $data[$key]['sous_projet']        = $sous_projet;
@@ -189,6 +193,7 @@ class Contrat_agep extends REST_Controller {
 
 		$data = array(
 			
+            'numero_ordre'     => $this->post('numero_ordre'),
             'numero_contrat'     => $this->post('numero_contrat'),
             'id_agep'            => $this->post('id_agep'),
             'id_sous_projet'     => $this->post('id_sous_projet'),

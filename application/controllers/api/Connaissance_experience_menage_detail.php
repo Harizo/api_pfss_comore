@@ -46,6 +46,7 @@ class Connaissance_experience_menage_detail extends REST_Controller {
                     $data[$key]['autre_activite_realise_auparavant'] = $value->autre_activite_realise_auparavant;
                     $data[$key]['difficulte_rencontre'] = $value->difficulte_rencontre;
                     $data[$key]['nbr_annee_activite'] = $value->nbr_annee_activite;
+                    $data[$key]['autre_activite_realise_auparavant'] = $value->autre_activite_realise_auparavant;
                     $data[$key]['formation_acquise'] = unserialize($value->formation_acquise);
                     if ($value->id_activite_realise_auparavant)
                     {
@@ -169,6 +170,7 @@ class Connaissance_experience_menage_detail extends REST_Controller {
                     'id_fiche_profilage_orientation' => $this->post('id_fiche_profilage_orientation'),
                     'difficulte_rencontre' => $this->post('difficulte_rencontre'),
                     'nbr_annee_activite' => $this->post('nbr_annee_activite'),
+                    'autre_activite_realise_auparavant' => $this->post('autre_activite_realise_auparavant'),
                     'formation_acquise' => serialize($getformation_acquise)
                 );
                 if (!$data) {
@@ -179,6 +181,15 @@ class Connaissance_experience_menage_detail extends REST_Controller {
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
                 $dataId = $this->Connaissance_experience_menage_detailManager->add($data);
+                
+                if (intval($this->post('id_activite_realise_auparavant'))==8)
+                {
+                    $delete_autreque_neant = $this->Connaissance_experience_menage_detailManager->delete_autreque_neant($this->post('id_fiche_profilage_orientation'));
+                }
+                if (intval($this->post('id_activite_realise_auparavant'))!=8)
+                {
+                    $delete_neant = $this->Connaissance_experience_menage_detailManager->delete_neant($this->post('id_fiche_profilage_orientation'));
+                }
                 if (!is_null($dataId))  {
                     $this->response([
                         'status' => TRUE,
@@ -198,6 +209,7 @@ class Connaissance_experience_menage_detail extends REST_Controller {
                     'id_fiche_profilage_orientation' => $this->post('id_fiche_profilage_orientation'),
                     'difficulte_rencontre' => $this->post('difficulte_rencontre'),
                     'nbr_annee_activite' => $this->post('nbr_annee_activite'),
+                    'autre_activite_realise_auparavant' => $this->post('autre_activite_realise_auparavant'),
                     'formation_acquise' => serialize($getformation_acquise)
                 );
                 if (!$data || !$id) {

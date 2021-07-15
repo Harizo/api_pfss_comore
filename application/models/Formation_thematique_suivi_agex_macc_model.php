@@ -1,7 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Formation_thematique_agex_model extends CI_Model {
-    protected $table = 'formation_thematique_agex';
+class Formation_thematique_suivi_agex_macc_model extends CI_Model {
+    protected $table = 'formation_thematique_suivi_agex_macc';
 
     public function add($formation_thematique_agex)  {
         $this->db->set($this->_set($formation_thematique_agex))
@@ -28,12 +28,14 @@ class Formation_thematique_agex_model extends CI_Model {
         return array
         (
             'id_theme_sensibilisation'    => $formation_thematique_agex['id_theme_sensibilisation'],
-            'contenu'         => $formation_thematique_agex['contenu'],
-            'objectif'           => $formation_thematique_agex['objectif'],
-            'methodologie'   => $formation_thematique_agex['methodologie'],
-            'materiel'     => $formation_thematique_agex['materiel'],
-            'date'         => $formation_thematique_agex['date'],
-            'duree'         => $formation_thematique_agex['duree'],
+            'periode_prevu'         => $formation_thematique_agex['periode_prevu'],
+            'periode_realisation'   => $formation_thematique_agex['periode_realisation'],
+            'beneficiaire'     => $formation_thematique_agex['beneficiaire'],
+            'nbr_beneficiaire_cible'         => $formation_thematique_agex['nbr_beneficiaire_cible'],
+            'nbr_participant'         => $formation_thematique_agex['nbr_participant'],
+            'nbr_femme'         => $formation_thematique_agex['nbr_femme'],
+            'formateur'         => $formation_thematique_agex['formateur'],
+            'observation'       => $formation_thematique_agex['observation'],
             'id_contrat_agex'   => $formation_thematique_agex['id_contrat_agex']
 
 
@@ -83,13 +85,12 @@ class Formation_thematique_agex_model extends CI_Model {
         }                 
     }    
     
-    public function getformation_thematique_agex()  {
+    public function getformation_thematique_suivi_agex_macc()  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                       // ->join("contrat_ugp_agex","contrat_ugp_agex.id=formation_thematique_agex.id_contrat_agex")
                         //->where("id_sous_projet", $id_sous_projet) 
                         //->order_by('contrat_ugp_agex.id', 'asc')
-                        //->order_by('contenu', 'asc')
+                        //->order_by('date_debut_prevu', 'asc')
                         ->get()
                         ->result();
         if($result) {
@@ -98,35 +99,7 @@ class Formation_thematique_agex_model extends CI_Model {
             return null;
         }                 
     }
-    
-    /*public function getformation_thematique_agexBysousprojet($id_sous_projet)  {
-        $result =  $this->db->select('
-                                        formation_thematique_agex.*,
-                                        formation_thematique_agex.id as id_theme,
-                                        (select count(menage.id) from menage
-                                                inner join liste_ml_pl on liste_ml_pl.menage_id=menage.id
-                                                inner join groupe_ml_pl on groupe_ml_pl.id=liste_ml_pl.id_groupe_ml_pl
-                                                inner join beneficiaire_formation_thematique_agex on beneficiaire_formation_thematique_agex.id_groupe_ml_pl=groupe_ml_pl.id
-                                                where beneficiaire_formation_thematique_agex.id_formation_thematique_agex=id_theme) as nbr_participant,
-                                        (select count(menage.id) from menage
-                                                inner join liste_ml_pl on liste_ml_pl.menage_id=menage.id
-                                                inner join groupe_ml_pl on groupe_ml_pl.id=liste_ml_pl.id_groupe_ml_pl
-                                                inner join beneficiaire_formation_thematique_agex on beneficiaire_formation_thematique_agex.id_groupe_ml_pl=groupe_ml_pl.id
-                                                where beneficiaire_formation_thematique_agex.id_formation_thematique_agex=id_theme
-                                                        and menage.SexeChefMenage="F") as nbr_femme')
-                        ->from($this->table)
-                        ->join("contrat_ugp_agex","contrat_ugp_agex.id=formation_thematique_agex.id_contrat_agex")
-                        ->where("id_sous_projet", $id_sous_projet) 
-                        ->order_by('contrat_ugp_agex.id', 'asc')
-                        ->order_by('contenu', 'asc')
-                        ->get()
-                        ->result();
-        if($result) {
-            return $result;
-        }else{
-            return null;
-        }                 
-    }*/
+
     
     public function findAlltheme_sensibilisation() {
         $result =  $this->db->select('*')

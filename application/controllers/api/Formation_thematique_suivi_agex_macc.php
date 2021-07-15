@@ -4,11 +4,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Formation_thematique_agex extends REST_Controller {
+class Formation_thematique_suivi_agex_macc extends REST_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('formation_thematique_agex_model', 'Formation_thematique_agexManager');
+        $this->load->model('formation_thematique_suivi_agex_macc_model', 'Formation_thematique_suivi_agex_maccManager');
         $this->load->model('contrat_ugp_agex_model', 'Contrat_ugp_agexManager');
     }
 
@@ -17,30 +17,32 @@ class Formation_thematique_agex extends REST_Controller {
 		$data = array();
         $menu = $this->get('menu');
         //$id_sous_projet = $this->get('id_sous_projet');
-		if ($menu=='getformation_thematique_agex') 
+		if ($menu=='getformation_thematique_suivi_agex_macc') 
         {
-			$tmp = $this->Formation_thematique_agexManager->getformation_thematique_agex();
+			$tmp = $this->Formation_thematique_suivi_agex_maccManager->getformation_thematique_suivi_agex_macc();
 			if ($tmp) 
             {   
 				foreach ($tmp as $key => $value)
                 {   
                     $contrat_ugp_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
-                    $theme_sensibilisation = $this->Formation_thematique_agexManager->findTheme_sensibilisationById($value->id_theme_sensibilisation);
+                    $theme_sensibilisation = $this->Formation_thematique_suivi_agex_maccManager->findTheme_sensibilisationById($value->id_theme_sensibilisation);
                     $data[$key]['id']         = $value->id;
+                    $data[$key]['nbr_participant']         = $value->nbr_participant;
+                    $data[$key]['nbr_femme']         = $value->nbr_femme;
                     $data[$key]['theme_sensibilisation']    = $theme_sensibilisation;
-                    $data[$key]['contenu']         = $value->contenu;
-                    $data[$key]['objectif']           = $value->objectif;
-                    $data[$key]['methodologie']   = $value->methodologie;
-                    $data[$key]['materiel']     = $value->materiel;
-                    $data[$key]['date']  = $value->date;
-                    $data[$key]['duree']  = $value->duree;
+                    $data[$key]['periode_prevu']         = $value->periode_prevu;
+                    $data[$key]['periode_realisation']   = $value->periode_realisation;
+                    $data[$key]['beneficiaire']     = $value->beneficiaire;
+                    $data[$key]['nbr_beneficiaire_cible']  = $value->nbr_beneficiaire_cible;
+                    $data[$key]['formateur']    = $value->formateur;
+                    $data[$key]['observation']  = $value->observation;
                     $data[$key]['contrat_agex'] = $contrat_ugp_agex;
                 }
 			}
 		} 
         elseif ($id) 
         {
-			$tmp = $this->Formation_thematique_agexManager->findById($id);
+			$tmp = $this->Formation_thematique_suivi_agex_maccManager->findById($id);
 			if($tmp) 
             {
 				$data=$tmp;
@@ -48,22 +50,24 @@ class Formation_thematique_agex extends REST_Controller {
 		} 
         else 
         {			
-			$tmp = $this->Formation_thematique_agexManager->findAll();
+			$tmp = $this->Formation_thematique_suivi_agex_maccManager->findAll();
 			if ($tmp) 
             {   
                 foreach ($tmp as $key => $value)
                 {   
                     $contrat_ugp_agex = $this->Contrat_ugp_agexManager->findByIdobjet($value->id_contrat_agex);
-                    $theme_sensibilisation = $this->Formation_thematique_agexManager->findTheme_sensibilisationById($value->id_theme_sensibilisation);
-                   // $nbr = $this->Formation_thematique_agexManager->findTheme_sensibilisationById($value->id_theme_sensibilisation);
-                    $data[$key]['id']         = $value->id;
+                    $theme_sensibilisation = $this->Formation_thematique_suivi_agex_maccManager->findTheme_sensibilisationById($value->id_theme_sensibilisation);
+                   // $nbr = $this->Formation_thematique_suivi_agex_maccManager->findTheme_sensibilisationById($value->id_theme_sensibilisation);
+                   $data[$key]['id']         = $value->id;
+                    $data[$key]['nbr_participant']         = $value->nbr_participant;
+                    $data[$key]['nbr_femme']         = $value->nbr_femme;
                     $data[$key]['theme_sensibilisation']    = $theme_sensibilisation;
-                    $data[$key]['contenu']         = $value->contenu;
-                    $data[$key]['objectif']           = $value->objectif;
-                    $data[$key]['methodologie']   = $value->methodologie;
-                    $data[$key]['materiel']     = $value->materiel;
-                    $data[$key]['date']  = $value->date;
-                    $data[$key]['duree']  = $value->duree;
+                    $data[$key]['periode_prevu']         = $value->periode_prevu;
+                    $data[$key]['periode_realisation']   = $value->periode_realisation;
+                    $data[$key]['beneficiaire']     = $value->beneficiaire;
+                    $data[$key]['nbr_beneficiaire_cible']  = $value->nbr_beneficiaire_cible;
+                    $data[$key]['formateur']    = $value->formateur;
+                    $data[$key]['observation']  = $value->observation;
                     $data[$key]['contrat_agex'] = $contrat_ugp_agex;
                 }
 				//$data=$tmp;
@@ -93,12 +97,14 @@ class Formation_thematique_agex extends REST_Controller {
 		$data = array(
 			
             'id_theme_sensibilisation'    => $this->post('id_theme_sensibilisation'),
-            'contenu'         => $this->post('contenu'),
-            'objectif'           => $this->post('objectif'),
-            'methodologie'   => $this->post('methodologie'),
-            'materiel'     => $this->post('materiel'),
-            'date'         => $this->post('date'),
-            'duree'         => $this->post('duree'),
+            'periode_prevu'         => $this->post('periode_prevu'),
+            'periode_realisation'   => $this->post('periode_realisation'),
+            'beneficiaire'     => $this->post('beneficiaire'),
+            'nbr_beneficiaire_cible'         => $this->post('nbr_beneficiaire_cible'),
+            'nbr_participant'         => $this->post('nbr_participant'),
+            'nbr_femme'         => $this->post('nbr_femme'),
+            'formateur'         => $this->post('formateur'),
+            'observation'       => $this->post('observation'),
             'id_contrat_agex'   => $this->post('id_contrat_agex')
 		);       
 
@@ -111,7 +117,7 @@ class Formation_thematique_agex extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $dataId = $this->Formation_thematique_agexManager->add($data);              
+                $dataId = $this->Formation_thematique_suivi_agex_maccManager->add($data);              
                 if (!is_null($dataId)) {
                     $this->response([
                         'status' => TRUE,
@@ -136,7 +142,7 @@ class Formation_thematique_agex extends REST_Controller {
                         'message' => 'No request found'
                             ], REST_Controller::HTTP_BAD_REQUEST);
                 }
-                $update = $this->Formation_thematique_agexManager->update($id, $data);              
+                $update = $this->Formation_thematique_suivi_agex_maccManager->update($id, $data);              
                 if(!is_null($update)){
                     $this->response([
                         'status' => TRUE, 
@@ -163,7 +169,7 @@ class Formation_thematique_agex extends REST_Controller {
                     ], REST_Controller::HTTP_BAD_REQUEST);
             }
 
-            $delete = $this->Formation_thematique_agexManager->delete($id);   
+            $delete = $this->Formation_thematique_suivi_agex_maccManager->delete($id);   
 
             if (!is_null($delete)) 
             {

@@ -27,6 +27,7 @@ class Contrat_agep_model extends CI_Model {
     {
         return array
         (
+            'numero_ordre'    => $contrat_agep['numero_ordre'],
             'numero_contrat'    => $contrat_agep['numero_contrat'],
             'id_agep'           => $contrat_agep['id_agep'],
             'id_sous_projet'    => $contrat_agep['id_sous_projet'],

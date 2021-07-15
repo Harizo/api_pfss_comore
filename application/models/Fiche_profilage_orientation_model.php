@@ -29,6 +29,7 @@ class Fiche_profilage_orientation_model extends CI_Model {
         (
             'activite'       => $fiche_profilage_orientation['activite'],
             'type_activite'     => $fiche_profilage_orientation['type_activite'],
+            'secteur'     => $fiche_profilage_orientation['secteur'],
             'groupe'  => $fiche_profilage_orientation['groupe'],
             'id_fiche_profilage_orientation'     => $fiche_profilage_orientation['id_fiche_profilage_orientation']
         );
