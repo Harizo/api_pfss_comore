@@ -29,7 +29,7 @@ class Activite_choisis_menage_model extends CI_Model {
     public function _set($data)  {
 		// Affectation des valeurs
         return array(
-            'id_theme_formation_detail'             => $data['id_theme_formation_detail'],
+            'id_theme_formation'             => $data['id_theme_formation'],
             'id_menage'                             => $data['id_menage']
         );
    }
@@ -69,7 +69,7 @@ class Activite_choisis_menage_model extends CI_Model {
     }
 
 
-    public function get_all_by_theme_formation_detail($id_theme_formation_detail, $id_village)
+    public function get_all_by_theme_formation_detail($id_theme_formation, $id_village)
     {
         $sql = 
         "
@@ -82,20 +82,20 @@ class Activite_choisis_menage_model extends CI_Model {
 
                 grp.nom_prenom_ml_pl AS groupe,
 
-                tfd.id as id_theme_formation_detail,
+                tfd.id as id_theme_formation,
                 tfd.description as description_theme_formation_detail
             FROM
                 activite_choisis_menage AS acm,
                 menage AS m,
                 menage_beneficiaire AS mb,
                 groupe_ml_pl AS grp,
-                theme_formation_detail AS tfd
+                theme_formation AS tfd
             WHERE 
                 acm.id_menage = m.id
-                AND tfd.id = acm.id_theme_formation_detail
+                AND tfd.id = acm.id_theme_formation
                 and m.id = mb.id_menage
                 AND m.id = grp.id_menage
-                and acm.id_theme_formation_detail = ".$id_theme_formation_detail."
+                and acm.id_theme_formation = ".$id_theme_formation."
                 and m.village_id = ".$id_village."
     
                             
@@ -118,10 +118,10 @@ class Activite_choisis_menage_model extends CI_Model {
 
                 grp.nom_prenom_ml_pl AS groupe,
 
-                tfd.id as id_theme_formation_detail,
+                tfd.id as id_theme_formation,
                 tfd.description as description_theme_formation_detail
             FROM
-                activite_choisis_menage AS acm,
+                activite_choisis_menage_sous_activite AS acm,
                 menage AS m,
                 menage_beneficiaire AS mb,
                 groupe_ml_pl AS grp,
@@ -158,7 +158,7 @@ class Activite_choisis_menage_model extends CI_Model {
                 theme_formation AS tf
             WHERE 
                 acm.id_menage = m.id
-                AND tfd.id = acm.id_theme_formation_detail
+                AND tfd.id = acm.id_theme_formation
                 and m.id = mb.id_menage
                 AND m.id = grp.id_menage
                 AND tf.id = tfd.id_theme_formation

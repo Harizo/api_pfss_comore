@@ -58,7 +58,7 @@ class Fiche_plan_relevement_plan_production_un_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 

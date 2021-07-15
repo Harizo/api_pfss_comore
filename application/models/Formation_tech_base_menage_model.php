@@ -1,10 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Contrat_ugp_agex_model extends CI_Model {
-    protected $table = 'contrat_ugp_agex';
+class Formation_tech_base_menage_model extends CI_Model {
+    protected $table = 'formation_tech_base_menage';
 
-    public function add($contrat_ugp_agex)  {
-        $this->db->set($this->_set($contrat_ugp_agex))
+    public function add($formation_tech_base_menage)  {
+        $this->db->set($this->_set($formation_tech_base_menage))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -13,8 +13,8 @@ class Contrat_ugp_agex_model extends CI_Model {
         }                    
     }
 
-    public function update($id, $contrat_ugp_agex)  {
-        $this->db->set($this->_set($contrat_ugp_agex))
+    public function update($id, $formation_tech_base_menage)  {
+        $this->db->set($this->_set($formation_tech_base_menage))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -23,20 +23,18 @@ class Contrat_ugp_agex_model extends CI_Model {
             return null;
         }                      
     }
-    public function _set($contrat_ugp_agex) 
+    public function _set($formation_tech_base_menage) 
     {
         return array
         (
-            'numero_contrat'            => $contrat_ugp_agex['numero_contrat'],
-            'id_agex'                   => $contrat_ugp_agex['id_agex'],
-            'id_sous_projet'            => $contrat_ugp_agex['id_sous_projet'],
-            'objet_contrat'             => $contrat_ugp_agex['objet_contrat'],
-            'montant_contrat'           => $contrat_ugp_agex['montant_contrat'],
-            'date_signature'            => $contrat_ugp_agex['date_signature'],
-            'date_prevu_fin_contrat'    => $contrat_ugp_agex['date_prevu_fin_contrat'],
-            'status_contrat'            => $contrat_ugp_agex['status_contrat'],
-            'note_resiliation'          => $contrat_ugp_agex['note_resiliation'],
-            'etat_validation'           => $contrat_ugp_agex['etat_validation']
+            'id_theme_formation_detail'             => $formation_tech_base_menage['id_theme_formation_detail'],
+            'id_village'                            => $formation_tech_base_menage['id_village'],
+            'date'                                  => $formation_tech_base_menage['date'],
+            'contenu'                               => $formation_tech_base_menage['contenu'],
+            'objectifs'                             => $formation_tech_base_menage['objectifs'],
+            'methodologies'                         => $formation_tech_base_menage['methodologies'],
+            'materiel'                              => $formation_tech_base_menage['materiel'],
+            'duree'                                 => $formation_tech_base_menage['duree']
         );
     }
 
@@ -49,41 +47,63 @@ class Contrat_ugp_agex_model extends CI_Model {
             return null;
         }  
     }
-    public function findAll() 
+    public function findBy_theme_and_village($id_village ,$id_theme_formation) 
     {
         $sql = 
         "
-            select 
-                cua.id AS id,
-                cua.numero_contrat AS numero_contrat,
+            select
+                ftbm.id AS id,
+	
+                tf.id AS id_theme_formation,
+                tf.description AS description_theme_formation,
                 
-                cua.id_agex AS id_agex, 
-                a.Nom AS nom_agex,
-                a.intervenant_agex AS intervenant_agex,
-                a.nom_contact_agex AS nom_contact_agex,
-                a.numero_phone_contact AS numero_phone_contact,
-                a.adresse_agex AS adresse_agex,
+                ftbm.id_theme_formation_detail AS id_theme_formation_detail,
+                tfd.description AS description_theme_formation_detail,
+
+                ftbm.id_village,
+                sv.Village ,
                 
-                cua.id_sous_projet AS  id_sous_projet,
-                sp.description AS description_sous_projet,
+                sc.id AS id_commune,
+                sc.Commune,
+                
+                sr.id AS id_region,
+                sr.Region,
+                
+                si.id AS id_ile,
+                si.Ile,
                 
                 
-                cua.objet_contrat AS objet_contrat,
-                cua.montant_contrat AS montant_contrat,
-                cua.date_signature AS date_signature,
-                cua.date_prevu_fin_contrat AS date_prevu_fin_contrat,
-                cua.status_contrat as status_contrat,
-                cua.note_resiliation as note_resiliation,
-                cua.etat_validation AS etat_validation
-            FROM 
-                contrat_ugp_agex AS cua,
-                see_agex AS a,
-                sous_projet AS sp
+                
+                ftbm.date,
+                ftbm.contenu,
+                ftbm.objectifs,
+                ftbm.methodologies,
+                ftbm.materiel,
+                ftbm.duree
+            FROM
+                formation_tech_base_menage AS ftbm,
+                see_village AS sv,
+                see_commune AS sc,
+                see_region AS sr,
+                see_ile AS si,
+                theme_formation AS tf,
+                theme_formation_detail AS tfd
             WHERE 
-                cua.id_agex = a.id
-                AND cua.id_sous_projet = sp.id
+                ftbm.id_theme_formation_detail = tfd.id
+                AND ftbm.id_village = sv.id
+                AND sv.commune_id = sc.id
+                AND sc.region_id = sr.id
+                AND sr.ile_id = si.id 
+                AND tfd.id_theme_formation = tf.id
+                AND sv.id = ".$id_village."
+                AND tf.id = ".$id_theme_formation."
         ";
-        return $this->db->query($sql)->result();               
+        $res = $this->db->query($sql)->result();     
+        if ($res) 
+            return $res ;      
+        else 
+            return array();
+        
     }
     public function findById($id) {
         $result =  $this->db->select('*')
@@ -131,7 +151,7 @@ class Contrat_ugp_agex_model extends CI_Model {
                 cua.numero_contrat,
                 cua.date_prevu_fin_contrat
             FROM 
-                contrat_ugp_agex as cua
+                formation_tech_base_menage as cua
             WHERE 
                 cua.date_prevu_fin_contrat < NOW()
                 and cua.status_contrat = 'En cours'
@@ -139,9 +159,9 @@ class Contrat_ugp_agex_model extends CI_Model {
                             select 
                                 count(id) 
                             from 
-                                contrat_ugp_agex_avenant  
+                                formation_tech_base_menage_avenant  
                             where 
-                                id_contrat_ugp_agex = cua.id 
+                                id_formation_tech_base_menage = cua.id 
                                 and not type = 'Financier' 
                         ) = 0 
                         
@@ -152,12 +172,12 @@ class Contrat_ugp_agex_model extends CI_Model {
                 cua.numero_contrat,
                 cuav.date_prevu_fin_contrat
             FROM 
-                contrat_ugp_agex as cua,
-                 contrat_ugp_agex_avenant AS cuav
+                formation_tech_base_menage as cua,
+                 formation_tech_base_menage_avenant AS cuav
             WHERE
-                cua.id = cuav.id_contrat_ugp_agex
+                cua.id = cuav.id_formation_tech_base_menage
                 AND cuav.date_prevu_fin_contrat < NOW()
-                AND cuav.date_prevu_fin_contrat = (select MAX(date_prevu_fin_contrat) FROM contrat_ugp_agex_avenant WHERE id_contrat_ugp_agex = cua.id)
+                AND cuav.date_prevu_fin_contrat = (select MAX(date_prevu_fin_contrat) FROM formation_tech_base_menage_avenant WHERE id_formation_tech_base_menage = cua.id)
                 and cuav.status_contrat = 'En cours'
                 AND not cuav.`type` = 'Financier'
                 

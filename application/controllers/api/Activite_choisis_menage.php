@@ -67,7 +67,7 @@ class Activite_choisis_menage extends REST_Controller {
 
                 $ligne=1; 
 
-                 // Set Orientation, size and scaling
+                // Set Orientation, size and scaling
                 // Set Orientation, size and scaling
                 $objPHPExcel->setActiveSheetIndex(0);
                 $objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT);
@@ -305,47 +305,47 @@ class Activite_choisis_menage extends REST_Controller {
             $data = $this->menageManager->get_menage_beneficiaire_par_village($id_village);                   
         }
 
-    if ($etat_export_excel) 
-    {
-        try
+        if ($etat_export_excel) 
         {
-            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-           // $objWriter->save(dirname(__FILE__) . "/../../../../exportexcel/".$repertoire.$nom_file.".xlsx");
-            $objWriter->save(dirname(__FILE__) . "/../../../../exportexcel/".$repertoire.$nom_file.".xlsx");
-            
-            $this->response([
-                'status' => TRUE,
-                'nom_file' => $nom_file.".xlsx",
-                'message' => 'Get file success',
-            ], REST_Controller::HTTP_OK);
-          
-        } 
-        catch (PHPExcel_Writer_Exception $e)
-        {
-            $this->response([
-                  'status' => FALSE,
-                   'nom_file' => array(),
-                   'message' => "Something went wrong: ". $e->getMessage(),
+            try
+            {
+                $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+               // $objWriter->save(dirname(__FILE__) . "/../../../../exportexcel/".$repertoire.$nom_file.".xlsx");
+                $objWriter->save(dirname(__FILE__) . "/../../../../exportexcel/".$repertoire.$nom_file.".xlsx");
+                
+                $this->response([
+                    'status' => TRUE,
+                    'nom_file' => $nom_file.".xlsx",
+                    'message' => 'Get file success',
                 ], REST_Controller::HTTP_OK);
+              
+            } 
+            catch (PHPExcel_Writer_Exception $e)
+            {
+                $this->response([
+                      'status' => FALSE,
+                       'nom_file' => array(),
+                       'message' => "Something went wrong: ". $e->getMessage(),
+                    ], REST_Controller::HTTP_OK);
+            }
         }
-    }
-    else
-    {
+        else
+        {
 
-        if (count($data)>0) {
-            $this->response([
-                'status' => TRUE,
-                'response' => $data,
-                'message' => 'Get data success',
-            ], REST_Controller::HTTP_OK);
-        } else {
-            $this->response([
-                'status' => FALSE,
-                'response' => array(),
-                'message' => 'No data were found'
-            ], REST_Controller::HTTP_OK);
+            if (count($data)>0) {
+                $this->response([
+                    'status' => TRUE,
+                    'response' => $data,
+                    'message' => 'Get data success',
+                ], REST_Controller::HTTP_OK);
+            } else {
+                $this->response([
+                    'status' => FALSE,
+                    'response' => array(),
+                    'message' => 'No data were found'
+                ], REST_Controller::HTTP_OK);
+            }
         }
-    }
 
     }
     public function index_post() {
@@ -355,7 +355,7 @@ class Activite_choisis_menage extends REST_Controller {
 		$data = array(
 			
 
-            'id_theme_formation_detail'             => $this->post('id_theme_formation_detail'),
+            'id_theme_formation'             => $this->post('id_theme_formation'),
             'id_menage'                             => $this->post('id_menage')
 		);   
 
@@ -367,7 +367,7 @@ class Activite_choisis_menage extends REST_Controller {
             {
                 $data = array(
 
-                    'id_theme_formation_detail'             => $this->post('id_theme_formation_detail'),
+                    'id_theme_formation'             => $this->post('id_theme_formation'),
                     'id_menage'                             => $value->id_menage
                 );  
 

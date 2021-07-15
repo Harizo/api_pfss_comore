@@ -1,10 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Fiche_plan_relevement_objdesc_quatre_model extends CI_Model {
-    protected $table = 'fiche_plan_relevement_objdesc_quatre';
+class Formation_tech_base_menage_fiche_presence_model extends CI_Model {
+    protected $table = 'formation_tech_base_menage_fiche_presence';
 
-    public function add($fiche_plan_relevement_objdesc_quatre)  {
-        $this->db->set($this->_set($fiche_plan_relevement_objdesc_quatre))
+    public function add($data)  {
+        $this->db->set($this->_set($data))
                             ->insert($this->table);
         if($this->db->affected_rows() === 1)  {
             return $this->db->insert_id();
@@ -13,8 +13,8 @@ class Fiche_plan_relevement_objdesc_quatre_model extends CI_Model {
         }                    
     }
 
-    public function update($id, $fiche_plan_relevement_objdesc_quatre)  {
-        $this->db->set($this->_set($fiche_plan_relevement_objdesc_quatre))
+    public function update($id, $data)  {
+        $this->db->set($this->_set($data))
                             ->where('id', (int) $id)
                             ->update($this->table);
         if($this->db->affected_rows() === 1)  {
@@ -23,13 +23,13 @@ class Fiche_plan_relevement_objdesc_quatre_model extends CI_Model {
             return null;
         }                      
     }
-    public function _set($fiche_plan_relevement_objdesc_quatre) 
+    public function _set($data) 
     {
         return array
         (
-            'id_identification'             => $fiche_plan_relevement_objdesc_quatre['id_identification'],
-            'risque_eventuelle'             => $fiche_plan_relevement_objdesc_quatre['risque_eventuelle'],
-            'solution_prevu'                => $fiche_plan_relevement_objdesc_quatre['solution_prevu']
+            'id_ftbm'                   => $data['id_ftbm'],
+            'nom_prenom'                => $data['nom_prenom'],
+            'adresse'                   => $data['adresse']
         );
     }
 
@@ -44,17 +44,17 @@ class Fiche_plan_relevement_objdesc_quatre_model extends CI_Model {
     }
     
  
-    public function findBy_id_identification($id_identification)  {
+    public function findBy_id_ftbm($id_ftbm)  {
         $result =  $this->db->select('*')
                         ->from($this->table)
-                        ->where("id_identification", $id_identification)
+                        ->where("id_ftbm", $id_ftbm)
                         ->order_by('id', 'asc')
                         ->get()
                         ->result();
         if($result) {
             return $result;
         }else{
-            return array();
+            return null;
         }                 
     }
 

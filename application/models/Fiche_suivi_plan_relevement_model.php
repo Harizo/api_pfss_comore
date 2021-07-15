@@ -134,13 +134,59 @@ class Fiche_suivi_plan_relevement_model extends CI_Model {
 
 
     public function findById($id)  {
-		// Selection par id
-        $this->db->where("id", $id);
-        $q = $this->db->get($this->table);
-        if ($q->num_rows() > 0) {
-            return $q->row();
-        }
-        return null;
+		$sql = 
+        "
+            select
+                fpri.id AS id,
+                
+                
+                
+                si.id AS id_ile,
+                si.Ile,
+                
+                sr.id AS id_region,
+                sr.Region,
+                
+                sc.id AS id_commune,
+                sc.Commune,
+                
+                sv.id AS id_village,
+                sv.Village ,
+                
+                z.libelle AS zip,
+                sv.vague AS vague,
+                
+                m.id AS id_menage,
+                m.identifiant_menage,
+                m.nomchefmenage AS nom_chef_menage,
+                m.agechefdemenage,
+                m.nombre_enfant_moins_quinze_ans,
+                m.NomTravailleur,
+                m.NomTravailleurSuppliant,
+                
+                sa.id as id_agex,
+                sa.Nom AS nom_agex
+                
+            FROM
+                fiche_suivi_plan_relevement AS fpri,
+                menage AS m,
+                see_agex AS sa,
+                see_village AS sv,
+                see_commune AS sc,
+                see_region AS sr,
+                see_ile AS si,
+                zip AS z
+            WHERE 
+                fpri.id_village = sv.id
+                AND fpri.id_menage = m.id
+                AND fpri.id_agex = sa.id
+                AND sc.id = sv.commune_id
+                AND sr.id = sc.region_id
+                AND si.id = sr.ile_id
+                AND sv.id_zip = z.id
+                and fpri.id = ".$id."
+        ";
+        return $this->db->query($sql)->result();
     }
  
 }

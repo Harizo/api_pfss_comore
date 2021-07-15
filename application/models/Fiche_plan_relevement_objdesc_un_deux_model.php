@@ -57,7 +57,7 @@ class Fiche_plan_relevement_objdesc_un_deux_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
     }
 

@@ -62,8 +62,30 @@ class Fiche_plan_relevement_plan_production_deux_model extends CI_Model {
         if($result) {
             return $result;
         }else{
-            return null;
+            return array();
         }                 
+    }
+
+
+    public function get_total($id_identification, $type)
+    {
+
+
+
+        $sql = 
+        "
+            select
+                SUM(fp_prod_deux.montant) AS total
+            FROM
+                fiche_plan_relevement_plan_production_deux AS fp_prod_deux,
+                fiche_plan_relevement_identification AS fp
+            WHERE 
+                fp.id = fp_prod_deux.id_identification
+                AND fp_prod_deux.type = '".$type."'
+                and fp.id = ".$id_identification."
+                
+        ";
+        return $this->db->query($sql)->result(); 
     }
 
 }
